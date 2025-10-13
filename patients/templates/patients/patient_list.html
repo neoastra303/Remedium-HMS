@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patients</title>
+</head>
+<body>
+    <h1>Patients</h1>
+    <form method="get">
+        <input type="text" name="q" placeholder="Search patients">
+        <button type="submit">Search</button>
+    </form>
+    <ul>
+        {% for patient in patients %}
+            <li><a href="{% url 'patient_detail' patient.pk %}">{{ patient.first_name }} {{ patient.last_name }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

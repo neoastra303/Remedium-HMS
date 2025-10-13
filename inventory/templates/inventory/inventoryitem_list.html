@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inventory Items</title>
+</head>
+<body>
+    <h1>Inventory Items</h1>
+    <ul>
+        {% for item in inventory_items %}
+            <li>{{ item.name }} - Quantity: {{ item.quantity }} {{ item.unit }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

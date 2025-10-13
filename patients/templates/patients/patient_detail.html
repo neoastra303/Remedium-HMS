@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Details</title>
+</head>
+<body>
+    <h1>Patient Details</h1>
+    <p>Unique ID: {{ patient.unique_id }}</p>
+    <p>First Name: {{ patient.first_name }}</p>
+    <p>Last Name: {{ patient.last_name }}</p>
+    <p>Date of Birth: {{ patient.date_of_birth }}</p>
+    <p>Gender: {{ patient.gender }}</p>
+    <p>Address: {{ patient.address }}</p>
+    <p>Phone: {{ patient.phone }}</p>
+    <p>Email: {{ patient.email }}</p>
+    <p>Medical History: {{ patient.medical_history }}</p>
+    <p>Admission Date: {{ patient.admission_date }}</p>
+    <p>Discharge Date: {{ patient.discharge_date }}</p>
+    <p>Ward: {{ patient.ward }}</p>
+    <p>Room: {{ patient.room }}</p>
+    <a href="{% url 'patient_list' %}">Back to List</a>
+</body>
+</html>

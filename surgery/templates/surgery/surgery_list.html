@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Surgeries</title>
+</head>
+<body>
+    <h1>Surgeries</h1>
+    <ul>
+        {% for surgery in surgeries %}
+            <li>Surgery for {{ surgery.patient }} by {{ surgery.surgeon }} on {{ surgery.scheduled_date }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'surgery_create' %}">Add Surgery</a>
+</body>
+</html>

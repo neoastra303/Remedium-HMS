@@ -4,6 +4,7 @@ from .models import Patient
 from .forms import PatientForm
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.urls import reverse_lazy
 
 class PatientListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Patient
@@ -32,29 +33,24 @@ class PatientDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
     context_object_name = 'patient'
     permission_required = 'patients_view_patient'
 
-
-from .forms import PatientForm
-
 class PatientCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Patient
     form_class = PatientForm
     template_name = 'patients/patient_form.html'
-    success_url = '/patients/'  # Redirect to the list view after success
+    success_url = reverse_lazy('patient_list')  # Redirect to the list view after success
     permission_required = 'patients_add_patient'
-
 
 class PatientUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Patient
     form_class = PatientForm
     template_name = 'patients/patient_form.html'
-    success_url = '/patients/'  # Redirect to the list view after success
+    success_url = reverse_lazy('patient_list')  # Redirect to the list view after success
     permission_required = 'patients_change_patient'
-
 
 class PatientDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Patient
     template_name = 'patients/patient_confirm_delete.html'
-    success_url = '/patients/'  # Redirect to the list view after success
+    success_url = reverse_lazy('patient_list')  # Redirect to the list view after success
     permission_required = 'patients_delete_patient'
 
 # Create your views here.

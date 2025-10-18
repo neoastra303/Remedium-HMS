@@ -1,6 +1,8 @@
 from django.db import models
 from patients.models import Patient
 from staff.models import Staff
+from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 
 class Appointment(models.Model):
@@ -29,6 +31,15 @@ class Appointment(models.Model):
         ],
         default="Scheduled",
     )
+
+    def clean(self):
+        super().clean()
+        if self.appointment_date and self.appointment_date < timezone.now():
+            raise ValidationError({'appointment_date': "Appointment date cannot be in the past."})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.patient} with {self.doctor} on {self.appointment_date}"

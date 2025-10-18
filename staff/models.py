@@ -127,7 +127,7 @@ class Staff(models.Model):
                 })
     
     def save(self, *args, **kwargs):
-        self.clean()
+        self.full_clean()
         super().save(*args, **kwargs)
     
     @property

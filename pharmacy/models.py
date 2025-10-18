@@ -20,5 +20,9 @@ class Prescription(models.Model):
     prescribed_by = models.ForeignKey('staff.Staff', on_delete=models.SET_NULL, null=True, blank=True)
     notes = models.TextField(blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.drug_name} for {self.patient}"

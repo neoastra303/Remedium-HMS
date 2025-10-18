@@ -4,4 +4,4 @@ from .models import Prescription
 class PrescriptionForm(forms.ModelForm):
     class Meta:
         model = Prescription
-        fields = '__all__'
+        fields = ['patient', 'drug_name', 'dosage', 'frequency', 'prescribed_by', 'notes']

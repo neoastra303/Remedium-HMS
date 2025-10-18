@@ -26,9 +26,6 @@ class PrescriptionDetailView(LoginRequiredMixin, PermissionRequiredMixin, generi
     permission_required = 'pharmacy_view_prescription'
 
 
-    permission_required = 'pharmacy_view_prescription'
-
-
 class PrescriptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Prescription
     form_class = PrescriptionForm
@@ -40,12 +37,14 @@ class PrescriptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generi
 class PrescriptionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Prescription
     form_class = PrescriptionForm
+    template_name = 'pharmacy/prescription_form.html'
     success_url = reverse_lazy('prescription_list')
     permission_required = 'pharmacy_change_prescription'
 
 
 class PrescriptionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Prescription
+    template_name = 'pharmacy/prescription_confirm_delete.html'
     success_url = reverse_lazy('prescription_list')
     permission_required = 'pharmacy_delete_prescription'
 

@@ -1,14 +1,73 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Lab Tests</title>
-</head>
-<body>
-    <h1>Lab Tests</h1>
-    <ul>
-        {% for test in lab_tests %}
-            <li>{{ test.test_name }} for {{ test.patient }} - Status: {{ test.status }}</li>
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Lab Tests</h1>
+
+<a href="{% url 'labtest_create' %}" class="btn btn-primary mb-3">Add New Lab Test</a>
+
+{% if lab_tests %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=test_name">Test Name {% if request.GET.order_by == 'test_name' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=patient">Patient {% if request.GET.order_by == 'patient' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=doctor">Doctor {% if request.GET.order_by == 'doctor' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=requested_date">Test Date {% if request.GET.order_by == 'requested_date' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col">Result</th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=status">Status {% if request.GET.order_by == 'status' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for test in lab_tests %}
+            <tr>
+                <td>{{ test.test_name }}</td>
+                <td>{{ test.patient }}</td>
+                <td>{{ test.doctor }}</td>
+                <td>{{ test.requested_date|date:"M d, Y" }}</td>
+                <td>{{ test.result }}</td>
+                <td>{{ test.status }}</td>
+                <td>
+                    <a href="{% url 'labtest_detail' test.pk %}" class="btn btn-info btn-sm">View</a>
+                    <a href="{% url 'labtest_update' test.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'labtest_delete' test.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Previous</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+        {% endif %}
+
+        {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+                <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">{{ i }}</a></li>
+            {% endif %}
         {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Next</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link">Next</a></li>
+        {% endif %}
     </ul>
-</body>
-</html>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="alert alert-info" role="alert">
+    No lab tests found.
+</div>
+{% endif %}
+{% endblock %}

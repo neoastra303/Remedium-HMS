@@ -1,15 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Confirm Delete</title>
-</head>
-<body>
-    <h1>Confirm Delete</h1>
-    <p>Are you sure you want to delete this lab test?</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Confirm</button>
-        <a href="/labtests/">Cancel</a>
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Delete Lab Test</h1>
+
+<div class="alert alert-warning" role="alert">
+    <p>Are you sure you want to delete the lab test <strong>{{ object.test_name }}</strong> for patient <strong>{{ object.patient }}</strong>?</p>
+</div>
+
+<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-action-url="{% url 'labtest_delete' object.pk %}" data-item-name="Lab Test {{ object.test_name }} for {{ object.patient }}">
+    Delete Lab Test
+</button>
+<a href="{% url 'labtest_list' %}" class="btn btn-secondary">Cancel</a>
+{% endblock %}

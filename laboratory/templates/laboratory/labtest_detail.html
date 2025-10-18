@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Lab Test Detail</h2>
+  <p><strong>Patient:</strong> {{ lab_test.patient }}</p>
+  <p><strong>Test Name:</strong> {{ lab_test.test_name }}</p>
+  <p><strong>Requested Date:</strong> {{ lab_test.requested_date }}</p>
+  <p><strong>Result Date:</strong> {{ lab_test.result_date }}</p>
+  <p><strong>Result:</strong> {{ lab_test.result }}</p>
+  <p><strong>Status:</strong> {{ lab_test.status }}</p>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Surgery Detail</h2>
+  <p><strong>Patient:</strong> {{ surgery.patient }}</p>
+  <p><strong>Surgeon:</strong> {{ surgery.surgeon }}</p>
+  <p><strong>Scheduled Date:</strong> {{ surgery.scheduled_date }}</p>
+  <p><strong>Operating Room:</strong> {{ surgery.operating_room }}</p>
+  <p><strong>Procedure:</strong> {{ surgery.procedure }}</p>
+  <p><strong>Status:</strong> {{ surgery.status }}</p>
+  <p><strong>Notes:</strong> {{ surgery.notes }}</p>
+{% endblock %}

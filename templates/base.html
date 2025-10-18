@@ -1,14 +1,144 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Remedium HMS</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 </head>
 <body>
-    <div class="container">
-        <a href="{% url 'login' %}">Sign In</a>
-        <a href="{% url 'logout' %}">Sign Out</a>
+    <a href="#main-content" class="visually-hidden-focusable">Skip to main content</a>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">Remedium HMS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.app_name == 'core' %}active{% endif %}" aria-current="page" href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownPatientServices" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Patient Services
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownPatientServices">
+                            <li><a class="dropdown-item {% if request.resolver_match.app_name == 'appointments' %}active{% endif %}" href="{% url 'appointment_list' %}">Appointments</a></li>
+                            <li><a class="dropdown-item {% if request.resolver_match.app_name == 'patients' %}active{% endif %}" href="{% url 'patient_list' %}">Patients</a></li>
+                            <li><a class="dropdown-item {% if request.resolver_match.app_name == 'billing' %}active{% endif %}" href="{% url 'invoice_list' %}">Billing</a></li>
+                            <li><a class="dropdown-item {% if request.resolver_match.app_name == 'surgery' %}active{% endif %}" href="{% url 'surgery_list' %}">Surgery</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownDepartments" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Departments
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownDepartments">
+                            <li><a class="dropdown-item {% if request.resolver_match.app_name == 'inventory' %}active{% endif %}" href="{% url 'inventoryitem_list' %}">Inventory</a></li>
+                            <li><a class="dropdown-item {% if request.resolver_match.app_name == 'pharmacy' %}active{% endif %}" href="{% url 'prescription_list' %}">Pharmacy</a></li>
+                            <li><a class="dropdown-item {% if request.resolver_match.app_name == 'laboratory' %}active{% endif %}" href="{% url 'labtest_list' %}">Laboratory</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.app_name == 'staff' %}active{% endif %}" href="{% url 'staff_list' %}">Staff</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.app_name == 'care_monitoring' %}active{% endif %}" href="{% url 'care_monitoring:patientcare_list' %}">Care Monitoring</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.app_name == 'reporting' %}active{% endif %}" href="{% url 'report_list' %}">Reporting</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.app_name == 'integration' %}active{% endif %}" href="{% url 'integration_list' %}">Integration</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Sign In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Sign Out</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="toast align-items-center text-white bg-{{ message.tags }} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            {{ message }}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="container mt-4" id="main-content">
         {% block content %}
         {% endblock %}
     </div>
+
+    <!-- Generic Delete Confirmation Modal -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this item?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteButton">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+            var toastList = toastElList.map(function(toastEl) {
+                return new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 })
+            })
+            toastList.forEach(toast => toast.show())
+
+            // Generic Delete Confirmation Modal Logic
+            var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+            if (confirmDeleteModal) {
+                confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    var actionUrl = button.getAttribute('data-action-url');
+                    var itemName = button.getAttribute('data-item-name');
+
+                    var modalBody = confirmDeleteModal.querySelector('.modal-body');
+                    modalBody.textContent = 'Are you sure you want to delete ' + (itemName ? '\'' + itemName + '\'' : 'this item') + '?';
+
+                    var confirmButton = confirmDeleteModal.querySelector('#confirmDeleteButton');
+                    confirmButton.onclick = function() {
+                        window.location.href = actionUrl; // Or submit a form, depending on implementation
+                    };
+                });
+            }
+        });
+    </script>
 </body>
 </html>

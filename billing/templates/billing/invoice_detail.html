@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Invoice Detail</h2>
+  <p><strong>Patient:</strong> {{ invoice.patient }}</p>
+  <p><strong>Issue Date:</strong> {{ invoice.issue_date }}</p>
+  <p><strong>Due Date:</strong> {{ invoice.due_date }}</p>
+  <p><strong>Total Amount:</strong> {{ invoice.total_amount }}</p>
+  <p><strong>Paid:</strong> {{ invoice.paid|yesno:"Yes,No" }}</p>
+  <p><strong>Details:</strong> {{ invoice.details }}</p>
+{% endblock %}

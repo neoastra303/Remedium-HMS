@@ -6,6 +6,15 @@ from staff.models import Staff
 class Surgery(models.Model):
     class Meta:
         app_label = 'surgery'
+        permissions = [
+            ('surgery_view_surgery', 'Can view surgery'),
+            ('surgery_add_surgery', 'Can add surgery'),
+            ('surgery_change_surgery', 'Can change surgery'),
+            ('surgery_delete_surgery', 'Can delete surgery'),
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=['operating_room', 'scheduled_date'], name='unique_operating_room_schedule')
+        ]
 
     patient = models.ForeignKey('patients.Patient', on_delete=models.CASCADE)
     surgeon = models.ForeignKey('staff.Staff', on_delete=models.CASCADE)

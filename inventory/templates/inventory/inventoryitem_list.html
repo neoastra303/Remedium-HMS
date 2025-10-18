@@ -1,14 +1,73 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Inventory Items</title>
-</head>
-<body>
-    <h1>Inventory Items</h1>
-    <ul>
-        {% for item in inventory_items %}
-            <li>{{ item.name }} - Quantity: {{ item.quantity }} {{ item.unit }}</li>
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Inventory Items</h1>
+
+<a href="{% url 'inventoryitem_create' %}" class="btn btn-primary mb-3">Add New Item</a>
+
+{% if inventory_items %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=name">Name {% if request.GET.order_by == 'name' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col">Description</th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=quantity">Quantity {% if request.GET.order_by == 'quantity' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col">Unit</th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=price">Price {% if request.GET.order_by == 'price' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=supplier">Supplier {% if request.GET.order_by == 'supplier' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in inventory_items %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.unit }}</td>
+                <td>{{ item.price }}</td>
+                <td>{{ item.supplier }}</td>
+                <td>
+                    <a href="{% url 'inventoryitem_detail' item.pk %}" class="btn btn-info btn-sm">View</a>
+                    <a href="{% url 'inventoryitem_update' item.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'inventoryitem_delete' item.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Previous</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+        {% endif %}
+
+        {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+                <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">{{ i }}</a></li>
+            {% endif %}
         {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Next</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link">Next</a></li>
+        {% endif %}
     </ul>
-</body>
-</html>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="alert alert-info" role="alert">
+    No inventory items found.
+</div>
+{% endif %}
+{% endblock %}

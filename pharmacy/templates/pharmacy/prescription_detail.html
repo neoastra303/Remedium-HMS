@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Prescription Detail</h2>
+  <p><strong>Patient:</strong> {{ prescription.patient }}</p>
+  <p><strong>Drug Name:</strong> {{ prescription.drug_name }}</p>
+  <p><strong>Dosage:</strong> {{ prescription.dosage }}</p>
+  <p><strong>Frequency:</strong> {{ prescription.frequency }}</p>
+  <p><strong>Prescribed Date:</strong> {{ prescription.prescribed_date }}</p>
+  <p><strong>Prescribed By:</strong> {{ prescription.prescribed_by }}</p>
+  <p><strong>Notes:</strong> {{ prescription.notes }}</p>
+{% endblock %}

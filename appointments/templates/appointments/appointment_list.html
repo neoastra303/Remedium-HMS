@@ -1,14 +1,71 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Appointments</title>
-</head>
-<body>
-    <h1>Appointments</h1>
-    <ul>
-        {% for appointment in appointments %}
-            <li>{{ appointment.patient }} with {{ appointment.doctor }} on {{ appointment.appointment_date }}</li>
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Appointments</h1>
+
+<a href="{% url 'appointment_create' %}" class="btn btn-primary mb-3">Add New Appointment</a>
+
+{% if appointments %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=patient">Patient {% if request.GET.order_by == 'patient' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=doctor">Doctor {% if request.GET.order_by == 'doctor' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=appointment_date">Date {% if request.GET.order_by == 'appointment_date' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=appointment_time">Time {% if request.GET.order_by == 'appointment_time' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=status">Status {% if request.GET.order_by == 'status' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointments %}
+            <tr>
+                <td>{{ appointment.patient }}</td>
+                <td>{{ appointment.doctor }}</td>
+                <td>{{ appointment.appointment_date|date:"M d, Y" }}</td>
+                <td>{{ appointment.appointment_time|time:"h:i A" }}</td>
+                <td>{{ appointment.status }}</td>
+                <td>
+                    <a href="{% url 'appointment_detail' appointment.pk %}" class="btn btn-info btn-sm">View</a>
+                    <a href="{% url 'appointment_update' appointment.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'appointment_delete' appointment.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Previous</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+        {% endif %}
+
+        {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+                <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">{{ i }}</a></li>
+            {% endif %}
         {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Next</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link">Next</a></li>
+        {% endif %}
     </ul>
-</body>
-</html>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="alert alert-info" role="alert">
+    No appointments found.
+</div>
+{% endif %}
+{% endblock %}

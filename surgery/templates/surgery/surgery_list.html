@@ -1,15 +1,71 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Surgeries</title>
-</head>
-<body>
-    <h1>Surgeries</h1>
-    <ul>
-        {% for surgery in surgeries %}
-            <li>Surgery for {{ surgery.patient }} by {{ surgery.surgeon }} on {{ surgery.scheduled_date }}</li>
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Surgeries</h1>
+
+<a href="{% url 'surgery_create' %}" class="btn btn-primary mb-3">Schedule New Surgery</a>
+
+{% if surgeries %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=patient">Patient {% if request.GET.order_by == 'patient' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=surgeon">Surgeon {% if request.GET.order_by == 'surgeon' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=procedure">Procedure {% if request.GET.order_by == 'procedure' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=scheduled_date">Scheduled Date {% if request.GET.order_by == 'scheduled_date' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=status">Status {% if request.GET.order_by == 'status' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for surgery in surgeries %}
+            <tr>
+                <td>{{ surgery.patient }}</td>
+                <td>{{ surgery.surgeon }}</td>
+                <td>{{ surgery.procedure }}</td>
+                <td>{{ surgery.scheduled_date|date:"M d, Y H:i" }}</td>
+                <td>{{ surgery.status }}</td>
+                <td>
+                    <a href="{% url 'surgery_detail' surgery.pk %}" class="btn btn-info btn-sm">View</a>
+                    <a href="{% url 'surgery_update' surgery.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'surgery_delete' surgery.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Previous</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+        {% endif %}
+
+        {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+                <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">{{ i }}</a></li>
+            {% endif %}
         {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Next</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link">Next</a></li>
+        {% endif %}
     </ul>
-    <a href="{% url 'surgery_create' %}">Add Surgery</a>
-</body>
-</html>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="alert alert-info" role="alert">
+    No surgeries found.
+</div>
+{% endif %}
+{% endblock %}

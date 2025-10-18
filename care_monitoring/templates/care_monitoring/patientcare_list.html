@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Care Monitoring Entries</h1>
+
+<a href="{% url 'care_monitoring:patientcare_create' %}" class="btn btn-primary mb-3">Add New Monitoring Entry</a>
+
+{% if patientcares %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=patient">Patient {% if request.GET.order_by == 'patient' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=date">Date {% if request.GET.order_by == 'date' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=type">Type {% if request.GET.order_by == 'type' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
+                <th scope="col">Value</th>
+                <th scope="col">Notes</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in patientcares %}
+            <tr>
+                <td>{{ entry.patient }}</td>
+                <td>{{ entry.date|date:"M d, Y" }}</td>
+                <td>{{ entry.type }}</td>
+                <td>{{ entry.value }}</td>
+                <td>{{ entry.notes }}</td>
+                <td>
+                    <a href="{% url 'care_monitoring:patientcare_detail' entry.pk %}" class="btn btn-info btn-sm">View</a>
+                    <a href="{% url 'care_monitoring:patientcare_update' entry.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'care_monitoring:patientcare_delete' entry.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Previous</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+        {% endif %}
+
+        {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+                <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">{{ i }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Next</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link">Next</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="alert alert-info" role="alert">
+    No monitoring entries found.
+</div>
+{% endif %}
+{% endblock %}

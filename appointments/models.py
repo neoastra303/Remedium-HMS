@@ -6,6 +6,15 @@ from staff.models import Staff
 class Appointment(models.Model):
     class Meta:
         app_label = 'appointments'
+        permissions = [
+            ('appointments_view_appointment', 'Can view appointment'),
+            ('appointments_add_appointment', 'Can add appointment'),
+            ('appointments_change_appointment', 'Can change appointment'),
+            ('appointments_delete_appointment', 'Can delete appointment'),
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=['patient', 'doctor', 'appointment_date'], name='unique_appointment')
+        ]
 
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     doctor = models.ForeignKey("staff.Staff", on_delete=models.CASCADE)

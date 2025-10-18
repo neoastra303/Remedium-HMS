@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Delete Integration</h1>
+
+<div class="alert alert-warning" role="alert">
+    <p>Are you sure you want to delete the integration <strong>{{ object.name }}</strong>?</p>
+</div>
+
+<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-action-url="{% url 'integration_delete' object.pk %}" data-item-name="Integration {{ object.name }}">
+    Delete Integration
+</button>
+<a href="{% url 'integration_list' %}" class="btn btn-secondary">Cancel</a>
+{% endblock %}

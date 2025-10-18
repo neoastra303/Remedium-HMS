@@ -5,6 +5,12 @@ from patients.models import Patient
 class LabTest(models.Model):
     class Meta:
         app_label = 'laboratory'
+        permissions = [
+            ('laboratory_view_labtest', 'Can view lab test'),
+            ('laboratory_add_labtest', 'Can add lab test'),
+            ('laboratory_change_labtest', 'Can change lab test'),
+            ('laboratory_delete_labtest', 'Can delete lab test'),
+        ]
 
     patient = models.ForeignKey('patients.Patient', on_delete=models.CASCADE)
     test_name = models.CharField(max_length=100)

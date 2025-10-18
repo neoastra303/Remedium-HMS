@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Delete Care Monitoring Entry</h1>
+
+<div class="alert alert-warning" role="alert">
+    <p>Are you sure you want to delete the care monitoring entry for <strong>{{ object.patient }}</strong> on <strong>{{ object.date }}</strong>?</p>
+</div>
+
+<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-action-url="{% url 'care_monitoring:patientcare_delete' object.pk %}" data-item-name="Care Monitoring Entry for {{ object.patient }} on {{ object.date }}">
+    Delete Entry
+</button>
+<a href="{% url 'care_monitoring:patientcare_list' %}" class="btn btn-secondary">Cancel</a>
+{% endblock %}

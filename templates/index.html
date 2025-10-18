@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2 text-center">
+            <h1 class="display-4">Welcome to Remedium HMS</h1>
+            <p class="lead">A modern, efficient, and user-friendly Hospital Management System.</p>
+            <hr class="my-4">
+            <p>Use the navigation bar to access the different modules of the system.</p>
+            <a class="btn btn-primary btn-lg" href="{% url 'patient_list' %}" role="button">View Patients</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

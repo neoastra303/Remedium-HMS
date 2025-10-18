@@ -1,23 +1,57 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Patient Details</title>
-</head>
-<body>
-    <h1>Patient Details</h1>
-    <p>Unique ID: {{ patient.unique_id }}</p>
-    <p>First Name: {{ patient.first_name }}</p>
-    <p>Last Name: {{ patient.last_name }}</p>
-    <p>Date of Birth: {{ patient.date_of_birth }}</p>
-    <p>Gender: {{ patient.gender }}</p>
-    <p>Address: {{ patient.address }}</p>
-    <p>Phone: {{ patient.phone }}</p>
-    <p>Email: {{ patient.email }}</p>
-    <p>Medical History: {{ patient.medical_history }}</p>
-    <p>Admission Date: {{ patient.admission_date }}</p>
-    <p>Discharge Date: {{ patient.discharge_date }}</p>
-    <p>Ward: {{ patient.ward }}</p>
-    <p>Room: {{ patient.room }}</p>
-    <a href="{% url 'patient_list' %}">Back to List</a>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Patient Details: {{ patient.first_name }} {{ patient.last_name }}</h1>
+
+<div class="card mb-4">
+    <div class="card-header">
+        Patient Information
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Unique ID:</dt>
+            <dd class="col-sm-9">{{ patient.unique_id }}</dd>
+
+            <dt class="col-sm-3">First Name:</dt>
+            <dd class="col-sm-9">{{ patient.first_name }}</dd>
+
+            <dt class="col-sm-3">Last Name:</dt>
+            <dd class="col-sm-9">{{ patient.last_name }}</dd>
+
+            <dt class="col-sm-3">Date of Birth:</dt>
+            <dd class="col-sm-9">{{ patient.date_of_birth|date:"M d, Y" }}</dd>
+
+            <dt class="col-sm-3">Gender:</dt>
+            <dd class="col-sm-9">{{ patient.gender }}</dd>
+
+            <dt class="col-sm-3">Address:</dt>
+            <dd class="col-sm-9">{{ patient.address }}</dd>
+
+            <dt class="col-sm-3">Phone:</dt>
+            <dd class="col-sm-9">{{ patient.phone }}</dd>
+
+            <dt class="col-sm-3">Email:</dt>
+            <dd class="col-sm-9">{{ patient.email }}</dd>
+
+            <dt class="col-sm-3">Medical History:</dt>
+            <dd class="col-sm-9">{{ patient.medical_history }}</dd>
+
+            <dt class="col-sm-3">Admission Date:</dt>
+            <dd class="col-sm-9">{{ patient.admission_date|date:"M d, Y" }}</dd>
+
+            <dt class="col-sm-3">Discharge Date:</dt>
+            <dd class="col-sm-9">{{ patient.discharge_date|default:"N/A"|date:"M d, Y" }}</dd>
+
+            <dt class="col-sm-3">Ward:</dt>
+            <dd class="col-sm-9">{{ patient.ward }}</dd>
+
+            <dt class="col-sm-3">Room:</dt>
+            <dd class="col-sm-9">{{ patient.room }}</dd>
+        </dl>
+    </div>
+</div>
+
+<a href="{% url 'patient_update' patient.pk %}" class="btn btn-warning me-2">Edit Patient</a>
+<a href="{% url 'patient_delete' patient.pk %}" class="btn btn-danger me-2">Delete Patient</a>
+<a href="{% url 'patient_list' %}" class="btn btn-secondary">Back to List</a>
+{% endblock %}

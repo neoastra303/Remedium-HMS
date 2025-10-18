@@ -1,6 +1,7 @@
 from django.db import models
 from patients.models import Patient
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 
 class Invoice(models.Model):
@@ -20,6 +21,17 @@ class Invoice(models.Model):
     paid = models.BooleanField(default=False)
     insurance_claimed = models.BooleanField(default=False)
     details = models.TextField(blank=True, null=True)
+
+    def clean(self):
+        super().clean()
+        if self.total_amount and self.total_amount < 0:
+            raise ValidationError({'total_amount': "Total amount cannot be negative."})
+        if self.issue_date and self.due_date and self.due_date < self.issue_date:
+            raise ValidationError({'due_date': "Due date cannot be before the issue date."})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Invoice #{self.id} for {self.patient}"

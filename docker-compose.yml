@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: remedium_db
+    environment:
+      POSTGRES_DB: remedium_hms
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: remedium_hms_app
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py create_groups &&
+             gunicorn remedium_hms.wsgi:application --bind 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: "False"
+      SECRET_KEY: your-secret-key-here
+      ALLOWED_HOSTS: localhost,127.0.0.1
+      DB_ENGINE: django.db.backends.postgresql
+      DB_NAME: remedium_hms
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+    depends_on:
+      - postgres
+    volumes:
+      - ./logs:/app/logs
+      - ./staticfiles:/app/staticfiles
+      - ./media:/app/media
+
+volumes:
+  postgres_data:

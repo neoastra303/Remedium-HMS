@@ -78,7 +78,7 @@ class PrescriptionViewTest(TestCase):
 
     def test_prescription_list_view_unauthenticated(self):
         response = self.client.get(reverse('prescription_list'))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 403)
 
     def test_prescription_list_view_no_permission(self):
         self.client.login(username='testuser', password='password')

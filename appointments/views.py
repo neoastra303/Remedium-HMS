@@ -11,7 +11,8 @@ class AppointmentListView(LoginRequiredMixin, PermissionRequiredMixin, generic.L
     template_name = 'appointments/appointment_list.html'
     context_object_name = 'appointments'
     paginate_by = 10  # Add pagination
-    permission_required = 'appointments_view_appointment'
+    permission_required = 'appointments.appointments_view_appointment'
+    raise_exception = True
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -24,7 +25,8 @@ class AppointmentCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic
     form_class = AppointmentForm
     template_name = 'appointments/appointment_form.html'
     success_url = reverse_lazy('appointment_list')  # Redirect to the list view after success
-    permission_required = 'appointments_add_appointment'
+    permission_required = 'appointments.appointments_add_appointment'
+    raise_exception = True
 
 
 class AppointmentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
@@ -32,19 +34,24 @@ class AppointmentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic
     form_class = AppointmentForm
     template_name = 'appointments/appointment_form.html'
     success_url = reverse_lazy('appointment_list')  # Redirect to the list view after success
-    permission_required = 'appointments_change_appointment'
+    permission_required = 'appointments.appointments_change_appointment'
+    raise_exception = True
 
 
 class AppointmentDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Appointment
     template_name = 'appointments/appointment_confirm_delete.html'
     success_url = reverse_lazy('appointment_list')  # Redirect to the list view after success
-    permission_required = 'appointments_delete_appointment'
+    permission_required = 'appointments.appointments_delete_appointment'
+    raise_exception = True
+
+
 class AppointmentDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Appointment
     template_name = 'appointments/appointment_detail.html'
     context_object_name = 'appointment'
-    permission_required = 'appointments_view_appointment'
+    permission_required = 'appointments.appointments_view_appointment'
+    raise_exception = True
 
 
 # Create your views here.

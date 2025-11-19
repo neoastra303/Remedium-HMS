@@ -10,7 +10,8 @@ class SurgeryListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListV
     template_name = 'surgery/surgery_list.html'
     context_object_name = 'surgeries'
     paginate_by = 10  # Add pagination
-    permission_required = 'surgery_view_surgery'
+    permission_required = 'surgery.surgery_view_surgery'
+    raise_exception = True
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -21,7 +22,8 @@ class SurgeryDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
     model = Surgery
     template_name = 'surgery/surgery_detail.html'
     context_object_name = 'surgery'
-    permission_required = 'surgery_view_surgery'
+    permission_required = 'surgery.surgery_view_surgery'
+    raise_exception = True
 
 
 class SurgeryCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
@@ -29,7 +31,8 @@ class SurgeryCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cre
     form_class = SurgeryForm
     template_name = 'surgery/surgery_form.html'
     success_url = reverse_lazy('surgery_list')
-    permission_required = 'surgery_add_surgery'
+    permission_required = 'surgery.surgery_add_surgery'
+    raise_exception = True
 
 
 class SurgeryUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
@@ -37,11 +40,14 @@ class SurgeryUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upd
     form_class = SurgeryForm
     template_name = 'surgery/surgery_form.html'
     success_url = reverse_lazy('surgery_list')
+    permission_required = 'surgery.surgery_change_surgery'
+    raise_exception = True
 
 
 class SurgeryDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Surgery
     success_url = reverse_lazy('surgery_list')
-    permission_required = 'surgery_delete_surgery'
+    permission_required = 'surgery.surgery_delete_surgery'
+    raise_exception = True
 
 # Create your views here.

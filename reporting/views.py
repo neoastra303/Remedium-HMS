@@ -13,7 +13,8 @@ class ReportListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListVi
     template_name = 'reporting/report_list.html'
     context_object_name = 'reports'
     paginate_by = 10  # Add pagination
-    permission_required = 'reporting_view_report'
+    permission_required = 'reporting.reporting_view_report'
+    raise_exception = True
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -24,7 +25,8 @@ class ReportDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Deta
     model = Report
     template_name = 'reporting/report_detail.html'
     context_object_name = 'report'
-    permission_required = 'reporting_view_report'
+    permission_required = 'reporting.reporting_view_report'
+    raise_exception = True
 
 
 class ReportCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
@@ -32,7 +34,8 @@ class ReportCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
     form_class = ReportForm
     template_name = 'reporting/report_form.html'
     success_url = '/reports/'
-    permission_required = 'reporting_add_report'
+    permission_required = 'reporting.reporting_add_report'
+    raise_exception = True
 
 
 class ReportUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
@@ -40,14 +43,16 @@ class ReportUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upda
     form_class = ReportForm
     template_name = 'reporting/report_form.html'
     success_url = '/reports/'
-    permission_required = 'reporting_change_report'
+    permission_required = 'reporting.reporting_change_report'
+    raise_exception = True
 
 
 class ReportDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Report
     template_name = 'reporting/report_confirm_delete.html'
     success_url = '/reports/'
-    permission_required = 'reporting_delete_report'
+    permission_required = 'reporting.reporting_delete_report'
+    raise_exception = True
 
 
 @login_required

@@ -127,6 +127,26 @@ class Staff(models.Model):
                 })
     
     def save(self, *args, **kwargs):
+        """Normalize data and run full validation before saving."""
+        # Allow using human-readable role labels like "Doctor" in addition to codes like "DOCTOR"
+        if self.role:
+            role_map = {
+                "Doctor": "DOCTOR",
+                "Nurse": "NURSE",
+                "Administrator": "ADMIN",
+                "Technician": "TECH",
+                "Pharmacist": "PHARMACIST",
+                "Receptionist": "RECEPTIONIST",
+                "Surgeon": "SURGEON",
+                "Anesthesiologist": "ANESTHESIOLOGIST",
+                "Radiologist": "RADIOLOGIST",
+                "Laboratory Technician": "LAB_TECH",
+                "Security": "SECURITY",
+                "Maintenance": "MAINTENANCE",
+                "Other": "OTHER",
+            }
+            self.role = role_map.get(self.role, self.role)
+
         self.full_clean()
         super().save(*args, **kwargs)
     

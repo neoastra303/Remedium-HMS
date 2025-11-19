@@ -11,7 +11,8 @@ class StaffListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListVie
     template_name = 'staff/staff_list.html'
     context_object_name = 'staff_list' # Changed to staff_list to avoid conflict with template variable
     paginate_by = 10  # Add pagination
-    permission_required = 'staff_view_staff'
+    permission_required = 'staff.staff_view_staff'
+    raise_exception = True
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -23,7 +24,8 @@ class StaffDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detai
     model = Staff
     template_name = 'staff/staff_detail.html'
     context_object_name = 'staff'
-    permission_required = 'staff_view_staff'
+    permission_required = 'staff.staff_view_staff'
+    raise_exception = True
 
 
 class StaffCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
@@ -31,7 +33,8 @@ class StaffCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Creat
     form_class = StaffForm  # Use the custom form class
     template_name = 'staff/staff_form.html'
     success_url = reverse_lazy('staff_list')  # Redirect to the list view after success
-    permission_required = 'staff_add_staff'
+    permission_required = 'staff.staff_add_staff'
+    raise_exception = True
 
 
 class StaffUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
@@ -39,13 +42,15 @@ class StaffUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Updat
     form_class = StaffForm  # Use the custom form class
     template_name = 'staff/staff_form.html'
     success_url = reverse_lazy('staff_list')  # Redirect to the list view after success
-    permission_required = 'staff_change_staff'
+    permission_required = 'staff.staff_change_staff'
+    raise_exception = True
 
 
 class StaffDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Staff
     template_name = 'staff/staff_confirm_delete.html'
     success_url = reverse_lazy('staff_list')  # Redirect to the list view after success
-    permission_required = 'staff_delete_staff'
+    permission_required = 'staff.staff_delete_staff'
+    raise_exception = True
 
 # Create your views here.

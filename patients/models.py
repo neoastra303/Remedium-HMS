@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from datetime import date
+import re
 
 
 class Patient(models.Model):
@@ -53,10 +54,16 @@ class Patient(models.Model):
         choices=GENDER_CHOICES,
         help_text="Patient's gender"
     )
-    address = models.TextField(help_text="Patient's address")
+    address = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Patient's address"
+    )
     phone = models.CharField(
         validators=[phone_regex],
         max_length=20,
+        blank=True,
+        null=True,
         help_text="Patient's phone number"
     )
     email = models.EmailField(
@@ -128,6 +135,25 @@ class Patient(models.Model):
                 })
     
     def save(self, *args, **kwargs):
+        """Normalize common input variants and run full validation before saving."""
+        # Allow gender to be provided as display values like "Male" as well as codes like "M"
+        if self.gender:
+            gender_map = {
+                "Male": "M",
+                "Female": "F",
+                "Other": "O",
+                "Prefer not to say": "P",
+            }
+            self.gender = gender_map.get(self.gender, self.gender)
+
+        # Normalize phone numbers with common formatting (e.g., 555-555-5555 -> +5555555555)
+        if self.phone:
+            pattern = r"^\+?1?\d{9,15}$"
+            if not re.match(pattern, self.phone):
+                digits = "".join(ch for ch in self.phone if ch.isdigit())
+                if digits:
+                    self.phone = f"+{digits}"
+
         self.full_clean()
         super().save(*args, **kwargs)
     

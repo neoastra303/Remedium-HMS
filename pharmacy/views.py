@@ -11,7 +11,8 @@ class PrescriptionListView(LoginRequiredMixin, PermissionRequiredMixin, generic.
     template_name = 'pharmacy/prescription_list.html'
     context_object_name = 'prescriptions'
     paginate_by = 10  # Add pagination
-    permission_required = 'pharmacy_view_prescription'
+    permission_required = 'pharmacy.pharmacy_view_prescription'
+    raise_exception = True
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -23,7 +24,8 @@ class PrescriptionDetailView(LoginRequiredMixin, PermissionRequiredMixin, generi
     model = Prescription
     template_name = 'pharmacy/prescription_detail.html'
     context_object_name = 'prescription'
-    permission_required = 'pharmacy_view_prescription'
+    permission_required = 'pharmacy.pharmacy_view_prescription'
+    raise_exception = True
 
 
 class PrescriptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
@@ -31,7 +33,8 @@ class PrescriptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generi
     form_class = PrescriptionForm
     template_name = 'pharmacy/prescription_form.html'
     success_url = reverse_lazy('prescription_list')
-    permission_required = 'pharmacy_add_prescription'
+    permission_required = 'pharmacy.pharmacy_add_prescription'
+    raise_exception = True
 
 
 class PrescriptionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
@@ -39,13 +42,15 @@ class PrescriptionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generi
     form_class = PrescriptionForm
     template_name = 'pharmacy/prescription_form.html'
     success_url = reverse_lazy('prescription_list')
-    permission_required = 'pharmacy_change_prescription'
+    permission_required = 'pharmacy.pharmacy_change_prescription'
+    raise_exception = True
 
 
 class PrescriptionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Prescription
     template_name = 'pharmacy/prescription_confirm_delete.html'
     success_url = reverse_lazy('prescription_list')
-    permission_required = 'pharmacy_delete_prescription'
+    permission_required = 'pharmacy.pharmacy_delete_prescription'
+    raise_exception = True
 
 # Create your views here.

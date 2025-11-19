@@ -1,7 +1,9 @@
 Django==5.2.7
-djangorestframework
-python-decouple
-Pillow
-django-crispy-forms
-crispy-bootstrap5
-psycopg2-binary
+djangorestframework==3.14.0
+python-decouple==3.8
+Pillow==10.1.0
+django-crispy-forms==2.1
+crispy-bootstrap5==2.0.2
+psycopg2-binary==2.9.9
+django-filter==23.5
+django-cors-headers==4.3.1

@@ -103,8 +103,7 @@ class PatientViewTest(TestCase):
 
     def test_patient_list_view_unauthenticated(self):
         response = self.client.get(reverse('patient_list'))
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/accounts/login/?next=/patients/')
+        self.assertEqual(response.status_code, 403)
 
     def test_patient_list_view_no_permission(self):
         self.client.login(username='testuser', password='password')
@@ -119,8 +118,7 @@ class PatientViewTest(TestCase):
 
     def test_patient_create_view_unauthenticated(self):
         response = self.client.get(reverse('patient_create'))
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/accounts/login/?next=/patients/create/')
+        self.assertEqual(response.status_code, 403)
 
     def test_patient_create_view_no_permission(self):
         self.client.login(username='testuser', password='password')
@@ -135,6 +133,7 @@ class PatientViewTest(TestCase):
 
     def test_patient_create_view_form_valid(self):
         self.user.groups.add(self.add_group)
+        self.user.groups.add(self.view_group)
         self.client.login(username='testuser', password='password')
         form_data = {
             'unique_id': '54321',
@@ -153,8 +152,7 @@ class PatientViewTest(TestCase):
 
     def test_patient_update_view_unauthenticated(self):
         response = self.client.get(reverse('patient_update', args=[self.patient.pk]))
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, f'/accounts/login/?next=/patients/{self.patient.pk}/update/')
+        self.assertEqual(response.status_code, 403)
 
     def test_patient_update_view_no_permission(self):
         self.client.login(username='testuser', password='password')
@@ -169,6 +167,7 @@ class PatientViewTest(TestCase):
 
     def test_patient_update_view_form_valid(self):
         self.user.groups.add(self.change_group)
+        self.user.groups.add(self.view_group)
         self.client.login(username='testuser', password='password')
         form_data = {
             'unique_id': '12345',
@@ -188,8 +187,7 @@ class PatientViewTest(TestCase):
 
     def test_patient_delete_view_unauthenticated(self):
         response = self.client.get(reverse('patient_delete', args=[self.patient.pk]))
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, f'/accounts/login/?next=/patients/{self.patient.pk}/delete/')
+        self.assertEqual(response.status_code, 403)
 
     def test_patient_delete_view_no_permission(self):
         self.client.login(username='testuser', password='password')
@@ -204,6 +202,7 @@ class PatientViewTest(TestCase):
 
     def test_patient_delete_view_post(self):
         self.user.groups.add(self.delete_group)
+        self.user.groups.add(self.view_group)
         self.client.login(username='testuser', password='password')
         response = self.client.post(reverse('patient_delete', args=[self.patient.pk]))
         self.assertEqual(response.status_code, 302)

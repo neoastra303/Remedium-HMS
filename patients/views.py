@@ -11,7 +11,8 @@ class PatientListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListV
     template_name = 'patients/patient_list.html'
     context_object_name = 'patients'
     paginate_by = 10  # Add pagination
-    permission_required = 'patients_view_patient'
+    permission_required = 'patients.patients_view_patient'
+    raise_exception = True
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -31,26 +32,30 @@ class PatientDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
     model = Patient
     template_name = 'patients/patient_detail.html'
     context_object_name = 'patient'
-    permission_required = 'patients_view_patient'
+    permission_required = 'patients.patients_view_patient'
+    raise_exception = True
 
 class PatientCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Patient
     form_class = PatientForm
     template_name = 'patients/patient_form.html'
     success_url = reverse_lazy('patient_list')  # Redirect to the list view after success
-    permission_required = 'patients_add_patient'
+    permission_required = 'patients.patients_add_patient'
+    raise_exception = True
 
 class PatientUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Patient
     form_class = PatientForm
     template_name = 'patients/patient_form.html'
     success_url = reverse_lazy('patient_list')  # Redirect to the list view after success
-    permission_required = 'patients_change_patient'
+    permission_required = 'patients.patients_change_patient'
+    raise_exception = True
 
 class PatientDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Patient
     template_name = 'patients/patient_confirm_delete.html'
     success_url = reverse_lazy('patient_list')  # Redirect to the list view after success
-    permission_required = 'patients_delete_patient'
+    permission_required = 'patients.patients_delete_patient'
+    raise_exception = True
 
 # Create your views here.

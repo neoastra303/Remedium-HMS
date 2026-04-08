@@ -1,10 +1,11 @@
 from rest_framework import serializers
+from rest_framework.fields import CharField, BooleanField
 from .models import Staff
 
 
 class StaffSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField()
-    is_medical_staff = serializers.SerializerMethodField()
+    full_name = CharField(read_only=True)
+    is_medical_staff = BooleanField(read_only=True)
 
     class Meta:
         model = Staff
@@ -14,9 +15,3 @@ class StaffSerializer(serializers.ModelSerializer):
             'is_medical_staff'
         ]
         read_only_fields = ['id', 'full_name', 'is_medical_staff', 'hire_date']
-
-    def get_full_name(self, obj):
-        return obj.full_name
-
-    def get_is_medical_staff(self, obj):
-        return obj.is_medical_staff

@@ -1,16 +1,16 @@
 from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django.utils import timezone
+from rest_framework.exceptions import ValidationError
 from .models import Patient
 from .serializers import PatientSerializer
+from core.permissions import IsClinicalStaff
 
 
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsClinicalStaff]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['unique_id', 'first_name', 'last_name', 'email']
     ordering_fields = ['admission_date', 'first_name', 'last_name']
@@ -27,6 +27,8 @@ class PatientViewSet(viewsets.ModelViewSet):
     def discharge(self, request, pk=None):
         """Discharge a patient."""
         patient = self.get_object()
+        if not patient.is_admitted:
+            raise ValidationError({'error': 'Patient is not currently admitted.'})
         patient.discharge_date = timezone.now()
         patient.save()
         serializer = self.get_serializer(patient)

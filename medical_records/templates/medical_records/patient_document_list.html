@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'patient_list' %}">Patients</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'patient_detail' patient.pk %}">{{ patient.full_name }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Documents</li>
+  </ol>
+</nav>
+
+<h1 class="mb-4">Medical Documents: {{ patient.full_name }}</h1>
+
+<div class="mb-3 text-end">
+    <a href="{% url 'patient_document_upload' patient.pk %}" class="btn btn-primary">Upload New Document</a>
+</div>
+
+{% if documents %}
+<div class="row">
+    {% for doc in documents %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ doc.title }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ doc.get_document_type_display }}</h6>
+                <p class="card-text small text-muted">Uploaded on {{ doc.uploaded_at|date:"M d, Y" }}</p>
+                {% if doc.notes %}
+                <p class="card-text">{{ doc.notes|truncatewords:20 }}</p>
+                {% endif %}
+                <a href="{{ doc.file.url }}" class="btn btn-sm btn-outline-info" target="_blank">View File</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    No medical documents found for this patient.
+</div>
+{% endif %}
+{% endblock %}

@@ -1,5 +1,6 @@
 from django.db import models
 from patients.models import Patient
+from simple_history.models import HistoricalRecords
 
 
 class Prescription(models.Model):
@@ -20,9 +21,7 @@ class Prescription(models.Model):
     prescribed_by = models.ForeignKey('staff.Staff', on_delete=models.SET_NULL, null=True, blank=True)
     notes = models.TextField(blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return f"{self.drug_name} for {self.patient}"
+
+    history = HistoricalRecords()

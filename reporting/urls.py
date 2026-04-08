@@ -2,8 +2,9 @@ from django.urls import path
 from . import views
 from django.views.generic import TemplateView
 
+app_name = 'reporting'
+
 urlpatterns = [
-    path('reports/', views.ReportListView.as_view(), name='report_list'),
     path('patient_report/', views.patient_report, name='patient_report'),
     path('reports/create/', views.ReportCreateView.as_view(), name='report_generate'),
     path('reports/<int:pk>/', views.ReportDetailView.as_view(), name='report_detail'),

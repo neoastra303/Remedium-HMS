@@ -5,13 +5,22 @@ services:
     image: postgres:15-alpine
     container_name: remedium_db
     environment:
-      POSTGRES_DB: remedium_hms
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${DB_NAME:-remedium_hms}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme_use_env_file}
+    # Port exposed only for local development debugging
+    # Remove in production docker-compose or use override file
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
 
   web:
     build: .
@@ -19,25 +28,34 @@ services:
     command: >
       sh -c "python manage.py migrate &&
              python manage.py create_groups &&
-             gunicorn remedium_hms.wsgi:application --bind 0.0.0.0:8000"
+             gunicorn remedium_hms.wsgi:application --bind 0.0.0.0:8000 --workers ${GUNICORN_WORKERS:-4}"
     ports:
       - "8000:8000"
     environment:
-      DEBUG: "False"
-      SECRET_KEY: your-secret-key-here
-      ALLOWED_HOSTS: localhost,127.0.0.1
+      DEBUG: ${DEBUG:-False}
+      SECRET_KEY: ${SECRET_KEY:?error SECRET_KEY is required}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
       DB_ENGINE: django.db.backends.postgresql
-      DB_NAME: remedium_hms
-      DB_USER: postgres
-      DB_PASSWORD: postgres
+      DB_NAME: ${DB_NAME:-remedium_hms}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-changeme_use_env_file}
       DB_HOST: postgres
       DB_PORT: 5432
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
       - ./logs:/app/logs
-      - ./staticfiles:/app/staticfiles
+      - staticfiles_volume:/app/staticfiles
       - ./media:/app/media
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
 
 volumes:
   postgres_data:
+  staticfiles_volume:

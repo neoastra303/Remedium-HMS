@@ -1,0 +1,133 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: test_remedium_hms
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-prod.txt
+        pip install pytest pytest-django pytest-cov flake8 cryptography bandit safety
+
+    - name: Lint with flake8
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+
+    - name: Security scan with bandit
+      run: |
+        bandit -r . -ll --exclude venv,venv3,*/migrations/*,*/tests.py
+
+    - name: Run Django checks
+      env:
+        SECRET_KEY: test-secret-key-for-ci-not-for-production
+        DB_ENGINE: django.db.backends.postgresql
+        DB_NAME: test_remedium_hms
+        DB_USER: test_user
+        DB_PASSWORD: test_password
+        DB_HOST: localhost
+        DB_PORT: 5432
+      run: |
+        python manage.py check
+        python manage.py migrate
+
+    - name: Run tests with pytest
+      env:
+        SECRET_KEY: test-secret-key-for-ci-not-for-production
+        DB_ENGINE: django.db.backends.postgresql
+        DB_NAME: test_remedium_hms
+        DB_USER: test_user
+        DB_PASSWORD: test_password
+        DB_HOST: localhost
+        DB_PORT: 5432
+      run: |
+        pytest --cov=. --cov-report=xml --cov-report=term-missing
+
+    - name: Upload coverage to GitHub
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage.xml
+
+  collectstatic:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run collectstatic dry-run
+      env:
+        SECRET_KEY: test-secret-key-for-ci-not-for-production
+        DEBUG: "False"
+      run: |
+        python manage.py collectstatic --dry-run --clear
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [test, collectstatic]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker image
+      run: |
+        docker build -t remedium-hms:${{ github.sha }} .
+
+    - name: Run Django check in Docker
+      env:
+        SECRET_KEY: test-secret-key-for-ci-not-for-production
+      run: |
+        docker run --rm remedium-hms:${{ github.sha }} python manage.py check

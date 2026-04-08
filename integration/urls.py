@@ -2,8 +2,9 @@ from django.urls import path
 from . import views
 from django.views.generic import TemplateView
 
+app_name = 'integration'
+
 urlpatterns = [
-    path('integrations/', views.IntegrationListView.as_view(), name='integration_list'),
     path('patients/', views.PatientListAPIView.as_view(), name='patient-list-api'),
     path('integrations/create/', TemplateView.as_view(template_name='integration/integration_form.html'), name='integration_create'),
     path('integrations/<int:pk>/', TemplateView.as_view(template_name='integration/integration_detail.html'), name='integration_detail'),

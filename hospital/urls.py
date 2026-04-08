@@ -1,8 +1,9 @@
 from django.urls import path
 from . import views
 
+app_name = 'hospital'
+
 urlpatterns = [
-    # Ward URLs
     path('wards/', views.WardListView.as_view(), name='ward_list'),
     path('wards/<int:pk>/', views.WardDetailView.as_view(), name='ward_detail'),
     path('wards/create/', views.WardCreateView.as_view(), name='ward_create'),

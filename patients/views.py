@@ -14,10 +14,15 @@ class PatientListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListV
     permission_required = 'patients.patients_view_patient'
     raise_exception = True
 
+    ALLOWED_ORDER_BY = ['last_name', 'first_name', 'admission_date', 'unique_id', '-last_name', '-first_name', '-admission_date', '-unique_id']
+
     def get_queryset(self):
         queryset = super().get_queryset()
         query = self.request.GET.get('q')
-        order_by = self.request.GET.get('order_by', 'last_name') # Default sort by last_name
+        order_by = self.request.GET.get('order_by', 'last_name')
+
+        if order_by not in self.ALLOWED_ORDER_BY:
+            order_by = 'last_name'
 
         if query:
             queryset = queryset.filter(
@@ -25,7 +30,7 @@ class PatientListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListV
                 Q(last_name__icontains=query) |
                 Q(unique_id__icontains=query)
             )
-        
+
         return queryset.order_by(order_by)
 
 class PatientDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
@@ -57,5 +62,18 @@ class PatientDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.Del
     success_url = reverse_lazy('patient_list')  # Redirect to the list view after success
     permission_required = 'patients.patients_delete_patient'
     raise_exception = True
+
+
+class PatientHistoryView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
+    model = Patient
+    template_name = 'patients/patient_history.html'
+    context_object_name = 'patient'
+    permission_required = 'patients.patients_view_patient'
+    raise_exception = True
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['history'] = self.object.history.all()
+        return context
 
 # Create your views here.

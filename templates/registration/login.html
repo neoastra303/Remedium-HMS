@@ -1,39 +1,44 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container">
+<div class="container py-5 mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card mt-5">
-                <div class="card-header">
-                    <h3 class="text-center">Login</h3>
+        <div class="col-md-5">
+            <div class="card shadow-2xl border-0 glass-effect">
+                <div class="card-header bg-medical-blue text-white text-center py-5 border-0">
+                    <i class="bi bi-shield-plus fs-1 mb-2"></i>
+                    <h2 class="fw-bold mb-0">REMEDIUM</h2>
+                    <p class="text-white-50 small mb-0 fw-medium">SECURE NEURAL ACCESS</p>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-5">
                     {% if form.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            Your username and password didn't match. Please try again.
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            Invalid credentials. Please try again.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
 
-                    <form method="post" action="{% url 'login' %}">
+                    <form method="post" action="{% url 'login' %}" novalidate>
                         {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="id_username" class="form-label">Username</label>
-                            <input type="text" name="username" class="form-control" id="id_username" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="id_password" class="form-label">Password</label>
-                            <input type="password" name="password" class="form-control" id="id_password" required>
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Login</button>
+                        {{ form|crispy }}
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
+                            </button>
                         </div>
                     </form>
                 </div>
-                <div class="card-footer text-center">
-                    <a href="#">Forgot password?</a>
+                <div class="card-footer bg-light text-center py-3">
+                    <a href="{% url 'password_reset' %}" class="text-decoration-none text-muted small">
+                        <i class="bi bi-key me-1"></i> Forgot your password?
+                    </a>
                 </div>
             </div>
+            <p class="text-center mt-4 text-muted small">
+                &copy; 2026 Remedium Healthcare Solutions. All rights reserved.
+            </p>
         </div>
     </div>
 </div>

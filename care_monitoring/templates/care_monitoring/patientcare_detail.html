@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Patient Care Record Detail</h2>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <table class="table table-borderless">
+                <tr>
+                    <th>Patient:</th>
+                    <td>{{ patientcare.patient }}</td>
+                </tr>
+                <tr>
+                    <th>Monitoring Date:</th>
+                    <td>{{ patientcare.monitoring_date }}</td>
+                </tr>
+                {% if patientcare.heart_rate %}
+                <tr>
+                    <th>Heart Rate:</th>
+                    <td>{{ patientcare.heart_rate }} bpm</td>
+                </tr>
+                {% endif %}
+                {% if patientcare.temperature %}
+                <tr>
+                    <th>Temperature:</th>
+                    <td>{{ patientcare.temperature }} °C</td>
+                </tr>
+                {% endif %}
+                {% if patientcare.blood_pressure_systolic and patientcare.blood_pressure_diastolic %}
+                <tr>
+                    <th>Blood Pressure:</th>
+                    <td>{{ patientcare.blood_pressure_systolic }}/{{ patientcare.blood_pressure_diastolic }} mmHg</td>
+                </tr>
+                {% endif %}
+                {% if patientcare.oxygen_saturation %}
+                <tr>
+                    <th>Oxygen Saturation:</th>
+                    <td>{{ patientcare.oxygen_saturation }}%</td>
+                </tr>
+                {% endif %}
+                {% if patientcare.notes %}
+                <tr>
+                    <th>Notes:</th>
+                    <td>{{ patientcare.notes }}</td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="{% url 'patientcare_list' %}" class="btn btn-secondary">Back to List</a>
+        <a href="{% url 'patientcare_update' patientcare.pk %}" class="btn btn-primary">Edit</a>
+        <a href="{% url 'patientcare_delete' patientcare.pk %}" class="btn btn-danger">Delete</a>
+    </div>
+</div>
+{% endblock %}

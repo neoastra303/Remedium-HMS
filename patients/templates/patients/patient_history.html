@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Change History: {{ patient.full_name }}</h1>
+
+<div class="card mb-4">
+    <div class="card-header">
+        Audit Log
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Changes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in history %}
+                <tr>
+                    <td>{{ record.history_date }}</td>
+                    <td>{{ record.history_user|default:"System" }}</td>
+                    <td>
+                        {% if record.history_type == '+' %}
+                            <span class="badge bg-success">Created</span>
+                        {% elif record.history_type == '~' %}
+                            <span class="badge bg-warning">Updated</span>
+                        {% else %}
+                            <span class="badge bg-danger">Deleted</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if record.prev_record %}
+                            <ul class="mb-0 small">
+                                {% for field, value in record.diff_against(record.prev_record).changes %}
+                                    <li><strong>{{ field }}:</strong> {{ value.0 }} → {{ value.1 }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            Initial record created.
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<a href="{% url 'patient_detail' patient.pk %}" class="btn btn-secondary">Back to Detail</a>
+{% endblock %}

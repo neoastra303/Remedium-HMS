@@ -52,6 +52,9 @@
 </div>
 
 <a href="{% url 'patient_update' patient.pk %}" class="btn btn-warning me-2">Edit Patient</a>
+<a href="{% url 'care_monitoring:patient_vital_trends' patient.pk %}" class="btn btn-success me-2"><i class="bi bi-graph-up-arrow"></i> Vital Trends</a>
+<a href="{% url 'patient_history' patient.pk %}" class="btn btn-info me-2">View History</a>
+<a href="{% url 'patient_document_list' patient.pk %}" class="btn btn-primary me-2">Manage Documents</a>
 <a href="{% url 'patient_delete' patient.pk %}" class="btn btn-danger me-2">Delete Patient</a>
 <a href="{% url 'patient_list' %}" class="btn btn-secondary">Back to List</a>
 {% endblock %}

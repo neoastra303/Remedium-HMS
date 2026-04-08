@@ -13,10 +13,15 @@ class SurgeryListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListV
     permission_required = 'surgery.surgery_view_surgery'
     raise_exception = True
 
+    ALLOWED_ORDER_BY = ['scheduled_date', 'status', '-scheduled_date', '-status']
+
     def get_queryset(self):
-        queryset = super().get_queryset()
-        order_by = self.request.GET.get('order_by', 'scheduled_date') # Default sort by scheduled_date
+        queryset = super().get_queryset().select_related('patient', 'surgeon')
+        order_by = self.request.GET.get('order_by', 'scheduled_date')
+        if order_by not in self.ALLOWED_ORDER_BY:
+            order_by = 'scheduled_date'
         return queryset.order_by(order_by)
+
 
 class SurgeryDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Surgery
@@ -24,6 +29,9 @@ class SurgeryDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
     context_object_name = 'surgery'
     permission_required = 'surgery.surgery_view_surgery'
     raise_exception = True
+
+    def get_queryset(self):
+        return Surgery.objects.select_related('patient', 'surgeon', 'operating_room').all()
 
 
 class SurgeryCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
@@ -46,6 +54,7 @@ class SurgeryUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upd
 
 class SurgeryDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Surgery
+    template_name = 'surgery/surgery_confirm_delete.html'
     success_url = reverse_lazy('surgery_list')
     permission_required = 'surgery.surgery_delete_surgery'
     raise_exception = True

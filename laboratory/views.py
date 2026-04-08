@@ -14,9 +14,13 @@ class LabTestListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListV
     permission_required = 'laboratory.laboratory_view_labtest'
     raise_exception = True
 
+    ALLOWED_ORDER_BY = ['requested_date', 'status', '-requested_date', '-status']
+
     def get_queryset(self):
-        queryset = super().get_queryset()
-        order_by = self.request.GET.get('order_by', 'requested_date') # Default sort by requested_date
+        queryset = super().get_queryset().select_related('patient')
+        order_by = self.request.GET.get('order_by', 'requested_date')
+        if order_by not in self.ALLOWED_ORDER_BY:
+            order_by = 'requested_date'
         return queryset.order_by(order_by)
 
 
@@ -40,6 +44,7 @@ class LabTestCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cre
 class LabTestUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = LabTest
     form_class = LabTestForm
+    template_name = 'laboratory/labtest_form.html'
     success_url = reverse_lazy('labtest_list')
     permission_required = 'laboratory.laboratory_change_labtest'
     raise_exception = True

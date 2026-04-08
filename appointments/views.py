@@ -14,9 +14,13 @@ class AppointmentListView(LoginRequiredMixin, PermissionRequiredMixin, generic.L
     permission_required = 'appointments.appointments_view_appointment'
     raise_exception = True
 
+    ALLOWED_ORDER_BY = ['appointment_date', 'status', '-appointment_date', '-status']
+
     def get_queryset(self):
-        queryset = super().get_queryset()
-        order_by = self.request.GET.get('order_by', 'appointment_date') # Default sort by appointment_date
+        queryset = super().get_queryset().select_related('patient', 'doctor')
+        order_by = self.request.GET.get('order_by', 'appointment_date')
+        if order_by not in self.ALLOWED_ORDER_BY:
+            order_by = 'appointment_date'
         return queryset.order_by(order_by)
 
 

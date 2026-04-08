@@ -1,25 +1,49 @@
-from django.test import TestCase
-from .models import LabTest
+"""Tests for laboratory app."""
+import pytest
+from django.utils import timezone
+from datetime import timedelta
+from laboratory.models import LabTest
 from patients.models import Patient
-import datetime
 
-class LabTestModelTest(TestCase):
-    def setUp(self):
-        self.patient = Patient.objects.create(
-            unique_id="12345",
-            first_name="John",
-            last_name="Doe",
-            date_of_birth=datetime.date(1990, 1, 1),
-            gender="Male",
-            address="123 Main St",
-            phone="555-555-5555",
-        )
-        self.lab_test = LabTest.objects.create(
-            patient=self.patient,
-            test_name="Blood Test",
+
+@pytest.mark.django_db
+class TestLabTestModel:
+    """Test LabTest model."""
+
+    def _create_patient(self):
+        return Patient.objects.create(
+            unique_id='PAT_LAB',
+            first_name='Test',
+            last_name='Patient',
+            date_of_birth=timezone.now().date() - timedelta(days=365 * 30),
+            gender='M',
         )
 
-    def test_lab_test_creation(self):
-        self.assertEqual(self.lab_test.patient, self.patient)
-        self.assertEqual(self.lab_test.test_name, "Blood Test")
-        self.assertEqual(str(self.lab_test), f"Blood Test for {self.patient}")
+    def test_create_lab_test(self):
+        patient = self._create_patient()
+        test = LabTest.objects.create(
+            patient=patient,
+            test_name='Blood Test',
+            status='Requested',
+        )
+        assert test.pk is not None
+        assert test.status == 'Requested'
+        assert str(test) == 'Blood Test for PAT_LAB - Test Patient'
+
+    def test_lab_test_auto_requested_date(self):
+        """Test requested_date is auto-set."""
+        patient = self._create_patient()
+        test = LabTest(patient=patient, test_name='X-Ray')
+        test.save()
+        assert test.requested_date is not None
+
+    def test_lab_test_status_choices(self):
+        """Test valid status values."""
+        patient = self._create_patient()
+        for status in ['Requested', 'Completed', 'Cancelled']:
+            test = LabTest(
+                patient=patient,
+                test_name=f'{status} Test',
+                status=status,
+            )
+            test.full_clean()  # Should not raise

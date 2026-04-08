@@ -1,37 +1,359 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 class="mb-4">Prescription Form</h1>
+<div class="container mt-4">
+    <h1 class="mb-4">
+        {% if object %}Edit{% else %}New{% endif %} Prescription
+    </h1>
 
-<form method="post" novalidate>
-    {% csrf_token %}
+    <div class="row">
+        <!-- Prescription Form -->
+        <div class="col-lg-6">
+            <form method="post" novalidate>
+                {% csrf_token %}
 
-    {% if form.non_field_errors %}
-        <div class="alert alert-danger" role="alert">
-            {% for error in form.non_field_errors %}
-                <p class="mb-0">{{ error }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
-    {% for field in form %}
-        <div class="mb-3">
-            {{ field.label_tag }}
-            <input type="{{ field.widget_type }}" name="{{ field.html_name }}" class="form-control {% if field.errors %}is-invalid{% endif %}" id="{{ field.id_for_label }}" value="{{ field.value|default_if_none:'' }}">
-            {% if field.help_text %}
-                <div class="form-text">{{ field.help_text }}</div>
-            {% endif %}
-            {% if field.errors %}
-                <div class="invalid-feedback d-block">
-                    {% for error in field.errors %}
-                        {{ error }}
-                    {% endfor %}
+                {% for field in form %}
+                    <div class="mb-3">
+                        {{ field.label_tag }}
+                        <input type="{{ field.widget_type }}" name="{{ field.html_name }}" 
+                               class="form-control {% if field.errors %}is-invalid{% endif %}" 
+                               id="{{ field.id_for_label }}" 
+                               value="{{ field.value|default_if_none:'' }}"
+                               {% if field.name == 'drug_name' %}autocomplete="off"{% endif %}>
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in field.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i> Save Prescription
+                    </button>
+                    <a href="{% url 'prescription_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle me-1"></i> Cancel
+                    </a>
                 </div>
-            {% endif %}
+            </form>
         </div>
-    {% endfor %}
 
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a href="{% url 'prescription_list' %}" class="btn btn-secondary">Cancel</a>
-</form>
+        <!-- Drug Info Panel -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-capsule me-2"></i>FDA Drug Information Lookup
+                </div>
+                <div class="card-body">
+                    <div class="input-group mb-3">
+                        <input type="text" id="drug-search-input" class="form-control" 
+                               placeholder="Enter drug name (e.g., Amoxicillin)">
+                        <button class="btn btn-outline-primary" type="button" id="drug-search-btn">
+                            <i class="bi bi-search me-1"></i> Lookup
+                        </button>
+                    </div>
+
+                    <!-- Loading Spinner -->
+                    <div id="drug-loading" class="text-center py-4 d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Fetching FDA drug information...</p>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="drug-error" class="alert alert-danger d-none" role="alert"></div>
+
+                    <!-- Drug Info Results -->
+                    <div id="drug-results" class="d-none">
+                        <div class="mb-3">
+                            <h5 class="mb-1" id="drug-brand-name"></h5>
+                            <small class="text-muted" id="drug-generic-name"></small>
+                        </div>
+
+                        <div class="mb-3">
+                            <span class="badge bg-info me-1" id="drug-manufacturer"></span>
+                            <span class="badge bg-secondary" id="drug-route"></span>
+                        </div>
+
+                        <div class="accordion" id="drug-info-accordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#collapse-indications">
+                                        <i class="bi bi-check-circle me-2 text-success"></i>Indications & Usage
+                                    </button>
+                                </h2>
+                                <div id="collapse-indications" class="accordion-collapse collapse" 
+                                     data-bs-parent="#drug-info-accordion">
+                                    <div class="accordion-body" id="drug-indications"></div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#collapse-dosage">
+                                        <i class="bi bi-capsule me-2 text-primary"></i>Dosage & Administration
+                                    </button>
+                                </h2>
+                                <div id="collapse-dosage" class="accordion-collapse collapse" 
+                                     data-bs-parent="#drug-info-accordion">
+                                    <div class="accordion-body" id="drug-dosage"></div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#collapse-warnings">
+                                        <i class="bi bi-exclamation-triangle me-2 text-warning"></i>Warnings & Cautions
+                                    </button>
+                                </h2>
+                                <div id="collapse-warnings" class="accordion-collapse collapse" 
+                                     data-bs-parent="#drug-info-accordion">
+                                    <div class="accordion-body text-danger" id="drug-warnings"></div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#collapse-interactions">
+                                        <i class="bi bi-link-45deg me-2 text-danger"></i>Drug Interactions
+                                    </button>
+                                </h2>
+                                <div id="collapse-interactions" class="accordion-collapse collapse" 
+                                     data-bs-parent="#drug-info-accordion">
+                                    <div class="accordion-body" id="drug-interactions"></div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#collapse-adverse">
+                                        <i class="bi bi-activity me-2 text-info"></i>Adverse Reactions
+                                    </button>
+                                </h2>
+                                <div id="collapse-adverse" class="accordion-collapse collapse" 
+                                     data-bs-parent="#drug-info-accordion">
+                                    <div class="accordion-body" id="drug-adverse"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- View Adverse Events Button -->
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-outline-danger w-100" id="adverse-events-btn">
+                                <i class="bi bi-graph-up me-1"></i>View FDA Adverse Event Reports
+                            </button>
+                        </div>
+
+                        <!-- Adverse Events Results -->
+                        <div id="adverse-results" class="mt-3 d-none">
+                            <h6>Top Reported Adverse Reactions</h6>
+                            <div id="adverse-list"></div>
+                            <small class="text-muted" id="adverse-total"></small>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="drug-empty" class="text-center py-4 text-muted">
+                        <i class="bi bi-capsule-pill" style="font-size: 2rem;"></i>
+                        <p class="mt-2 mb-0">Enter a drug name to view FDA information</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('drug-search-input');
+    const searchBtn = document.getElementById('drug-search-btn');
+    const loading = document.getElementById('drug-loading');
+    const error = document.getElementById('drug-error');
+    const results = document.getElementById('drug-results');
+    const empty = document.getElementById('drug-empty');
+    const adverseBtn = document.getElementById('adverse-events-btn');
+    const adverseResults = document.getElementById('adverse-results');
+
+    // Get CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // Get current drug name from form if editing
+    const drugNameField = document.querySelector('[name="drug_name"]');
+    if (drugNameField && drugNameField.value) {
+        searchInput.value = drugNameField.value;
+    }
+
+    // Auto-lookup when drug name field changes
+    let lookupTimeout;
+    drugNameField?.addEventListener('input', function() {
+        clearTimeout(lookupTimeout);
+        searchInput.value = this.value;
+        lookupTimeout = setTimeout(() => {
+            if (this.value.trim().length >= 2) {
+                lookupDrug(this.value.trim());
+            }
+        }, 1000);
+    });
+
+    // Search button click
+    searchBtn.addEventListener('click', function() {
+        const drugName = searchInput.value.trim();
+        if (drugName.length >= 2) {
+            lookupDrug(drugName);
+        }
+    });
+
+    // Enter key in search input
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const drugName = searchInput.value.trim();
+            if (drugName.length >= 2) {
+                lookupDrug(drugName);
+            }
+        }
+    });
+
+    // Adverse events button
+    adverseBtn?.addEventListener('click', function() {
+        const drugName = searchInput.value.trim();
+        if (drugName) {
+            lookupAdverseEvents(drugName);
+        }
+    });
+
+    function lookupDrug(drugName) {
+        // Show loading
+        loading.classList.remove('d-none');
+        error.classList.add('d-none');
+        results.classList.add('d-none');
+        empty.classList.add('d-none');
+        adverseResults?.classList.add('d-none');
+
+        fetch(`/api/v1/prescriptions/drug-info/?q=${encodeURIComponent(drugName)}`, {
+            headers: {
+                'X-CSRFToken': csrfToken,
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.error || 'Drug not found');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            displayDrugInfo(data);
+        })
+        .catch(err => {
+            showError(err.message);
+        });
+    }
+
+    function displayDrugInfo(data) {
+        loading.classList.add('d-none');
+
+        if (!data.generic_name && !data.brand_name) {
+            showError('No information found for this drug.');
+            return;
+        }
+
+        // Set values
+        document.getElementById('drug-brand-name').textContent = data.brand_name || 'Unknown Brand';
+        document.getElementById('drug-generic-name').textContent = data.generic_name ? `Generic: ${data.generic_name}` : '';
+        document.getElementById('drug-manufacturer').textContent = data.manufacturer || 'Unknown Manufacturer';
+        document.getElementById('drug-route').textContent = (data.route || []).join(', ');
+
+        // Set accordion content (show "No information available" if empty)
+        const fields = {
+            'drug-indications': data.indications,
+            'drug-dosage': data.dosage_administration,
+            'drug-warnings': data.warnings,
+            'drug-interactions': data.drug_interactions,
+            'drug-adverse': data.adverse_reactions,
+        };
+
+        for (const [id, value] of Object.entries(fields)) {
+            const el = document.getElementById(id);
+            el.innerHTML = value ? formatText(value) : '<em class="text-muted">No information available</em>';
+        }
+
+        results.classList.remove('d-none');
+    }
+
+    function lookupAdverseEvents(drugName) {
+        adverseBtn.disabled = true;
+        adverseBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Loading...';
+
+        fetch(`/api/v1/prescriptions/adverse-events/?q=${encodeURIComponent(drugName)}`, {
+            headers: { 'X-CSRFToken': csrfToken }
+        })
+        .then(response => response.json())
+        .then(data => {
+            adverseResults.classList.remove('d-none');
+            const list = document.getElementById('adverse-list');
+            
+            if (data.top_adverse_reactions && data.top_adverse_reactions.length > 0) {
+                list.innerHTML = '<ul class="list-group">' + 
+                    data.top_adverse_reactions.map(r => 
+                        `<li class="list-group-item d-flex justify-content-between align-items-center">
+                            ${r.reaction}
+                            <span class="badge bg-danger rounded-pill">${r.count}</span>
+                        </li>`
+                    ).join('') + 
+                '</ul>';
+                document.getElementById('adverse-total').textContent = 
+                    `Total reports: ${data.total_reports.toLocaleString()}`;
+            } else {
+                list.innerHTML = '<p class="text-muted">No adverse events reported.</p>';
+                document.getElementById('adverse-total').textContent = '';
+            }
+        })
+        .catch(err => {
+            document.getElementById('adverse-list').innerHTML = 
+                `<div class="alert alert-warning">Unable to load adverse event data.</div>`;
+        })
+        .finally(() => {
+            adverseBtn.disabled = false;
+            adverseBtn.innerHTML = '<i class="bi bi-graph-up me-1"></i>View FDA Adverse Event Reports';
+        });
+    }
+
+    function showError(message) {
+        loading.classList.add('d-none');
+        results.classList.add('d-none');
+        empty.classList.remove('d-none');
+        error.textContent = message;
+        error.classList.remove('d-none');
+    }
+
+    function formatText(text) {
+        // Convert plain text to HTML with line breaks
+        if (!text) return '';
+        return text
+            .replace(/\n/g, '<br>')
+            .replace(/\r/g, '');
+    }
+});
+</script>
 {% endblock %}

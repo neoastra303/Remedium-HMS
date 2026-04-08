@@ -1,9 +1,25 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
+from django.conf import settings
+from simple_history.models import HistoricalRecords
+
+# Shared phone validator - same as Patient model
+phone_regex = RegexValidator(
+    regex=r'^\+?\d{9,15}$',
+    message="Phone number must be 9-15 digits, optionally with a leading +."
+)
 
 
 class Staff(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='staff_profile',
+        help_text="System user account associated with this staff member"
+    )
     ROLE_CHOICES = [
         ('DOCTOR', 'Doctor'),
         ('NURSE', 'Nurse'),
@@ -54,10 +70,7 @@ class Staff(models.Model):
             ),
         ]
 
-    phone_regex = RegexValidator(
-        regex=r'^\+?1?\d{9,15}$',
-        message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
-    )
+    # Uses shared phone_validator defined at module level
     
     staff_id = models.CharField(
         max_length=20, 
@@ -108,6 +121,8 @@ class Staff(models.Model):
         help_text="Whether the staff member is currently active"
     )
 
+    history = HistoricalRecords()
+
     def clean(self):
         super().clean()
         
@@ -147,7 +162,6 @@ class Staff(models.Model):
             }
             self.role = role_map.get(self.role, self.role)
 
-        self.full_clean()
         super().save(*args, **kwargs)
     
     @property
@@ -163,3 +177,28 @@ class Staff(models.Model):
     
     def __str__(self):
         return f"{self.staff_id} - {self.first_name} {self.last_name} ({self.role})"
+
+
+class Shift(models.Model):
+    DAYS_OF_WEEK = [
+        (0, 'Monday'),
+        (1, 'Tuesday'),
+        (2, 'Wednesday'),
+        (3, 'Thursday'),
+        (4, 'Friday'),
+        (5, 'Saturday'),
+        (6, 'Sunday'),
+    ]
+
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE, related_name='shifts')
+    day_of_week = models.IntegerField(choices=DAYS_OF_WEEK)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    
+    class Meta:
+        ordering = ['day_of_week', 'start_time']
+        unique_together = ['staff', 'day_of_week', 'start_time']
+
+    def __str__(self):
+        return f"{self.staff} - {self.get_day_of_week_display()} ({self.start_time} - {self.end_time})"
+

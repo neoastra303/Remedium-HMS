@@ -3,6 +3,7 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from datetime import date
 import re
+from simple_history.models import HistoricalRecords
 
 
 class Patient(models.Model):
@@ -12,7 +13,7 @@ class Patient(models.Model):
         ('O', 'Other'),
         ('P', 'Prefer not to say'),
     ]
-    
+
     class Meta:
         app_label = 'patients'
         permissions = [
@@ -23,14 +24,16 @@ class Patient(models.Model):
         ]
         constraints = [
             models.CheckConstraint(
-                check=models.Q(discharge_date__isnull=True) | models.Q(discharge_date__gte=models.F('admission_date')),
+                condition=models.Q(discharge_date__isnull=True) | models.Q(discharge_date__gte=models.F('admission_date')),
                 name='discharge_after_admission'
             ),
         ]
 
+    # Simplified phone regex: accepts optional + followed by 9-15 digits
+    # Supports any country code, not just US (+1)
     phone_regex = RegexValidator(
-        regex=r'^\+?1?\d{9,15}$',
-        message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
+        regex=r'^\+?\d{9,15}$',
+        message="Phone number must be 9-15 digits, optionally with a leading +."
     )
     
     unique_id = models.CharField(
@@ -119,6 +122,8 @@ class Patient(models.Model):
         null=True,
         help_text="Assigned room"
     )
+    
+    history = HistoricalRecords()
 
     def clean(self):
         super().clean()
@@ -135,7 +140,7 @@ class Patient(models.Model):
                 })
     
     def save(self, *args, **kwargs):
-        """Normalize common input variants and run full validation before saving."""
+        """Normalize common input variants before saving."""
         # Allow gender to be provided as display values like "Male" as well as codes like "M"
         if self.gender:
             gender_map = {
@@ -146,15 +151,15 @@ class Patient(models.Model):
             }
             self.gender = gender_map.get(self.gender, self.gender)
 
-        # Normalize phone numbers with common formatting (e.g., 555-555-5555 -> +5555555555)
-        if self.phone:
-            pattern = r"^\+?1?\d{9,15}$"
-            if not re.match(pattern, self.phone):
-                digits = "".join(ch for ch in self.phone if ch.isdigit())
+        # Normalize phone numbers: strip non-digit chars, prepend + if missing
+        for field_name in ['phone', 'emergency_contact_phone']:
+            phone_value = getattr(self, field_name, None)
+            if phone_value:
+                digits = "".join(ch for ch in phone_value if ch.isdigit())
                 if digits:
-                    self.phone = f"+{digits}"
+                    # Prepend + if not already present
+                    setattr(self, field_name, f"+{digits}")
 
-        self.full_clean()
         super().save(*args, **kwargs)
     
     @property

@@ -43,11 +43,11 @@ class InventoryItem(models.Model):
         ]
         constraints = [
             models.CheckConstraint(
-                check=models.Q(quantity__gte=0),
+                condition=models.Q(quantity__gte=0),
                 name='inventory_quantity_non_negative'
             ),
             models.CheckConstraint(
-                check=models.Q(reorder_level__gte=0),
+                condition=models.Q(reorder_level__gte=0),
                 name='inventory_reorder_level_non_negative'
             ),
         ]

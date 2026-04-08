@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h2 class="h5 mb-0"><i class="bi bi-person-plus"></i> Create New User & Staff Profile</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Account Information -->
+                            <div class="col-md-6 border-end">
+                                <h3 class="h6 mb-3 text-muted border-bottom pb-2">Account Information</h3>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                                    <input type="text" name="username" class="form-control {% if form.username.errors %}is-invalid{% endif %}" id="{{ form.username.id_for_label }}" value="{{ form.username.value|default:'' }}">
+                                    {% if form.username.errors %}<div class="invalid-feedback">{{ form.username.errors.0 }}</div>{% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                                    <input type="password" name="password" class="form-control {% if form.password.errors %}is-invalid{% endif %}" id="{{ form.password.id_for_label }}">
+                                    {% if form.password.errors %}<div class="invalid-feedback">{{ form.password.errors.0 }}</div>{% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.confirm_password.id_for_label }}" class="form-label">Confirm Password</label>
+                                    <input type="password" name="confirm_password" class="form-control {% if form.confirm_password.errors %}is-invalid{% endif %}" id="{{ form.confirm_password.id_for_label }}">
+                                    {% if form.confirm_password.errors %}<div class="invalid-feedback">{{ form.confirm_password.errors.0 }}</div>{% endif %}
+                                </div>
+
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" name="is_superuser" class="form-check-input" id="{{ form.is_superuser.id_for_label }}" {% if form.is_superuser.value %}checked{% endif %}>
+                                    <label class="form-check-label" for="{{ form.is_superuser.id_for_label }}">Grant Admin Access (Superuser)</label>
+                                </div>
+                            </div>
+
+                            <!-- Staff Profile -->
+                            <div class="col-md-6">
+                                <h3 class="h6 mb-3 text-muted border-bottom pb-2">Staff Profile</h3>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.staff_id.id_for_label }}" class="form-label">Staff ID</label>
+                                    <input type="text" name="staff_id" class="form-control {% if form.staff_id.errors %}is-invalid{% endif %}" id="{{ form.staff_id.id_for_label }}" value="{{ form.staff_id.value|default:'' }}">
+                                    {% if form.staff_id.errors %}<div class="invalid-feedback">{{ form.staff_id.errors.0 }}</div>{% endif %}
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                                        <input type="text" name="first_name" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" id="{{ form.first_name.id_for_label }}" value="{{ form.first_name.value|default:'' }}">
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                                        <input type="text" name="last_name" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" id="{{ form.last_name.id_for_label }}" value="{{ form.last_name.value|default:'' }}">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.role.id_for_label }}" class="form-label">Role</label>
+                                    <select name="role" class="form-select {% if form.role.errors %}is-invalid{% endif %}" id="{{ form.role.id_for_label }}">
+                                        {% for val, label in form.role.field.choices %}
+                                        <option value="{{ val }}" {% if form.role.value == val %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.department.id_for_label }}" class="form-label">Department</label>
+                                    <select name="department" class="form-select {% if form.department.errors %}is-invalid{% endif %}" id="{{ form.department.id_for_label }}">
+                                        {% for val, label in form.department.field.choices %}
+                                        <option value="{{ val }}" {% if form.department.value == val %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">Email Address</label>
+                                    <input type="email" name="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" id="{{ form.email.id_for_label }}" value="{{ form.email.value|default:'' }}">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
+                                    <input type="text" name="phone" class="form-control {% if form.phone.errors %}is-invalid{% endif %}" id="{{ form.phone.id_for_label }}" value="{{ form.phone.value|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                            <a href="{% url 'user_list' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+                            <button type="submit" class="btn btn-success px-4">Create Account</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

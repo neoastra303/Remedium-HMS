@@ -10,4 +10,34 @@
   <p><strong>Phone:</strong> {{ staff.phone }}</p>
   <p><strong>Email:</strong> {{ staff.email }}</p>
   <p><strong>Schedule:</strong> {{ staff.schedule }}</p>
+
+  <hr>
+  <h3>Working Schedule</h3>
+  {% if shifts %}
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for shift in shifts %}
+          <tr>
+            <td>{{ shift.get_day_of_week_display }}</td>
+            <td>{{ shift.start_time }}</td>
+            <td>{{ shift.end_time }}</td>
+            <td>
+                <a href="{% url 'shift_delete' shift.pk %}" class="btn btn-sm btn-danger">Remove</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No working shifts defined for this staff member.</p>
+  {% endif %}
+  <a href="{% url 'shift_create' staff.pk %}" class="btn btn-primary mb-3">Add New Shift</a>
 {% endblock %}

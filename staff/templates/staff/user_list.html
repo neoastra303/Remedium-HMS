@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>User Account Management</h1>
+        <a href="{% url 'user_create' %}" class="btn btn-success">
+            <i class="bi bi-person-plus"></i> Create New Account
+        </a>
+    </div>
+
+    {% if users_list %}
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Is Admin</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for staff in users_list %}
+                        <tr>
+                            <td><strong>{{ staff.user.username }}</strong></td>
+                            <td>{{ staff.full_name }}</td>
+                            <td><span class="badge bg-info text-dark">{{ staff.get_role_display }}</span></td>
+                            <td>
+                                {% if staff.user.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if staff.user.is_superuser %}
+                                <span class="badge bg-danger">Yes</span>
+                                {% else %}
+                                <span class="badge bg-secondary">No</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'staff_detail' staff.pk %}" class="btn btn-sm btn-outline-primary" title="View Profile">
+                                        <i class="bi bi-person"></i>
+                                    </a>
+                                    <a href="{% url 'user_password_reset' staff.pk %}" class="btn btn-sm btn-outline-warning" title="Reset Password" onclick="return confirm('Are you sure you want to reset the password for {{ staff.user.username }}?')">
+                                        <i class="bi bi-key"></i>
+                                    </a>
+                                    <a href="{% url 'user_status_toggle' staff.pk %}" class="btn btn-sm {% if staff.user.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}" title="{% if staff.user.is_active %}Deactivate{% else %}Activate{% endif %}">
+                                        <i class="bi {% if staff.user.is_active %}bi-person-x{% else %}bi-person-check{% endif %}"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning">
+        No user accounts found. All staff must be linked to a system user account to appear here.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

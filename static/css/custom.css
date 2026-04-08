@@ -1,65 +1,220 @@
-/* Custom CSS for Remedium HMS */
+/* Futuristic Glassmorphic Design for Remedium HMS */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-blue: #0062ff;
+    --primary-glow: rgba(0, 98, 255, 0.4);
+    --secondary-purple: #7b2ff7;
+    --accent-teal: #00d1b2;
+    --medical-green: #20bc77;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --bg-gradient: radial-gradient(circle at top right, #e0e7ff, #f8fafc), radial-gradient(circle at bottom left, #f1f5f9, #ffffff);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-gradient);
+    background-attachment: fixed;
+    color: var(--text-main);
+    min-height: 100vh;
+}
+
+/* Glassmorphism utility */
+.glass-effect {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
 
 /* Navbar */
 .navbar {
-    background-color: #f8f9fa; /* Light grey background */
-    border-bottom: 1px solid #dee2e6; /* Subtle border */
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 1rem 0;
+    margin-bottom: 2rem;
 }
 
 .navbar-brand {
-    font-weight: 500;
-    color: #0d6efd; /* Bootstrap primary blue */
+    font-weight: 700;
+    font-size: 1.4rem;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
 }
 
 .nav-link {
-    color: #495057; /* Darker grey for text */
-}
-
-.nav-link:hover,
-.nav-link:focus {
-    color: #0d6efd; /* Bootstrap primary blue on hover */
-}
-
-.nav-link.active {
     font-weight: 500;
-    color: #0d6efd; /* Bootstrap primary blue for active link */
+    color: var(--text-main) !important;
+    padding: 0.5rem 1.2rem !important;
+    border-radius: 8px;
+    transition: all 0.3s ease;
 }
 
-/* Dropdown Menu */
-.dropdown-menu {
-    border: 1px solid #dee2e6; /* Subtle border */
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); /* Soft shadow */
-}
-
-.dropdown-item:hover,
-.dropdown-item:focus {
-    background-color: #e9ecef; /* Light grey on hover */
-}
-
-/* Buttons */
-.btn-primary {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-}
-
-.btn-primary:hover {
-    background-color: #0b5ed7;
-    border-color: #0a58ca;
-}
-
-/* Tables */
-.table-hover tbody tr:hover {
-    background-color: #f1f3f5; /* Lighter grey for table row hover */
+.nav-link:hover {
+    background: rgba(0, 98, 255, 0.08);
+    color: var(--primary-blue) !important;
 }
 
 /* Cards */
 .card {
-    border: 1px solid #dee2e6;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
 }
 
-/* Forms */
-.form-control:focus {
-    border-color: #86b7fe;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+.card-header {
+    background: rgba(255, 255, 255, 0.4);
+    border-bottom: 1px solid var(--glass-border);
+    font-weight: 600;
+    color: var(--primary-blue);
+}
+
+/* Buttons */
+.btn {
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 0.6rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
+    border: none;
+    box-shadow: 0 4px 15px var(--primary-glow);
+}
+
+.btn-primary:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px var(--primary-glow);
+}
+
+/* Dashboard Widgets */
+.dashboard-widget {
+    color: white !important;
+    border: none;
+}
+
+.dashboard-widget .card-body {
+    padding: 2rem;
+}
+
+.dashboard-widget .icon {
+    font-size: 3.5rem;
+    opacity: 0.2;
+    position: absolute;
+    right: 1.5rem;
+    bottom: 1.5rem;
+}
+
+.bg-medical-blue { background: linear-gradient(135deg, #0062ff, #00b4db); }
+.bg-medical-teal { background: linear-gradient(135deg, #00d1b2, #009781); }
+.bg-medical-purple { background: linear-gradient(135deg, #7b2ff7, #bc26ef); }
+.bg-medical-orange { background: linear-gradient(135deg, #f7941d, #ff512f); }
+
+/* Tables */
+.table-responsive {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.table {
+    background: transparent;
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background: rgba(255, 255, 255, 0.5);
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 1.2rem;
+}
+
+.table tbody td {
+    border-color: var(--glass-border);
+    padding: 1.2rem;
+    color: var(--text-main);
+}
+
+/* Login Page Background */
+.login-page {
+    background: radial-gradient(circle at 50% 50%, #e0e7ff 0%, #f8fafc 100%);
+    position: relative;
+}
+
+.login-page::before {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: var(--primary-blue);
+    filter: blur(150px);
+    border-radius: 50%;
+    top: 10%;
+    left: 10%;
+    opacity: 0.1;
+}
+
+.login-page::after {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: var(--secondary-purple);
+    filter: blur(150px);
+    border-radius: 50%;
+    bottom: 10%;
+    right: 10%;
+    opacity: 0.1;
+}
+
+/* Custom Checkboxes/Inputs */
+.form-control {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+/* Avatar and Badge Styles */
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 10px var(--primary-glow);
+}
+
+.badge {
+    padding: 0.5rem 0.85rem;
+    font-weight: 600;
+}
+
+/* Transitions for interactive elements */
+.btn-group .btn {
+    padding: 0.4rem 0.75rem;
 }

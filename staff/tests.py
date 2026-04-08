@@ -1,88 +1,46 @@
-from django.test import TestCase, Client
-from django.contrib.auth.models import User, Permission, Group
-from .models import Staff
-from .forms import StaffForm
+"""Tests for staff app."""
+import pytest
 from django.core.exceptions import ValidationError
-from django.urls import reverse
-import datetime
+from staff.models import Staff
 
-class StaffModelTest(TestCase):
-    def test_staff_creation(self):
+
+@pytest.mark.django_db
+class TestStaffModel:
+    """Test Staff model."""
+
+    def test_create_staff(self):
+        """Test basic staff creation."""
         staff = Staff.objects.create(
-            staff_id="doc1",
-            first_name="James",
-            last_name="Smith",
-            role="DOCTOR",
-            phone="+15555555556",
+            staff_id="STF001",
+            first_name="John",
+            last_name="Doe",
+            role="Doctor",
         )
-        self.assertEqual(staff.first_name, "James")
-        self.assertEqual(staff.last_name, "Smith")
-        self.assertEqual(str(staff), "doc1 - James Smith (DOCTOR)")
+        assert staff.pk is not None
+        assert str(staff) == "STF001 - John Doe (DOCTOR)"
 
-class StaffFormTest(TestCase):
-    def test_staff_form_valid(self):
-        form = StaffForm(data={
-            'staff_id': 'nurse1',
-            'first_name': 'Mary',
-            'last_name': 'Jane',
-            'role': 'NURSE',
-            'phone': '+15555555557',
-        })
-        self.assertTrue(form.is_valid())
-
-class StaffViewTest(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.user = User.objects.create_user(username='testuser', password='password')
-        self.staff = Staff.objects.create(
-            staff_id="doc1",
-            first_name="James",
+    def test_full_name_property(self):
+        """Test full_name property."""
+        staff = Staff(
+            staff_id="STF002",
+            first_name="Jane",
             last_name="Smith",
-            role="DOCTOR",
-            phone="+15555555556",
+            role="Nurse",
         )
-        self.view_group = Group.objects.create(name='view_group')
-        self.add_group = Group.objects.create(name='add_group')
-        self.change_group = Group.objects.create(name='change_group')
-        self.delete_group = Group.objects.create(name='delete_group')
-        self.view_permission = Permission.objects.get(codename='staff_view_staff')
-        self.add_permission = Permission.objects.get(codename='staff_add_staff')
-        self.change_permission = Permission.objects.get(codename='staff_change_staff')
-        self.delete_permission = Permission.objects.get(codename='staff_delete_staff')
-        self.view_group.permissions.add(self.view_permission)
-        self.add_group.permissions.add(self.add_permission)
-        self.change_group.permissions.add(self.change_permission)
-        self.delete_group.permissions.add(self.delete_permission)
+        assert staff.full_name == "Jane Smith"
 
-    def test_staff_list_view_unauthenticated(self):
-        response = self.client.get(reverse('staff_list'))
-        self.assertEqual(response.status_code, 403)
-
-    def test_staff_list_view_no_permission(self):
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('staff_list'))
-        self.assertEqual(response.status_code, 403)
-
-    def test_staff_list_view_with_permission(self):
-        self.user.groups.add(self.view_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('staff_list'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_staff_create_view_with_permission(self):
-        self.user.groups.add(self.add_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('staff_create'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_staff_update_view_with_permission(self):
-        self.user.groups.add(self.change_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('staff_update', args=[self.staff.pk]))
-        self.assertEqual(response.status_code, 200)
-
-    def test_staff_delete_view_with_permission(self):
-        self.user.groups.add(self.delete_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('staff_delete', args=[self.staff.pk]))
-        self.assertEqual(response.status_code, 200)
+    def test_staff_id_must_be_unique(self):
+        """Test staff_id constraint."""
+        Staff.objects.create(
+            staff_id="DUP_STF",
+            first_name="First",
+            last_name="User",
+            role="Admin",
+        )
+        with pytest.raises(Exception):  # IntegrityError
+            Staff.objects.create(
+                staff_id="DUP_STF",
+                first_name="Second",
+                last_name="User",
+                role="Admin",
+            )

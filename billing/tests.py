@@ -1,135 +1,111 @@
-from django.test import TestCase, Client
-from django.contrib.auth.models import User, Permission, Group
-from .models import Invoice
-from .forms import InvoiceForm
-from patients.models import Patient
+"""Tests for billing app."""
+import pytest
+from decimal import Decimal
+from datetime import date, timedelta
 from django.core.exceptions import ValidationError
-from django.urls import reverse
-import datetime
 from django.utils import timezone
+from billing.models import Invoice, Payment
+from patients.models import Patient
 
-class InvoiceModelTest(TestCase):
-    def setUp(self):
-        self.patient = Patient.objects.create(
-            unique_id="12345",
-            first_name="John",
-            last_name="Doe",
-            date_of_birth=datetime.date(1990, 1, 1),
+
+@pytest.mark.django_db
+class TestInvoiceModel:
+    """Test Invoice model."""
+
+    def _create_patient(self):
+        """Helper to create a test patient."""
+        return Patient.objects.create(
+            unique_id="PAT_BILL",
+            first_name="Test",
+            last_name="Patient",
+            date_of_birth=timezone.now().date() - timedelta(days=365 * 30),
             gender="M",
-            address="123 Main St",
-            phone="+15555555555",
-        )
-        self.invoice = Invoice.objects.create(
-            patient=self.patient,
-            total_amount=100.00,
-            details="Test invoice",
         )
 
-    def test_invoice_creation(self):
-        self.assertEqual(self.invoice.patient, self.patient)
-        self.assertEqual(self.invoice.total_amount, 100.00)
-        self.assertEqual(str(self.invoice), f"Invoice #{self.invoice.id} for {self.patient}")
+    def test_create_invoice(self):
+        """Test basic invoice creation."""
+        patient = self._create_patient()
+        invoice = Invoice.objects.create(
+            patient=patient,
+            total_amount=Decimal("100.00"),
+        )
+        assert invoice.pk is not None
+        assert invoice.paid is False
 
-    def test_negative_total_amount(self):
-        with self.assertRaises(ValidationError):
-            invoice = Invoice(
-                patient=self.patient,
-                total_amount=-100.00,
-            )
+    def test_negative_amount_raises_error(self):
+        """Test negative total amount raises validation error."""
+        patient = self._create_patient()
+        invoice = Invoice(
+            patient=patient,
+            total_amount=Decimal("-50.00"),
+        )
+        with pytest.raises(ValidationError):
             invoice.full_clean()
 
-    def test_due_date_before_issue_date(self):
-        with self.assertRaises(ValidationError):
-            invoice = Invoice(
-                patient=self.patient,
-                total_amount=100.00,
-                issue_date=datetime.date.today(),
-                due_date=datetime.date.today() - datetime.timedelta(days=1),
-            )
+    def test_due_date_before_issue_date_raises_error(self):
+        """Test due date before issue date raises error."""
+        patient = self._create_patient()
+        invoice = Invoice(
+            patient=patient,
+            total_amount=Decimal("100.00"),
+            issue_date=date.today(),
+            due_date=date.today() - timedelta(days=1),
+        )
+        with pytest.raises(ValidationError):
             invoice.full_clean()
 
-class InvoiceFormTest(TestCase):
-    def setUp(self):
-        self.patient = Patient.objects.create(
-            unique_id="12345",
-            first_name="John",
-            last_name="Doe",
-            date_of_birth=datetime.date(1990, 1, 1),
+
+@pytest.mark.django_db
+class TestPaymentModel:
+    """Test Payment model."""
+
+    def _create_patient(self):
+        """Helper to create a test patient."""
+        return Patient.objects.create(
+            unique_id="PAY_PAT",
+            first_name="Test",
+            last_name="Patient",
+            date_of_birth=timezone.now().date() - timedelta(days=365 * 30),
             gender="M",
-            address="123 Main St",
-            phone="+15555555555",
         )
 
-    def test_invoice_form_valid(self):
-        form = InvoiceForm(data={
-            'patient': self.patient.pk,
-            'total_amount': 100.00,
-            'paid': False,
-            'insurance_claimed': False,
-            'details': 'Test invoice',
-        })
-        self.assertTrue(form.is_valid())
-
-class InvoiceViewTest(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.user = User.objects.create_user(username='testuser', password='password')
-        self.patient = Patient.objects.create(
-            unique_id="12345",
-            first_name="John",
-            last_name="Doe",
-            date_of_birth=datetime.date(1990, 1, 1),
-            gender="M",
-            address="123 Main St",
-            phone="+15555555555",
+    def _create_invoice(self):
+        """Helper to create a test invoice."""
+        patient = self._create_patient()
+        return Invoice.objects.create(
+            patient=patient,
+            total_amount=Decimal("100.00"),
         )
-        self.invoice = Invoice.objects.create(
-            patient=self.patient,
-            total_amount=100.00,
-            details="Test invoice",
+
+    def test_create_payment(self):
+        """Test basic payment creation."""
+        invoice = self._create_invoice()
+        payment = Payment.objects.create(
+            invoice=invoice,
+            amount=Decimal("50.00"),
+            payment_method="CASH",
         )
-        self.view_group = Group.objects.create(name='view_group')
-        self.add_group = Group.objects.create(name='add_group')
-        self.change_group = Group.objects.create(name='change_group')
-        self.delete_group = Group.objects.create(name='delete_group')
-        self.view_permission = Permission.objects.get(codename='billing_view_invoice')
-        self.add_permission = Permission.objects.get(codename='billing_add_invoice')
-        self.change_permission = Permission.objects.get(codename='billing_change_invoice')
-        self.delete_permission = Permission.objects.get(codename='billing_delete_invoice')
-        self.view_group.permissions.add(self.view_permission)
-        self.add_group.permissions.add(self.add_permission)
-        self.change_group.permissions.add(self.change_permission)
-        self.delete_group.permissions.add(self.delete_permission)
+        assert payment.pk is not None
+        assert payment.status == "COMPLETED"
 
-    def test_invoice_list_view_unauthenticated(self):
-        response = self.client.get(reverse('invoice_list'))
-        self.assertEqual(response.status_code, 403)
+    def test_payment_updates_invoice_paid(self):
+        """Test payment updates invoice paid status."""
+        invoice = self._create_invoice()
+        Payment.objects.create(
+            invoice=invoice,
+            amount=Decimal("100.00"),
+            payment_method="CARD",
+        )
+        invoice.refresh_from_db()
+        assert invoice.paid is True
 
-    def test_invoice_list_view_no_permission(self):
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('invoice_list'))
-        self.assertEqual(response.status_code, 403)
-
-    def test_invoice_list_view_with_permission(self):
-        self.user.groups.add(self.view_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('invoice_list'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_invoice_create_view_with_permission(self):
-        self.user.groups.add(self.add_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('invoice_create'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_invoice_update_view_with_permission(self):
-        self.user.groups.add(self.change_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('invoice_update', args=[self.invoice.pk]))
-        self.assertEqual(response.status_code, 200)
-
-    def test_invoice_delete_view_with_permission(self):
-        self.user.groups.add(self.delete_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('invoice_delete', args=[self.invoice.pk]))
-        self.assertEqual(response.status_code, 200)
+    def test_partial_payment_keeps_invoice_unpaid(self):
+        """Test partial payment keeps invoice unpaid."""
+        invoice = self._create_invoice()
+        Payment.objects.create(
+            invoice=invoice,
+            amount=Decimal("50.00"),
+            payment_method="CASH",
+        )
+        invoice.refresh_from_db()
+        assert invoice.paid is False

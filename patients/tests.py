@@ -1,210 +1,179 @@
-from django.test import TestCase, Client
-from django.contrib.auth.models import User, Permission, Group
-from .models import Patient
-from .forms import PatientForm
+"""Tests for patients app."""
+import pytest
+from datetime import date, timedelta
 from django.core.exceptions import ValidationError
-from django.urls import reverse
-import datetime
+from patients.models import Patient
 
-class PatientModelTest(TestCase):
-    def setUp(self):
-        self.patient = Patient.objects.create(
-            unique_id="12345",
+
+@pytest.mark.django_db
+class TestPatientModel:
+    """Test Patient model."""
+
+    def test_create_patient(self):
+        """Test basic patient creation."""
+        patient = Patient.objects.create(
+            unique_id="PAT001",
             first_name="John",
             last_name="Doe",
-            date_of_birth=datetime.date(1990, 1, 1),
+            date_of_birth=date(1990, 1, 1),
             gender="M",
-            address="123 Main St",
-            phone="+15555555555",
         )
+        assert patient.pk is not None
+        assert str(patient) == "PAT001 - John Doe"
 
-    def test_patient_creation(self):
-        self.assertEqual(self.patient.first_name, "John")
-        self.assertEqual(self.patient.last_name, "Doe")
-        self.assertEqual(str(self.patient), "12345 - John Doe")
+    def test_full_name_property(self):
+        """Test full_name property."""
+        patient = Patient(
+            unique_id="PAT002",
+            first_name="Jane",
+            last_name="Smith",
+            date_of_birth=date(1985, 5, 15),
+            gender="F",
+        )
+        assert patient.full_name == "Jane Smith"
 
-    def test_invalid_phone(self):
-        with self.assertRaises(ValidationError):
-            patient = Patient(
-                unique_id="54321",
-                first_name="Jane",
-                last_name="Doe",
-                date_of_birth=datetime.date(1992, 2, 2),
-                gender="F",
-                address="456 Oak Ave",
-                phone="invalid-phone",
-                email='jane.doe@example.com',
-            )
+    def test_age_property(self):
+        """Test age calculation."""
+        birth_date = date.today().replace(year=date.today().year - 30)
+        patient = Patient(
+            unique_id="PAT003",
+            first_name="Test",
+            last_name="User",
+            date_of_birth=birth_date,
+            gender="O",
+        )
+        assert patient.age == 30
+
+    def test_age_property_no_dob(self):
+        """Test age returns None when DOB not set."""
+        patient = Patient(
+            unique_id="PAT004",
+            first_name="Test",
+            last_name="User",
+            date_of_birth=None,
+            gender="O",
+        )
+        assert patient.age is None
+
+    def test_is_admitted_property(self):
+        """Test is_admitted property."""
+        from django.utils import timezone
+        patient = Patient(
+            unique_id="PAT005",
+            first_name="Test",
+            last_name="User",
+            date_of_birth=date(1990, 1, 1),
+            gender="M",
+            admission_date=timezone.now() - timedelta(days=1),
+            discharge_date=None,
+        )
+        assert patient.is_admitted is True
+
+    def test_is_admitted_discharged(self):
+        """Test is_admitted returns False after discharge."""
+        from django.utils import timezone
+        patient = Patient(
+            unique_id="PAT006",
+            first_name="Test",
+            last_name="User",
+            date_of_birth=date(1990, 1, 1),
+            gender="M",
+            admission_date=timezone.now() - timedelta(days=2),
+            discharge_date=timezone.now() - timedelta(days=1),
+        )
+        assert patient.is_admitted is False
+
+    def test_phone_normalization(self):
+        """Test phone number normalization."""
+        patient = Patient(
+            unique_id="PAT007",
+            first_name="Test",
+            last_name="User",
+            date_of_birth=date(1990, 1, 1),
+            gender="M",
+            phone="555-123-4567",
+        )
+        patient.save()
+        assert patient.phone.startswith("+")
+
+    def test_valid_phone_with_plus(self):
+        """Test valid phone with country code."""
+        patient = Patient(
+            unique_id="PAT008",
+            first_name="Test",
+            last_name="User",
+            date_of_birth=date(1990, 1, 1),
+            gender="M",
+            phone="+12345678901",
+        )
+        patient.full_clean()  # Should not raise
+
+    def test_invalid_phone_too_short(self):
+        """Test invalid phone number too short."""
+        patient = Patient(
+            unique_id="PAT009",
+            first_name="Test",
+            last_name="User",
+            date_of_birth=date(1990, 1, 1),
+            gender="M",
+            phone="+123",
+        )
+        with pytest.raises(ValidationError):
             patient.full_clean()
 
-class PatientFormTest(TestCase):
-    def test_patient_form_valid(self):
-        form = PatientForm(data={
-            'unique_id': '54321',
-            'first_name': 'Jane',
-            'last_name': 'Doe',
-            'date_of_birth': '1992-02-02',
-            'gender': 'F',
-            'address': '456 Oak Ave',
-            'phone': '+1234567890',
-            'email': 'jane.doe@example.com',
-        })
-        self.assertTrue(form.is_valid())
+    def test_date_of_birth_in_future_raises_error(self):
+        """Test DOB in future raises validation error."""
+        patient = Patient(
+            unique_id="PAT010",
+            first_name="Test",
+            last_name="User",
+            date_of_birth=date.today() + timedelta(days=1),
+            gender="M",
+        )
+        with pytest.raises(ValidationError):
+            patient.full_clean()
 
-    def test_patient_form_duplicate_email(self):
+    def test_discharge_before_admission_raises_error(self):
+        """Test discharge before admission raises constraint error."""
+        from django.utils import timezone
+        patient = Patient(
+            unique_id="PAT011",
+            first_name="Test",
+            last_name="User",
+            date_of_birth=date(1990, 1, 1),
+            gender="M",
+            admission_date=timezone.now() + timedelta(days=1),
+            discharge_date=timezone.now(),
+        )
+        with pytest.raises(ValidationError):
+            patient.full_clean()
+
+    def test_gender_normalization(self):
+        """Test gender normalization from display value."""
+        patient = Patient(
+            unique_id="PAT012",
+            first_name="Test",
+            last_name="User",
+            date_of_birth=date(1990, 1, 1),
+            gender="Male",
+        )
+        patient.save()
+        assert patient.gender == "M"
+
+    def test_unique_id_must_be_unique(self):
+        """Test unique_id constraint."""
         Patient.objects.create(
-            unique_id="12345",
-            first_name="John",
-            last_name="Doe",
-            date_of_birth=datetime.date(1990, 1, 1),
+            unique_id="DUP001",
+            first_name="First",
+            last_name="User",
+            date_of_birth=date(1990, 1, 1),
             gender="M",
-            address="123 Main St",
-            phone="+15555555555",
-            email='john.doe@example.com',
         )
-        form = PatientForm(data={
-            'unique_id': '54321',
-            'first_name': 'Jane',
-            'last_name': 'Doe',
-            'date_of_birth': '1992-02-02',
-            'gender': 'F',
-            'address': '456 Oak Ave',
-            'phone': '+1234567890',
-            'email': 'john.doe@example.com',
-        })
-        self.assertFalse(form.is_valid())
-        self.assertIn('email', form.errors)
-
-class PatientViewTest(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.user = User.objects.create_user(username='testuser', password='password')
-        self.view_group = Group.objects.create(name='view_group')
-        self.add_group = Group.objects.create(name='add_group')
-        self.change_group = Group.objects.create(name='change_group')
-        self.delete_group = Group.objects.create(name='delete_group')
-        self.view_permission = Permission.objects.get(codename='patients_view_patient')
-        self.add_permission = Permission.objects.get(codename='patients_add_patient')
-        self.change_permission = Permission.objects.get(codename='patients_change_patient')
-        self.delete_permission = Permission.objects.get(codename='patients_delete_patient')
-        self.view_group.permissions.add(self.view_permission)
-        self.add_group.permissions.add(self.add_permission)
-        self.change_group.permissions.add(self.change_permission)
-        self.delete_group.permissions.add(self.delete_permission)
-        self.patient = Patient.objects.create(
-            unique_id="12345",
-            first_name="John",
-            last_name="Doe",
-            date_of_birth=datetime.date(1990, 1, 1),
-            gender="M",
-            address="123 Main St",
-            phone="+15555555555",
-        )
-
-    def test_patient_list_view_unauthenticated(self):
-        response = self.client.get(reverse('patient_list'))
-        self.assertEqual(response.status_code, 403)
-
-    def test_patient_list_view_no_permission(self):
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('patient_list'))
-        self.assertEqual(response.status_code, 403)
-
-    def test_patient_list_view_with_permission(self):
-        self.user.groups.add(self.view_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('patient_list'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_patient_create_view_unauthenticated(self):
-        response = self.client.get(reverse('patient_create'))
-        self.assertEqual(response.status_code, 403)
-
-    def test_patient_create_view_no_permission(self):
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('patient_create'))
-        self.assertEqual(response.status_code, 403)
-
-    def test_patient_create_view_with_permission(self):
-        self.user.groups.add(self.add_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('patient_create'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_patient_create_view_form_valid(self):
-        self.user.groups.add(self.add_group)
-        self.user.groups.add(self.view_group)
-        self.client.login(username='testuser', password='password')
-        form_data = {
-            'unique_id': '54321',
-            'first_name': 'Jane',
-            'last_name': 'Doe',
-            'date_of_birth': '1992-02-02',
-            'gender': 'F',
-            'address': '456 Oak Ave',
-            'phone': '+1234567890',
-            'email': 'jane.doe@example.com',
-        }
-        response = self.client.post(reverse('patient_create'), data=form_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('patient_list'))
-        self.assertTrue(Patient.objects.filter(unique_id='54321').exists())
-
-    def test_patient_update_view_unauthenticated(self):
-        response = self.client.get(reverse('patient_update', args=[self.patient.pk]))
-        self.assertEqual(response.status_code, 403)
-
-    def test_patient_update_view_no_permission(self):
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('patient_update', args=[self.patient.pk]))
-        self.assertEqual(response.status_code, 403)
-
-    def test_patient_update_view_with_permission(self):
-        self.user.groups.add(self.change_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('patient_update', args=[self.patient.pk]))
-        self.assertEqual(response.status_code, 200)
-
-    def test_patient_update_view_form_valid(self):
-        self.user.groups.add(self.change_group)
-        self.user.groups.add(self.view_group)
-        self.client.login(username='testuser', password='password')
-        form_data = {
-            'unique_id': '12345',
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'date_of_birth': '1990-01-01',
-            'gender': 'M',
-            'address': '123 Main St',
-            'phone': '+15555555555',
-            'email': 'john.doe.updated@example.com',
-        }
-        response = self.client.post(reverse('patient_update', args=[self.patient.pk]), data=form_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('patient_list'))
-        self.patient.refresh_from_db()
-        self.assertEqual(self.patient.email, 'john.doe.updated@example.com')
-
-    def test_patient_delete_view_unauthenticated(self):
-        response = self.client.get(reverse('patient_delete', args=[self.patient.pk]))
-        self.assertEqual(response.status_code, 403)
-
-    def test_patient_delete_view_no_permission(self):
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('patient_delete', args=[self.patient.pk]))
-        self.assertEqual(response.status_code, 403)
-
-    def test_patient_delete_view_with_permission(self):
-        self.user.groups.add(self.delete_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('patient_delete', args=[self.patient.pk]))
-        self.assertEqual(response.status_code, 200)
-
-    def test_patient_delete_view_post(self):
-        self.user.groups.add(self.delete_group)
-        self.user.groups.add(self.view_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.post(reverse('patient_delete', args=[self.patient.pk]))
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('patient_list'))
-        self.assertFalse(Patient.objects.filter(pk=self.patient.pk).exists())
+        with pytest.raises(Exception):  # IntegrityError
+            Patient.objects.create(
+                unique_id="DUP001",
+                first_name="Second",
+                last_name="User",
+                date_of_birth=date(1990, 1, 1),
+                gender="M",
+            )

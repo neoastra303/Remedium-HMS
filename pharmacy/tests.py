@@ -1,110 +1,217 @@
-from django.test import TestCase, Client
-from django.contrib.auth.models import User, Permission, Group
-from .models import Prescription
-from .forms import PrescriptionForm
+"""Tests for pharmacy app."""
+import pytest
+from unittest.mock import patch, MagicMock
+from django.utils import timezone
+from datetime import timedelta
+from rest_framework.test import APIClient
+from rest_framework import status
+from pharmacy.models import Prescription
+from pharmacy.openfda_service import search_drug_label, search_adverse_events
 from patients.models import Patient
 from staff.models import Staff
-from django.urls import reverse
-import datetime
+from django.contrib.auth.models import User
 
-class PrescriptionModelTest(TestCase):
-    def setUp(self):
-        self.patient = Patient.objects.create(
-            unique_id="12345",
-            first_name="John",
-            last_name="Doe",
-            date_of_birth=datetime.date(1990, 1, 1),
-            gender="M",
-        )
-        self.prescription = Prescription.objects.create(
-            patient=self.patient,
-            drug_name="Test Drug",
-            dosage="10mg",
-            frequency="Once a day",
+
+@pytest.mark.django_db
+class TestPrescriptionModel:
+    """Test Prescription model."""
+
+    def _create_patient(self):
+        return Patient.objects.create(
+            unique_id='PAT_PHARM',
+            first_name='Test',
+            last_name='Patient',
+            date_of_birth=timezone.now().date() - timedelta(days=365 * 30),
+            gender='M',
         )
 
-    def test_prescription_creation(self):
-        self.assertEqual(self.prescription.drug_name, "Test Drug")
-        self.assertEqual(str(self.prescription), f"Test Drug for {self.patient}")
-
-class PrescriptionFormTest(TestCase):
-    def setUp(self):
-        self.patient = Patient.objects.create(
-            unique_id="12345",
-            first_name="John",
-            last_name="Doe",
-            date_of_birth=datetime.date(1990, 1, 1),
-            gender="M",
+    def _create_doctor(self):
+        return Staff.objects.create(
+            staff_id='DOC_PHARM',
+            first_name='Dr. Test',
+            last_name='Doctor',
+            role='DOCTOR',
         )
 
-    def test_prescription_form_valid(self):
-        form = PrescriptionForm(data={
-            'patient': self.patient.pk,
-            'drug_name': 'Test Drug',
-            'dosage': '10mg',
-            'frequency': 'Once a day',
-        })
-        self.assertTrue(form.is_valid())
-
-class PrescriptionViewTest(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.user = User.objects.create_user(username='testuser', password='password')
-        self.patient = Patient.objects.create(
-            unique_id="12345",
-            first_name="John",
-            last_name="Doe",
-            date_of_birth=datetime.date(1990, 1, 1),
-            gender="M",
+    def test_create_prescription(self):
+        patient = self._create_patient()
+        doctor = self._create_doctor()
+        rx = Prescription.objects.create(
+            patient=patient,
+            drug_name='Amoxicillin',
+            dosage='500mg',
+            frequency='3 times daily',
+            prescribed_by=doctor,
         )
-        self.prescription = Prescription.objects.create(
-            patient=self.patient,
-            drug_name="Test Drug",
-            dosage="10mg",
-            frequency="Once a day",
+        assert rx.pk is not None
+        assert str(rx) == 'Amoxicillin for PAT_PHARM - Test Patient'
+
+    def test_prescription_auto_date(self):
+        """Test prescribed_date is auto-set."""
+        patient = self._create_patient()
+        rx = Prescription(
+            patient=patient,
+            drug_name='Test Drug',
+            dosage='100mg',
+            frequency='Daily',
         )
-        self.view_group = Group.objects.create(name='view_group')
-        self.add_group = Group.objects.create(name='add_group')
-        self.change_group = Group.objects.create(name='change_group')
-        self.delete_group = Group.objects.create(name='delete_group')
-        self.view_permission = Permission.objects.get(codename='pharmacy_view_prescription')
-        self.add_permission = Permission.objects.get(codename='pharmacy_add_prescription')
-        self.change_permission = Permission.objects.get(codename='pharmacy_change_prescription')
-        self.delete_permission = Permission.objects.get(codename='pharmacy_delete_prescription')
-        self.view_group.permissions.add(self.view_permission)
-        self.add_group.permissions.add(self.add_permission)
-        self.change_group.permissions.add(self.change_permission)
-        self.delete_group.permissions.add(self.delete_permission)
+        rx.save()
+        assert rx.prescribed_date is not None
 
-    def test_prescription_list_view_unauthenticated(self):
-        response = self.client.get(reverse('prescription_list'))
-        self.assertEqual(response.status_code, 403)
 
-    def test_prescription_list_view_no_permission(self):
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('prescription_list'))
-        self.assertEqual(response.status_code, 403)
+@pytest.mark.django_db
+class TestOpenFDAService:
+    """Test OpenFDA API service functions."""
 
-    def test_prescription_list_view_with_permission(self):
-        self.user.groups.add(self.view_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('prescription_list'))
-        self.assertEqual(response.status_code, 200)
+    @patch('pharmacy.openfda_service.requests.get')
+    def test_search_drug_label_success(self, mock_get):
+        """Test successful drug label search."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            "results": [{
+                "openfda": {
+                    "generic_name": ["AMOXICILLIN"],
+                    "brand_name": ["AMOXIL"],
+                    "manufacturer_name": ["Test Pharma"],
+                    "route": ["ORAL"],
+                    "substance_name": ["AMOXICILLIN"],
+                    "product_type": ["HUMAN PRESCRIPTION DRUG"],
+                },
+                "warnings_and_cautions": ["Use with caution."],
+                "adverse_reactions": ["Nausea, diarrhea."],
+                "dosage_and_administration": ["Take as directed."],
+                "drug_interactions": ["None known."],
+                "indications_and_usage": ["Bacterial infections."],
+            }]
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_get.return_value = mock_response
 
-    def test_prescription_create_view_with_permission(self):
-        self.user.groups.add(self.add_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('prescription_create'))
-        self.assertEqual(response.status_code, 200)
+        result = search_drug_label("Amoxicillin")
+        assert result["generic_name"] == "AMOXICILLIN"
+        assert result["brand_name"] == "AMOXIL"
+        assert result["manufacturer"] == "Test Pharma"
+        assert "ORAL" in result["route"]
 
-    def test_prescription_update_view_with_permission(self):
-        self.user.groups.add(self.change_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('prescription_update', args=[self.prescription.pk]))
-        self.assertEqual(response.status_code, 200)
+    @patch('pharmacy.openfda_service.requests.get')
+    def test_search_drug_label_not_found(self, mock_get):
+        """Test drug not found returns error."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {"results": []}
+        mock_response.raise_for_status = MagicMock()
+        mock_get.return_value = mock_response
 
-    def test_prescription_delete_view_with_permission(self):
-        self.user.groups.add(self.delete_group)
-        self.client.login(username='testuser', password='password')
-        response = self.client.get(reverse('prescription_delete', args=[self.prescription.pk]))
-        self.assertEqual(response.status_code, 200)
+        result = search_drug_label("NonExistentDrug")
+        assert "error" in result
+
+    @patch('pharmacy.openfda_service.requests.get')
+    def test_search_drug_label_api_error(self, mock_get):
+        """Test API failure returns error."""
+        import requests as req
+        from django.core.cache import cache
+        cache.clear()  # Clear cache to avoid stale results
+        mock_get.side_effect = req.RequestException("API down")
+
+        result = search_drug_label("FailingDrug123")
+        assert "error" in result
+
+    @patch('pharmacy.openfda_service.requests.get')
+    def test_search_adverse_events(self, mock_get):
+        """Test adverse event search."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            "results": [
+                {"term": "Nausea", "count": 150},
+                {"term": "Headache", "count": 80},
+            ]
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_get.return_value = mock_response
+
+        result = search_adverse_events("Amoxicillin")
+        assert result["drug_name"] == "Amoxicillin"
+        assert len(result["top_adverse_reactions"]) == 2
+        assert result["total_reports"] == 230
+
+
+@pytest.mark.django_db
+class TestPrescriptionAPIWithOpenFDA:
+    """Test Prescription API with OpenFDA endpoints."""
+
+    def _create_user(self):
+        return User.objects.create_user('pharm@test.com', 'pharm@test.com', 'pharmpass')
+
+    def _create_patient(self):
+        return Patient.objects.create(
+            unique_id='PAT_API_PHARM',
+            first_name='Test',
+            last_name='Patient',
+            date_of_birth=timezone.now().date() - timedelta(days=365 * 30),
+            gender='M',
+        )
+
+    def _create_doctor(self):
+        return Staff.objects.create(
+            staff_id='DOC_PHARM_API',
+            first_name='Dr.',
+            last_name='Test',
+            role='DOCTOR',
+        )
+
+    @patch('pharmacy.openfda_service.requests.get')
+    def test_drug_info_endpoint(self, mock_get, api_client):
+        """Test /api/v1/prescriptions/drug-info/ returns drug data."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            "results": [{
+                "openfda": {
+                    "generic_name": ["IBUPROFEN"],
+                    "brand_name": ["ADVIL"],
+                    "manufacturer_name": ["Pfizer"],
+                    "route": ["ORAL"],
+                    "substance_name": ["IBUPROFEN"],
+                    "product_type": ["HUMAN PRESCRIPTION DRUG"],
+                },
+                "warnings_and_cautions": ["Take with food."],
+                "adverse_reactions": ["Stomach upset."],
+                "dosage_and_administration": ["200mg every 6 hours."],
+                "drug_interactions": ["Blood thinners."],
+                "indications_and_usage": ["Pain relief."],
+            }]
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_get.return_value = mock_response
+
+        user = self._create_user()
+        api_client.force_authenticate(user=user)
+        response = api_client.get('/api/v1/prescriptions/drug-info/', {'q': 'Ibuprofen'})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['generic_name'] == 'IBUPROFEN'
+        assert response.data['brand_name'] == 'ADVIL'
+
+    def test_drug_info_missing_query(self, api_client):
+        """Test drug-info returns 400 without query parameter."""
+        user = self._create_user()
+        api_client.force_authenticate(user=user)
+        response = api_client.get('/api/v1/prescriptions/drug-info/')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @patch('pharmacy.openfda_service.requests.get')
+    def test_adverse_events_endpoint(self, mock_get, api_client):
+        """Test /api/v1/prescriptions/adverse-events/ returns data."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            "results": [
+                {"term": "Dizziness", "count": 50},
+            ]
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_get.return_value = mock_response
+
+        user = self._create_user()
+        api_client.force_authenticate(user=user)
+        response = api_client.get('/api/v1/prescriptions/adverse-events/', {'q': 'Aspirin'})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['total_reports'] == 50

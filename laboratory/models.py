@@ -1,5 +1,6 @@
 from django.db import models
 from patients.models import Patient
+from simple_history.models import HistoricalRecords
 
 
 class LabTest(models.Model):
@@ -29,3 +30,5 @@ class LabTest(models.Model):
 
     def __str__(self):
         return f"{self.test_name} for {self.patient}"
+
+    history = HistoricalRecords()

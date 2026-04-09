@@ -8,7 +8,7 @@ We take the security of Remedium Hospital Management System seriously. If you di
 
 **Do not** file a public issue for security vulnerabilities. Instead, please report them directly to our security team:
 
-- **Email**: security@remedium-hms.org (replace with actual email)
+- **Email**: security@remedium-hms.org 
 - **Subject**: "Security Vulnerability Report - [Brief description]"
 
 Please provide the following information in your report:

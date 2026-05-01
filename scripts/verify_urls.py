@@ -38,6 +38,13 @@ to_check = [
     ('care_monitoring:patientcare_detail', [1]), ('care_monitoring:patientcare_update', [1]),
     ('care_monitoring:patientcare_delete', [1]), ('care_monitoring:patient_vital_trends', [1]),
     ('billing:invoice_print', [1]),
+    # non-namespaced care_monitoring (used in patientcare_detail.html)
+    ('patientcare_list', []), ('patientcare_update', [1]), ('patientcare_delete', [1]),
+    # hospital
+    ('ward_list', []), ('ward_create', []), ('ward_detail', [1]), ('ward_update', [1]), ('ward_delete', [1]),
+    ('room_list', []), ('room_create', []), ('room_detail', [1]), ('room_update', [1]), ('room_delete', [1]),
+    # integration sync
+    ('integration_sync', [1]),
     # auth
     ('login', []), ('logout', []), ('password_change', []), ('password_reset', []),
 ]

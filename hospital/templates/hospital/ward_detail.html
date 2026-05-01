@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-building me-2 text-primary"></i>{{ ward.name }}</h4>
+    <div class="d-flex gap-2">
+        <a href="{% url 'ward_update' ward.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
+        <a href="{% url 'ward_delete' ward.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Delete</a>
+    </div>
+</div>
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body px-4">
+                <dl class="row mb-0">
+                    <dt class="col-5 text-muted small">Capacity</dt><dd class="col-7">{{ ward.capacity }} beds</dd>
+                    <dt class="col-5 text-muted small">Rooms</dt><dd class="col-7">{{ ward.room_set.count }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 fw-bold py-3 px-4">Rooms</div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light"><tr><th class="ps-4">Room #</th><th>Capacity</th><th class="pe-4 text-end">Actions</th></tr></thead>
+                    <tbody>
+                        {% for room in ward.room_set.all %}
+                        <tr>
+                            <td class="ps-4">{{ room.room_number }}</td>
+                            <td>{{ room.capacity }}</td>
+                            <td class="pe-4 text-end">
+                                <a href="{% url 'room_update' room.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'room_delete' room.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                            </td>
+                        </tr>
+                        {% empty %}<tr><td colspan="3" class="text-center py-3 text-muted">No rooms.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mt-3"><a href="{% url 'ward_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a></div>
+{% endblock %}

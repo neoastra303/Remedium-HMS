@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-6">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4 text-center">
+            <i class="bi bi-exclamation-triangle display-4 text-danger mb-3"></i>
+            <h5 class="fw-bold">Delete Ward "{{ ward.name }}"?</h5>
+            <p class="text-muted">This will also delete all rooms in this ward.</p>
+            <form method="post">{% csrf_token %}
+                <button type="submit" class="btn btn-danger me-2">Delete</button>
+                <a href="{% url 'ward_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div></div>
+{% endblock %}

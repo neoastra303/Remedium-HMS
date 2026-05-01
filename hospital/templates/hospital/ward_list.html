@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-building me-2 text-primary"></i>Wards</h4>
+    <a href="{% url 'ward_create' %}" class="btn btn-sm btn-primary"><i class="bi bi-plus-circle me-1"></i>New Ward</a>
+</div>
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light"><tr><th class="ps-4">Name</th><th>Capacity</th><th class="pe-4 text-end">Actions</th></tr></thead>
+            <tbody>
+                {% for ward in wards %}
+                <tr>
+                    <td class="ps-4 fw-medium">{{ ward.name }}</td>
+                    <td>{{ ward.capacity }} beds</td>
+                    <td class="pe-4 text-end">
+                        <a href="{% url 'ward_detail' ward.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'ward_update' ward.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'ward_delete' ward.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}<tr><td colspan="3" class="text-center py-4 text-muted">No wards found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% include 'partials/pagination.html' %}
+{% endblock %}

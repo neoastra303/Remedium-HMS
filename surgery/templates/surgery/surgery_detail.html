@@ -1,12 +1,28 @@
 {% extends 'base.html' %}
-
 {% block content %}
-  <h2>Surgery Detail</h2>
-  <p><strong>Patient:</strong> {{ surgery.patient }}</p>
-  <p><strong>Surgeon:</strong> {{ surgery.surgeon }}</p>
-  <p><strong>Scheduled Date:</strong> {{ surgery.scheduled_date }}</p>
-  <p><strong>Operating Room:</strong> {{ surgery.operating_room }}</p>
-  <p><strong>Procedure:</strong> {{ surgery.procedure }}</p>
-  <p><strong>Status:</strong> {{ surgery.get_status_display }}</p>
-  <p><strong>Notes:</strong> {{ surgery.notes }}</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-scissors me-2 text-primary"></i>{{ surgery.procedure }}</h4>
+    <div class="d-flex gap-2">
+        <a href="{% url 'surgery_update' surgery.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
+        <a href="{% url 'surgery_delete' surgery.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Delete</a>
+    </div>
+</div>
+<div class="card border-0 shadow-sm">
+    <div class="card-body px-4">
+        <dl class="row mb-0">
+            <dt class="col-4 text-muted small">Patient</dt><dd class="col-8"><a href="{% url 'patient_detail' surgery.patient.pk %}">{{ surgery.patient.full_name }}</a></dd>
+            <dt class="col-4 text-muted small">Surgeon</dt><dd class="col-8">{{ surgery.surgeon }}</dd>
+            <dt class="col-4 text-muted small">Scheduled</dt><dd class="col-8">{{ surgery.scheduled_date|date:"M d, Y H:i" }}</dd>
+            <dt class="col-4 text-muted small">Operating Room</dt><dd class="col-8">{{ surgery.operating_room }}</dd>
+            <dt class="col-4 text-muted small">Status</dt>
+            <dd class="col-8">
+                {% if surgery.status == 'Scheduled' %}<span class="badge bg-primary rounded-pill">{{ surgery.get_status_display }}</span>
+                {% elif surgery.status == 'Completed' %}<span class="badge bg-success rounded-pill">{{ surgery.get_status_display }}</span>
+                {% else %}<span class="badge bg-secondary rounded-pill">{{ surgery.get_status_display }}</span>{% endif %}
+            </dd>
+            {% if surgery.notes %}<dt class="col-4 text-muted small">Notes</dt><dd class="col-8">{{ surgery.notes }}</dd>{% endif %}
+        </dl>
+    </div>
+</div>
+<div class="mt-3"><a href="{% url 'surgery_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a></div>
 {% endblock %}

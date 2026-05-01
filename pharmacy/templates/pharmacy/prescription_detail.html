@@ -1,12 +1,24 @@
 {% extends 'base.html' %}
-
 {% block content %}
-  <h2>Prescription Detail</h2>
-  <p><strong>Patient:</strong> {{ prescription.patient }}</p>
-  <p><strong>Drug Name:</strong> {{ prescription.drug_name }}</p>
-  <p><strong>Dosage:</strong> {{ prescription.dosage }}</p>
-  <p><strong>Frequency:</strong> {{ prescription.frequency }}</p>
-  <p><strong>Prescribed Date:</strong> {{ prescription.prescribed_date }}</p>
-  <p><strong>Prescribed By:</strong> {{ prescription.prescribed_by }}</p>
-  <p><strong>Notes:</strong> {{ prescription.notes }}</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-capsule me-2 text-primary"></i>{{ prescription.drug_name }}</h4>
+    <div class="d-flex gap-2">
+        <a href="{% url 'prescription_update' prescription.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
+        <a href="{% url 'prescription_delete' prescription.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Delete</a>
+    </div>
+</div>
+<div class="card border-0 shadow-sm">
+    <div class="card-body px-4">
+        <dl class="row mb-0">
+            <dt class="col-4 text-muted small">Patient</dt><dd class="col-8"><a href="{% url 'patient_detail' prescription.patient.pk %}">{{ prescription.patient.full_name }}</a></dd>
+            <dt class="col-4 text-muted small">Drug</dt><dd class="col-8 fw-medium">{{ prescription.drug_name }}</dd>
+            <dt class="col-4 text-muted small">Dosage</dt><dd class="col-8">{{ prescription.dosage }}</dd>
+            <dt class="col-4 text-muted small">Frequency</dt><dd class="col-8">{{ prescription.frequency }}</dd>
+            <dt class="col-4 text-muted small">Prescribed By</dt><dd class="col-8">{{ prescription.prescribed_by|default:"—" }}</dd>
+            <dt class="col-4 text-muted small">Date</dt><dd class="col-8">{{ prescription.prescribed_date|date:"M d, Y" }}</dd>
+            {% if prescription.notes %}<dt class="col-4 text-muted small">Notes</dt><dd class="col-8">{{ prescription.notes }}</dd>{% endif %}
+        </dl>
+    </div>
+</div>
+<div class="mt-3"><a href="{% url 'prescription_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a></div>
 {% endblock %}

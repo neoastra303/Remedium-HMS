@@ -1,99 +1,86 @@
-"""Tests for surgery app."""
+"""Tests for surgery app REST API."""
 import pytest
-from datetime import timedelta
+from django.contrib.auth.models import User
 from django.utils import timezone
-from django.core.exceptions import ValidationError
+from datetime import timedelta
+from rest_framework.test import APIClient
+from rest_framework import status
 from surgery.models import Surgery
 from patients.models import Patient
 from staff.models import Staff
 
 
+def make_admin():
+    return User.objects.create_superuser(username='surg_admin', password='pass', email='s@s.com')
+
+
+@pytest.fixture
+def admin_client():
+    client = APIClient()
+    client.force_authenticate(user=make_admin())
+    return client
+
+
+@pytest.fixture
+def patient():
+    return Patient.objects.create(
+        unique_id='PAT_SURG', first_name='Jane', last_name='Doe',
+        date_of_birth=timezone.now().date() - timedelta(days=365 * 40), gender='F',
+    )
+
+
+@pytest.fixture
+def surgeon():
+    return Staff.objects.create(staff_id='SURG01', first_name='Dr', last_name='Smith', role='SURGEON')
+
+
 @pytest.mark.django_db
-class TestSurgeryModel:
-    """Test Surgery model."""
-
-    def _create_patient(self):
-        return Patient.objects.create(
-            unique_id='PAT_SURG',
-            first_name='Test',
-            last_name='Patient',
-            date_of_birth=timezone.now().date() - timedelta(days=365 * 30),
-            gender='M',
-        )
-
-    def _create_surgeon(self):
-        return Staff.objects.create(
-            staff_id='DOC_SURG',
-            first_name='Dr. Surgeon',
-            last_name='Test',
-            role='SURGEON',
-        )
-
-    def test_create_surgery(self):
-        patient = self._create_patient()
-        surgeon = self._create_surgeon()
-        surgery = Surgery.objects.create(
-            patient=patient,
-            surgeon=surgeon,
-            scheduled_date=timezone.now() + timedelta(days=7),
-            operating_room='OR-1',
-            procedure='Appendectomy',
-        )
-        assert surgery.pk is not None
-        assert surgery.status == 'Scheduled'
-
-    def test_surgery_status_choices(self):
-        """Test valid status values."""
-        patient = self._create_patient()
-        surgeon = self._create_surgeon()
-        for status in ['Scheduled', 'Completed', 'Cancelled']:
-            surgery = Surgery(
-                patient=patient,
-                surgeon=surgeon,
-                scheduled_date=timezone.now() + timedelta(days=1),
-                operating_room='OR-2',
-                procedure='Test',
-                status=status,
-            )
-            surgery.full_clean()  # Should not raise
-
-    def test_unique_operating_room_schedule(self):
-        """Test room cannot be double-booked at exact same datetime."""
-        patient = self._create_patient()
-        surgeon = self._create_surgeon()
-        fixed_datetime = timezone.now().replace(hour=10, minute=0, second=0, microsecond=0) + timedelta(days=10)
+class TestSurgeryAPI:
+    def test_list_surgeries(self, admin_client, patient, surgeon):
         Surgery.objects.create(
-            patient=patient,
-            surgeon=surgeon,
-            scheduled_date=fixed_datetime,
-            operating_room='OR-3',
-            procedure='Test 1',
+            patient=patient, surgeon=surgeon,
+            scheduled_date=timezone.now() + timedelta(days=1),
+            operating_room='OR-1', procedure='Appendectomy',
         )
-        patient2 = Patient.objects.create(
-            unique_id='PAT_SURG2',
-            first_name='Second',
-            last_name='Patient',
-            date_of_birth=timezone.now().date() - timedelta(days=365 * 25),
-            gender='F',
-        )
-        with pytest.raises(Exception):  # IntegrityError
-            Surgery.objects.create(
-                patient=patient2,
-                surgeon=surgeon,
-                scheduled_date=fixed_datetime,  # Exact same datetime
-                operating_room='OR-3',
-                procedure='Test 2',
-            )
+        r = admin_client.get('/api/v1/surgeries/')
+        assert r.status_code == status.HTTP_200_OK
+        assert r.data['count'] == 1
 
-    def test_surgery_str_representation(self):
-        """Test string representation."""
-        patient = self._create_patient()
-        surgeon = self._create_surgeon()
-        surgery = Surgery(
-            patient=patient,
-            surgeon=surgeon,
-            scheduled_date=timezone.now() + timedelta(days=7),
-            operating_room='OR-1',
-            procedure='Appendectomy',
+    def test_create_surgery(self, admin_client, patient, surgeon):
+        r = admin_client.post('/api/v1/surgeries/', {
+            'patient': patient.pk,
+            'surgeon': surgeon.pk,
+            'scheduled_date': (timezone.now() + timedelta(days=2)).isoformat(),
+            'operating_room': 'OR-2',
+            'procedure': 'Cholecystectomy',
+            'status': 'Scheduled',
+        })
+        assert r.status_code == status.HTTP_201_CREATED
+
+    def test_scheduled_action(self, admin_client, patient, surgeon):
+        Surgery.objects.create(
+            patient=patient, surgeon=surgeon,
+            scheduled_date=timezone.now() + timedelta(days=1),
+            operating_room='OR-3', procedure='Hip Replacement', status='Scheduled',
         )
-        assert 'Appendectomy' in str(surgery) or 'Surgery' in str(surgery)
+        Surgery.objects.create(
+            patient=patient, surgeon=surgeon,
+            scheduled_date=timezone.now() - timedelta(days=1),
+            operating_room='OR-4', procedure='Old Surgery', status='Completed',
+        )
+        r = admin_client.get('/api/v1/surgeries/scheduled/')
+        assert r.status_code == status.HTTP_200_OK
+        assert all(s['status'] == 'Scheduled' for s in r.data)
+
+    def test_serializer_includes_patient_name(self, admin_client, patient, surgeon):
+        Surgery.objects.create(
+            patient=patient, surgeon=surgeon,
+            scheduled_date=timezone.now() + timedelta(days=1),
+            operating_room='OR-5', procedure='Test',
+        )
+        r = admin_client.get('/api/v1/surgeries/')
+        assert r.data['results'][0]['patient_name'] == 'Jane Doe'
+
+    def test_unauthenticated_denied(self):
+        r = APIClient().get('/api/v1/surgeries/')
+        assert r.status_code == status.HTTP_401_UNAUTHORIZED

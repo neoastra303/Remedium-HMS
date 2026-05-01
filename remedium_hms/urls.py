@@ -14,7 +14,7 @@ from hospital.api_views import WardViewSet, RoomViewSet
 from inventory.api_views import InventoryItemViewSet
 from surgery.api_views import SurgeryViewSet
 from care_monitoring.api_views import PatientCareViewSet
-
+from core.views import homepage
 
 # API Router
 api_router = DefaultRouter()
@@ -32,6 +32,9 @@ api_router.register(r'surgeries', SurgeryViewSet, basename='surgery')
 api_router.register(r'care-monitoring', PatientCareViewSet, basename='care-monitoring')
 
 urlpatterns = [
+    # Root-level 'home' alias — fixes {% url 'home' %} in base.html
+    path("", homepage, name='home'),
+
     path("admin/", admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path("api/v1/", include(api_router.urls)),

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.core.exceptions import ValidationError as DjangoValidationError
 from .models import PatientCare
 
 
@@ -18,3 +19,12 @@ class PatientCareSerializer(serializers.ModelSerializer):
             'is_vital_signs_critical',
         ]
         read_only_fields = ['id', 'monitoring_date']
+
+    def validate(self, data):
+        systolic = data.get('blood_pressure_systolic')
+        diastolic = data.get('blood_pressure_diastolic')
+        if systolic and diastolic and systolic <= diastolic:
+            raise serializers.ValidationError(
+                {'blood_pressure_systolic': 'Systolic pressure must be higher than diastolic pressure.'}
+            )
+        return data

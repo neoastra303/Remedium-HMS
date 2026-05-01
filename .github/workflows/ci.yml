@@ -90,6 +90,23 @@ jobs:
         name: coverage-report
         path: coverage.xml
 
+  changelog:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Verify CHANGELOG.md was updated
+      run: |
+        if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q "CHANGELOG.md"; then
+          echo "✅ CHANGELOG.md updated."
+        else
+          echo "❌ CHANGELOG.md was not updated. Please document your changes."
+          exit 1
+        fi
+
   collectstatic:
     runs-on: ubuntu-latest
     steps:

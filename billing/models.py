@@ -8,6 +8,22 @@ from django.dispatch import receiver
 from simple_history.models import HistoricalRecords
 
 
+class InvoiceCounter(models.Model):
+    """Per-year atomic sequence counter for invoice numbers."""
+    year = models.PositiveIntegerField(primary_key=True)
+    last_seq = models.PositiveIntegerField(default=0)
+
+    @classmethod
+    def next_seq(cls, year):
+        """Atomically increment and return the next sequence number for the given year."""
+        from django.db import transaction
+        with transaction.atomic():
+            counter, _ = cls.objects.select_for_update().get_or_create(year=year)
+            counter.last_seq += 1
+            counter.save(update_fields=['last_seq'])
+            return counter.last_seq
+
+
 class Invoice(models.Model):
     class Meta:
         app_label = 'billing'
@@ -33,16 +49,9 @@ class Invoice(models.Model):
         """Auto-generate invoice number if not set."""
         if not self.invoice_number:
             year = timezone.now().year
-            # Get the next sequence number for this year
-            last_invoice = Invoice.objects.filter(
-                invoice_number__startswith=f'INV-{year}-'
-            ).order_by('-invoice_number').first()
-            if last_invoice:
-                seq = int(last_invoice.invoice_number.split('-')[-1]) + 1
-            else:
-                seq = 1
+            seq = InvoiceCounter.next_seq(year)
             self.invoice_number = f'INV-{year}-{seq:05d}'
-        super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def clean(self):
         super().clean()

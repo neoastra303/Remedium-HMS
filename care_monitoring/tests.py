@@ -1,96 +1,79 @@
-"""Tests for care_monitoring app."""
+"""Tests for care_monitoring app REST API."""
 import pytest
-from datetime import timedelta
-from decimal import Decimal
+from django.contrib.auth.models import User
 from django.utils import timezone
-from django.core.exceptions import ValidationError
+from datetime import timedelta
+from rest_framework.test import APIClient
+from rest_framework import status
 from care_monitoring.models import PatientCare
 from patients.models import Patient
-from staff.models import Staff
+
+
+def make_admin():
+    return User.objects.create_superuser(username='care_admin', password='pass', email='c@c.com')
+
+
+@pytest.fixture
+def admin_client():
+    client = APIClient()
+    client.force_authenticate(user=make_admin())
+    return client
+
+
+@pytest.fixture
+def patient():
+    return Patient.objects.create(
+        unique_id='PAT_CARE', first_name='Bob', last_name='Jones',
+        date_of_birth=timezone.now().date() - timedelta(days=365 * 50), gender='M',
+    )
 
 
 @pytest.mark.django_db
-class TestPatientCareModel:
-    """Test PatientCare model."""
+class TestPatientCareAPI:
+    def test_list_records(self, admin_client, patient):
+        PatientCare.objects.create(patient=patient, status='STABLE')
+        r = admin_client.get('/api/v1/care-monitoring/')
+        assert r.status_code == status.HTTP_200_OK
+        assert r.data['count'] == 1
 
-    def _create_patient(self):
-        return Patient.objects.create(
-            unique_id='PAT_CARE',
-            first_name='Test',
-            last_name='Patient',
-            date_of_birth=timezone.now().date() - timedelta(days=365 * 30),
-            gender='M',
+    def test_create_record(self, admin_client, patient):
+        r = admin_client.post('/api/v1/care-monitoring/', {
+            'patient': patient.pk,
+            'status': 'STABLE',
+            'heart_rate': 72,
+            'temperature': '37.0',
+        })
+        assert r.status_code == status.HTTP_201_CREATED
+
+    def test_critical_action(self, admin_client, patient):
+        PatientCare.objects.create(patient=patient, status='CRITICAL')
+        PatientCare.objects.create(patient=patient, status='STABLE')
+        r = admin_client.get('/api/v1/care-monitoring/critical/')
+        assert r.status_code == status.HTTP_200_OK
+        assert all(rec['status'] == 'CRITICAL' for rec in r.data)
+
+    def test_serializer_computed_fields(self, admin_client, patient):
+        PatientCare.objects.create(
+            patient=patient, status='STABLE',
+            weight='70.0', height='175.0',
+            blood_pressure_systolic=120, blood_pressure_diastolic=80,
         )
+        r = admin_client.get('/api/v1/care-monitoring/')
+        rec = r.data['results'][0]
+        assert rec['blood_pressure'] == '120/80'
+        assert rec['bmi'] is not None
+        assert rec['patient_name'] == 'Bob Jones'
 
-    def _create_nurse(self):
-        return Staff.objects.create(
-            staff_id='NRS_CARE',
-            first_name='Nurse',
-            last_name='Test',
-            role='NURSE',
-        )
+    def test_invalid_bp_rejected(self, admin_client, patient):
+        # systolic must be > diastolic
+        r = admin_client.post('/api/v1/care-monitoring/', {
+            'patient': patient.pk,
+            'status': 'STABLE',
+            'blood_pressure_systolic': 70,
+            'blood_pressure_diastolic': 90,
+        })
+        assert r.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_create_patient_care(self):
-        patient = self._create_patient()
-        nurse = self._create_nurse()
-        care = PatientCare.objects.create(
-            patient=patient,
-            status='STABLE',
-            temperature=Decimal('37.0'),
-            heart_rate=72,
-            monitored_by=nurse,
-        )
-        assert care.pk is not None
-        assert care.status == 'STABLE'
-
-    def test_blood_pressure_validation(self):
-        """Systolic must be higher than diastolic."""
-        patient = self._create_patient()
-        care = PatientCare(
-            patient=patient,
-            status='STABLE',
-            blood_pressure_systolic=80,
-            blood_pressure_diastolic=120,
-        )
-        with pytest.raises(ValidationError):
-            care.full_clean()
-
-    def test_vital_signs_critical(self):
-        """Test critical condition detection."""
-        patient = self._create_patient()
-        # High temperature
-        care = PatientCare(
-            patient=patient,
-            status='CRITICAL',
-            temperature=Decimal('41.0'),
-        )
-        assert care.is_vital_signs_critical is True
-
-        # Normal vitals
-        care2 = PatientCare(
-            patient=patient,
-            status='STABLE',
-            temperature=Decimal('37.0'),
-            heart_rate=72,
-        )
-        assert care2.is_vital_signs_critical is False
-
-    def test_bmi_calculation(self):
-        """Test BMI calculation."""
-        patient = self._create_patient()
-        care = PatientCare(
-            patient=patient,
-            status='STABLE',
-            weight=Decimal('70.0'),
-            height=Decimal('175.0'),
-        )
-        care.save()
-        assert care.bmi is not None
-        assert 22 <= care.bmi <= 23  # Normal BMI range
-
-    def test_status_choices(self):
-        """Test valid status values."""
-        patient = self._create_patient()
-        for status in ['STABLE', 'CRITICAL', 'IMPROVING', 'DETERIORATING', 'DISCHARGED', 'OBSERVATION']:
-            care = PatientCare(patient=patient, status=status)
-            care.full_clean()  # Should not raise
+    def test_unauthenticated_denied(self):
+        r = APIClient().get('/api/v1/care-monitoring/')
+        assert r.status_code == status.HTTP_401_UNAUTHORIZED

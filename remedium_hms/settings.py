@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 import os
 from decouple import config
@@ -177,8 +178,8 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 # REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -209,9 +210,9 @@ SPECTACULAR_SETTINGS = {
 Comprehensive REST API for the Remedium Hospital Management System.
 
 ## Authentication
-All API endpoints require authentication. Obtain a token via `/api-token-auth/` and include it in requests:
+All API endpoints require authentication. Obtain JWT tokens via `/api/v1/token/`:
 ```
-Authorization: Token <your-token>
+Authorization: Bearer <your-access-token>
 ```
 
 ## Versioning
@@ -220,7 +221,9 @@ All API endpoints are versioned under `/api/v1/`.
 ## Rate Limiting
 - Anonymous users: 100 requests/hour
 - Authenticated users: 1000 requests/hour
-- Login attempts: 20/hour
+
+## Caching
+Redis is used for caching (configure via REDIS_URL env var). Set REDIS_ENABLED=false to use local memory cache.
 
 ## Resources
 - **Patients** - Patient demographics and medical records
@@ -308,6 +311,45 @@ LOGGING = {
 LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 if not os.path.exists(LOGS_DIR):
     os.makedirs(LOGS_DIR)
+
+# Cache Configuration (Redis)
+# Cache Configuration with Redis fallback to LocMemCache
+REDIS_URL = config('REDIS_URL', default='redis://localhost:6379/0')
+REDIS_ENABLED = config('REDIS_ENABLED', default=False, cast=bool)
+
+if REDIS_ENABLED:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': f'{REDIS_URL}/1',
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            }
+        }
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
+    }
+
+# JWT Configuration
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': config('SECRET_KEY', default=None),
+    'VERIFYING_KEY': None,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+}
 
 # Security Headers
 X_FRAME_OPTIONS = 'DENY'

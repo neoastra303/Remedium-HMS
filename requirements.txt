@@ -1,5 +1,8 @@
 Django==5.0.9
 djangorestframework==3.14.0
+djangorestframework-simplejwt==5.3.1
+django-redis==5.4.0
+redis==5.0.1
 python-decouple==3.8
 Pillow==10.1.0
 django-crispy-forms==2.3.0

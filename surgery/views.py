@@ -31,7 +31,7 @@ class SurgeryDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
     raise_exception = True
 
     def get_queryset(self):
-        return Surgery.objects.select_related('patient', 'surgeon', 'operating_room').all()
+        return Surgery.objects.select_related('patient', 'surgeon').all()
 
 
 class SurgeryCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):

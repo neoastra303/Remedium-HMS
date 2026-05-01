@@ -1,67 +1,48 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<h1 class="mb-4">Care Monitoring Entries</h1>
-
-<a href="{% url 'care_monitoring:patientcare_create' %}" class="btn btn-primary mb-3">Add New Monitoring Entry</a>
-
-{% if patientcares %}
-<div class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
-        <thead>
-            <tr>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=patient">Patient {% if request.GET.order_by == 'patient' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=date">Date {% if request.GET.order_by == 'date' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=type">Type {% if request.GET.order_by == 'type' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col">Value</th>
-                <th scope="col">Notes</th>
-                <th scope="col">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for entry in patientcares %}
-            <tr>
-                <td>{{ entry.patient }}</td>
-                <td>{{ entry.date|date:"M d, Y" }}</td>
-                <td>{{ entry.type }}</td>
-                <td>{{ entry.value }}</td>
-                <td>{{ entry.notes }}</td>
-                <td>
-                    <a href="{% url 'care_monitoring:patientcare_detail' entry.pk %}" class="btn btn-info btn-sm">View</a>
-                    <a href="{% url 'care_monitoring:patientcare_update' entry.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                    <a href="{% url 'care_monitoring:patientcare_delete' entry.pk %}" class="btn btn-danger btn-sm">Delete</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-heart-pulse me-2 text-primary"></i>Care Monitoring</h4>
+    <a href="{% url 'care_monitoring:patientcare_create' %}" class="btn btn-sm btn-primary"><i class="bi bi-plus-circle me-1"></i>New Record</a>
 </div>
 
-{% include 'partials/pagination.html' %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Previous</a></li>
-        {% else %}
-            <li class="page-item disabled"><a class="page-link">Previous</a></li>
-        {% endif %}
-
-        {% for i in page_obj.paginator.page_range %}
-            {% if page_obj.number == i %}
-                <li class="page-item active"><a class="page-link">{{ i }}</a></li>
-            {% else %}
-                <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">{{ i }}</a></li>
-            {% endif %}
-        {% endfor %}
-
-        {% if page_obj.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Next</a></li>
-        {% else %}
-            <li class="page-item disabled"><a class="page-link">Next</a></li>
-        {% endif %}
-    </ul>
-</nav>
-{% endif %}
-
-{% else %}
-<div class="alert alert-info" role="alert">
-    No monitoring entries found.
+<div class="card border-0 shadow-sm" style="background:#fff;">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4 ">Patient</th>
+                    <th class="">Status</th>
+                    <th class="d-mobile-none">Date</th>
+                    <th class="d-mobile-none">HR</th>
+                    <th class="d-mobile-none">Temp</th>
+                    <th class="pe-4 text-end"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patientcare in patientcares %}
+                <tr>
+                    <td class="ps-4 fw-medium">{{ patientcare.patient }}</td>
+                    <td>
+                        {% if patientcare.status == 'CRITICAL' %}<span class="badge bg-danger rounded-pill">{{ patientcare.get_status_display }}</span>
+                        {% elif patientcare.status == 'STABLE' %}<span class="badge bg-success rounded-pill">{{ patientcare.get_status_display }}</span>
+                        {% else %}<span class="badge bg-secondary rounded-pill">{{ patientcare.get_status_display }}</span>{% endif %}
+                    </td>
+                    <td class="d-mobile-none text-muted small">{{ patientcare.monitoring_date|date:"M d, H:i" }}</td>
+                    <td class="d-mobile-none">{% if patientcare.heart_rate %}{{ patientcare.heart_rate }} bpm{% else %}—{% endif %}</td>
+                    <td class="d-mobile-none">{% if patientcare.temperature %}{{ patientcare.temperature }}°C{% else %}—{% endif %}</td>
+                    <td class="pe-4 text-end">
+                        <a href="{% url 'care_monitoring:patientcare_detail' patientcare.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'care_monitoring:patientcare_update' patientcare.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'care_monitoring:patientcare_delete' patientcare.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                {% include 'partials/empty_state.html' with icon="bi-heart-pulse" message="No care records found." colspan="6" %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
-{% endif %}
+
+{% include 'partials/pagination.html' %}
 {% endblock %}

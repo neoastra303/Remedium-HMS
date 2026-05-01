@@ -1,71 +1,42 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<h1 class="mb-4">Prescriptions</h1>
-
-<a href="{% url 'prescription_create' %}" class="btn btn-primary mb-3">Create New Prescription</a>
-
-{% if prescriptions %}
-<div class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
-        <thead>
-            <tr>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=drug_name">Drug Name {% if request.GET.order_by == 'drug_name' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=patient">Patient {% if request.GET.order_by == 'patient' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=doctor">Doctor {% if request.GET.order_by == 'doctor' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col">Dosage</th>
-                <th scope="col">Frequency</th>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=start_date">Start Date {% if request.GET.order_by == 'start_date' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=end_date">End Date {% if request.GET.order_by == 'end_date' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for prescription in prescriptions %}
-            <tr>
-                <td>{{ prescription.drug_name }}</td>
-                <td>{{ prescription.patient }}</td>
-                <td>{{ prescription.doctor }}</td>
-                <td>{{ prescription.dosage }}</td>
-                <td>{{ prescription.frequency }}</td>
-                <td>{{ prescription.start_date|date:"M d, Y" }}</td>
-                <td>{{ prescription.end_date|date:"M d, Y" }}</td>
-                <td>
-                    <a href="{% url 'prescription_detail' prescription.pk %}" class="btn btn-info btn-sm">View</a>
-                    <a href="{% url 'prescription_update' prescription.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                    <a href="{% url 'prescription_delete' prescription.pk %}" class="btn btn-danger btn-sm">Delete</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-capsule me-2 text-primary"></i>Prescriptions</h4>
+    <a href="{% url 'prescription_create' %}" class="btn btn-sm btn-primary"><i class="bi bi-plus-circle me-1"></i>New Prescription</a>
 </div>
 
-{% include 'partials/pagination.html' %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Previous</a></li>
-        {% else %}
-            <li class="page-item disabled"><a class="page-link">Previous</a></li>
-        {% endif %}
-
-        {% for i in page_obj.paginator.page_range %}
-            {% if page_obj.number == i %}
-                <li class="page-item active"><a class="page-link">{{ i }}</a></li>
-            {% else %}
-                <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">{{ i }}</a></li>
-            {% endif %}
-        {% endfor %}
-
-        {% if page_obj.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Next</a></li>
-        {% else %}
-            <li class="page-item disabled"><a class="page-link">Next</a></li>
-        {% endif %}
-    </ul>
-</nav>
-{% endif %}
-
-{% else %}
-<div class="alert alert-info" role="alert">
-    No prescriptions found.
+<div class="card border-0 shadow-sm" style="background:#fff;">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4 ">Patient</th>
+                    <th class="">Drug</th>
+                    <th class="d-mobile-none">Dosage</th>
+                    <th class="d-mobile-none">Date</th>
+                    <th class="pe-4 text-end"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prescription in prescriptions %}
+                <tr>
+                    <td class="ps-4 fw-medium">{{ prescription.patient }}</td>
+                    <td>{{ prescription.drug_name }}</td>
+                    <td class="d-mobile-none text-muted small">{{ prescription.dosage }}</td>
+                    <td class="d-mobile-none text-muted small">{{ prescription.prescribed_date|date:"M d, Y" }}</td>
+                    <td class="pe-4 text-end">
+                        <a href="{% url 'prescription_detail' prescription.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'prescription_update' prescription.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'prescription_delete' prescription.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                {% include 'partials/empty_state.html' with icon="bi-capsule" message="No prescriptions found." colspan="5" %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
-{% endif %}
+
+{% include 'partials/pagination.html' %}
 {% endblock %}

@@ -1,0 +1,7 @@
+<div>
+    <label for="{{ field.id_for_label }}" class="form-label fw-medium small">{{ label }}</label>
+    {% with attrs=field.field.widget.attrs %}
+        {{ field }}
+    {% endwith %}
+    {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors.0 }}</div>{% endif %}
+</div>

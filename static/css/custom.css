@@ -62,19 +62,29 @@ body {
     color: var(--primary-blue) !important;
 }
 
-/* Cards */
+/* Cards — solid white for data, glass only where explicitly applied */
 .card {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+/* Glass effect only on dashboard stat cards */
+.card.glass-effect {
     background: var(--glass-bg);
     backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    overflow: hidden;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+/* Hover animation scoped to action cards only */
+.card-action {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+.card-action:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.10) !important;
 }
 
 .card-header {

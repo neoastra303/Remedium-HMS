@@ -1,67 +1,48 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<h1 class="mb-4">Surgeries</h1>
-
-<a href="{% url 'surgery_create' %}" class="btn btn-primary mb-3">Schedule New Surgery</a>
-
-{% if surgeries %}
-<div class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
-        <thead>
-            <tr>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=patient">Patient {% if request.GET.order_by == 'patient' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=surgeon">Surgeon {% if request.GET.order_by == 'surgeon' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=procedure">Procedure {% if request.GET.order_by == 'procedure' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=scheduled_date">Scheduled Date {% if request.GET.order_by == 'scheduled_date' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=status">Status {% if request.GET.order_by == 'status' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for surgery in surgeries %}
-            <tr>
-                <td>{{ surgery.patient }}</td>
-                <td>{{ surgery.surgeon }}</td>
-                <td>{{ surgery.procedure }}</td>
-                <td>{{ surgery.scheduled_date|date:"M d, Y H:i" }}</td>
-                <td>{{ surgery.get_status_display }}</td>
-                <td>
-                    <a href="{% url 'surgery_detail' surgery.pk %}" class="btn btn-info btn-sm">View</a>
-                    <a href="{% url 'surgery_update' surgery.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                    <a href="{% url 'surgery_delete' surgery.pk %}" class="btn btn-danger btn-sm">Delete</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-scissors me-2 text-primary"></i>Surgeries</h4>
+    <a href="{% url 'surgery_create' %}" class="btn btn-sm btn-primary"><i class="bi bi-plus-circle me-1"></i>Schedule Surgery</a>
 </div>
 
-{% include 'partials/pagination.html' %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Previous</a></li>
-        {% else %}
-            <li class="page-item disabled"><a class="page-link">Previous</a></li>
-        {% endif %}
-
-        {% for i in page_obj.paginator.page_range %}
-            {% if page_obj.number == i %}
-                <li class="page-item active"><a class="page-link">{{ i }}</a></li>
-            {% else %}
-                <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">{{ i }}</a></li>
-            {% endif %}
-        {% endfor %}
-
-        {% if page_obj.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Next</a></li>
-        {% else %}
-            <li class="page-item disabled"><a class="page-link">Next</a></li>
-        {% endif %}
-    </ul>
-</nav>
-{% endif %}
-
-{% else %}
-<div class="alert alert-info" role="alert">
-    No surgeries found.
+<div class="card border-0 shadow-sm" style="background:#fff;">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4 ">Patient</th>
+                    <th class="">Surgeon</th>
+                    <th class="d-mobile-none">Procedure</th>
+                    <th class="d-mobile-none">Scheduled</th>
+                    <th class="d-mobile-none">Status</th>
+                    <th class="pe-4 text-end"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for surgery in surgeries %}
+                <tr>
+                    <td class="ps-4">{{ surgery.patient }}</td>
+                    <td>{{ surgery.surgeon }}</td>
+                    <td class="fw-medium">{{ surgery.procedure }}</td>
+                    <td class="d-mobile-none">{{ surgery.scheduled_date|date:"M d, Y H:i" }}</td>
+                    <td>
+                        {% if surgery.status == 'Scheduled' %}<span class="badge bg-primary rounded-pill">{{ surgery.get_status_display }}</span>
+                        {% elif surgery.status == 'Completed' %}<span class="badge bg-success rounded-pill">{{ surgery.get_status_display }}</span>
+                        {% else %}<span class="badge bg-secondary rounded-pill">{{ surgery.get_status_display }}</span>{% endif %}
+                    </td>
+                    <td class="pe-4 text-end">
+                        <a href="{% url 'surgery_detail' surgery.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'surgery_update' surgery.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'surgery_delete' surgery.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                {% include 'partials/empty_state.html' with icon="bi-scissors" message="No surgeries scheduled." colspan="6" %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
-{% endif %}
+
+{% include 'partials/pagination.html' %}
 {% endblock %}

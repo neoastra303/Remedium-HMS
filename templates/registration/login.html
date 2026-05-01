@@ -1,45 +1,128 @@
-{% extends "base.html" %}
-{% load crispy_forms_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Remedium HMS — Sign In</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 20% 20%, #e0e7ff 0%, #f8fafc 50%, #f1f5f9 100%);
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            width: 500px; height: 500px;
+            background: var(--primary-blue);
+            filter: blur(180px);
+            border-radius: 50%;
+            top: -100px; left: -100px;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            width: 400px; height: 400px;
+            background: var(--secondary-purple);
+            filter: blur(180px);
+            border-radius: 50%;
+            bottom: -80px; right: -80px;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.6);
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.10);
+        }
+        .brand-logo {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1rem;
+            box-shadow: 0 8px 20px rgba(0,98,255,0.3);
+        }
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0,98,255,0.12);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card p-5">
+        <div class="text-center mb-4">
+            <div class="brand-logo">
+                <i class="bi bi-shield-plus text-white fs-4"></i>
+            </div>
+            <h4 class="fw-bold mb-1" style="background:linear-gradient(135deg,#0062ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Remedium HMS</h4>
+            <p class="text-muted small mb-0">Hospital Management System</p>
+        </div>
 
-{% block content %}
-<div class="container py-5 mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow-2xl border-0 glass-effect">
-                <div class="card-header bg-medical-blue text-white text-center py-5 border-0">
-                    <i class="bi bi-shield-plus fs-1 mb-2"></i>
-                    <h2 class="fw-bold mb-0">REMEDIUM</h2>
-                    <p class="text-white-50 small mb-0 fw-medium">SECURE NEURAL ACCESS</p>
-                </div>
-                <div class="card-body p-5">
-                    {% if form.errors %}
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            Invalid credentials. Please try again.
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endif %}
+        {% if form.errors %}
+        <div class="alert alert-danger py-2 small" role="alert">
+            <i class="bi bi-exclamation-triangle me-1"></i> Invalid username or password.
+        </div>
+        {% endif %}
 
-                    <form method="post" action="{% url 'login' %}" novalidate>
-                        {% csrf_token %}
-                        {{ form|crispy }}
-                        <div class="d-grid mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
-                                <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                <div class="card-footer bg-light text-center py-3">
-                    <a href="{% url 'password_reset' %}" class="text-decoration-none text-muted small">
-                        <i class="bi bi-key me-1"></i> Forgot your password?
-                    </a>
+        <form method="post" action="{% url 'login' %}" novalidate id="loginForm">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="id_username" class="form-label fw-medium small">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
+                    <input type="text" name="username" id="id_username" class="form-control border-start-0 ps-0" placeholder="Enter username" autocomplete="username" required>
                 </div>
             </div>
-            <p class="text-center mt-4 text-muted small">
-                &copy; 2026 Remedium Healthcare Solutions. All rights reserved.
-            </p>
+            <div class="mb-4">
+                <label for="id_password" class="form-label fw-medium small">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                    <input type="password" name="password" id="id_password" class="form-control border-start-0 ps-0" placeholder="Enter password" autocomplete="current-password" required>
+                    <button type="button" class="input-group-text bg-light border-start-0" onclick="togglePwd()" tabindex="-1">
+                        <i class="bi bi-eye" id="pwdToggleIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2" id="loginBtn">
+                <span id="loginText"><i class="bi bi-box-arrow-in-right me-2"></i>Sign In</span>
+                <span id="loginSpinner" class="d-none">
+                    <span class="spinner-border spinner-border-sm me-2"></span>Signing in…
+                </span>
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="{% url 'password_reset' %}" class="text-muted small text-decoration-none">
+                <i class="bi bi-key me-1"></i>Forgot password?
+            </a>
         </div>
     </div>
-</div>
-{% endblock %}
+
+    <script>
+        function togglePwd() {
+            const inp = document.getElementById('id_password');
+            const icon = document.getElementById('pwdToggleIcon');
+            if (inp.type === 'password') { inp.type = 'text'; icon.className = 'bi bi-eye-slash'; }
+            else { inp.type = 'password'; icon.className = 'bi bi-eye'; }
+        }
+        document.getElementById('loginForm').addEventListener('submit', function() {
+            document.getElementById('loginText').classList.add('d-none');
+            document.getElementById('loginSpinner').classList.remove('d-none');
+            document.getElementById('loginBtn').disabled = true;
+        });
+    </script>
+</body>
+</html>

@@ -109,3 +109,10 @@ def audit_log(request):
     return render(request, 'core/audit_logs.html', {'history': all_history})
 
 # Create your views here.
+
+
+class DeleteSuccessMixin:
+    """Appends ?deleted=1 to the success URL so the list page shows a toast."""
+    def get_success_url(self):
+        url = super().get_success_url()
+        return f'{url}?deleted=1'

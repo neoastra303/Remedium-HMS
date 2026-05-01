@@ -1,67 +1,42 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<h1 class="mb-4">Staff Members</h1>
-
-<a href="{% url 'staff_create' %}" class="btn btn-primary mb-3">Add New Staff Member</a>
-
-{% if staff_list %}
-<div class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
-        <thead>
-            <tr>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=first_name">First Name {% if request.GET.order_by == 'first_name' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=last_name">Last Name {% if request.GET.order_by == 'last_name' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=role">Role {% if request.GET.order_by == 'role' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
-                <th scope="col">Contact Number</th>
-                <th scope="col">Email</th>
-                <th scope="col">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for member in staff_list %}
-            <tr>
-                <td>{{ member.first_name }}</td>
-                <td>{{ member.last_name }}</td>
-                <td>{{ member.get_role_display }}</td>
-                <td>{{ member.contact_number }}</td>
-                <td>{{ member.email }}</td>
-                <td>
-                    <a href="{% url 'staff_detail' member.pk %}" class="btn btn-info btn-sm">View</a>
-                    <a href="{% url 'staff_update' member.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                    <a href="{% url 'staff_delete' member.pk %}" class="btn btn-danger btn-sm">Delete</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-person-badge me-2 text-primary"></i>Staff</h4>
+    <a href="{% url 'staff_create' %}" class="btn btn-sm btn-primary"><i class="bi bi-plus-circle me-1"></i>Add Staff</a>
 </div>
 
-{% include 'partials/pagination.html' %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Previous</a></li>
-        {% else %}
-            <li class="page-item disabled"><a class="page-link">Previous</a></li>
-        {% endif %}
-
-        {% for i in page_obj.paginator.page_range %}
-            {% if page_obj.number == i %}
-                <li class="page-item active"><a class="page-link">{{ i }}</a></li>
-            {% else %}
-                <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">{{ i }}</a></li>
-            {% endif %}
-        {% endfor %}
-
-        {% if page_obj.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Next</a></li>
-        {% else %}
-            <li class="page-item disabled"><a class="page-link">Next</a></li>
-        {% endif %}
-    </ul>
-</nav>
-{% endif %}
-
-{% else %}
-<div class="alert alert-info" role="alert">
-    No staff members found.
+<div class="card border-0 shadow-sm" style="background:#fff;">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4 ">Name</th>
+                    <th class="">Role</th>
+                    <th class="d-mobile-none">Department</th>
+                    <th class="d-mobile-none">Email</th>
+                    <th class="pe-4 text-end"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in staff_list %}
+                <tr>
+                    <td class="ps-4 fw-medium">{{ member.first_name }} {{ member.last_name }}</td>
+                    <td>{{ member.get_role_display }}</td>
+                    <td class="d-mobile-none text-muted small">{{ member.get_department_display|default:"—" }}</td>
+                    <td class="d-mobile-none text-muted small">{{ member.email|default:"—" }}</td>
+                    <td class="pe-4 text-end">
+                        <a href="{% url 'staff_detail' member.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'staff_update' member.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'staff_delete' member.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                {% include 'partials/empty_state.html' with icon="bi-person-badge" message="No staff members found." colspan="5" %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
-{% endif %}
+
+{% include 'partials/pagination.html' %}
 {% endblock %}

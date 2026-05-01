@@ -5,6 +5,7 @@ from .forms import PatientForm
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.urls import reverse_lazy
+from core.views import DeleteSuccessMixin
 
 
 class PatientListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
@@ -82,7 +83,7 @@ class PatientUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upd
     raise_exception = True
 
 
-class PatientDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
+class PatientDeleteView(DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Patient
     template_name = 'patients/patient_confirm_delete.html'
     success_url = reverse_lazy('patient_list')

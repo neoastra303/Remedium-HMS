@@ -25,7 +25,20 @@ curl -X GET http://localhost:8000/api/patients/ \
 Include credentials in headers:
 ```bash
 curl -X GET http://localhost:8000/api/patients/ \
-  -H "Authorization: Bearer your-token"
+  -H "Authorization: Token your-token-here"
+```
+
+### Obtaining a Token
+To get your authentication token, send your username and password to:
+```bash
+curl -X POST http://localhost:8000/api-token-auth/ \
+  -d "username=your_username&password=your_password"
+```
+Response:
+```json
+{
+  "token": "9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b"
+}
 ```
 
 ## API Endpoints

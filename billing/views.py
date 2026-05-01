@@ -66,6 +66,22 @@ class InvoiceDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
         return context
 
 
+class InvoicePrintView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
+    model = Invoice
+    template_name = 'billing/invoice_print.html'
+    context_object_name = 'invoice'
+    permission_required = 'billing.billing_view_invoice'
+    raise_exception = True
+
+    def get_queryset(self):
+        return Invoice.objects.select_related('patient').prefetch_related('payments').all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['payments'] = self.object.payments.all()
+        return context
+
+
 class PaymentCreateView(LoginRequiredMixin, generic.CreateView):
     model = Payment
     fields = ['amount', 'payment_method', 'transaction_id']

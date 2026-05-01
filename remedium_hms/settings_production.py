@@ -76,16 +76,20 @@ LOGGING = {
 }
 
 # Email settings (example for SendGrid)
-# EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+# EMAIL_BACKEND = 'sendgrig_backend.SendgridBackend'
 # SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 # DEFAULT_FROM_EMAIL = 'your_email@example.com'
 
-# Other production-specific settings
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-#         'LOCATION': 'unique-snowflake',
-#     }
-# }
+# Production Cache (Redis) - Uses REDIS_URL environment variable
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': config('REDIS_URL', default='redis://localhost:6379/1'),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
 
-# SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+# Session backend with Redis
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'

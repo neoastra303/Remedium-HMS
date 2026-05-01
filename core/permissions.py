@@ -55,10 +55,18 @@ class IsBillingStaff(permissions.BasePermission):
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
-    """Object-level permission: only owners can edit, anyone authenticated can view."""
+    """Object-level permission: only staff with appropriate permissions can edit, anyone authenticated can view."""
     def has_object_permission(self, request, view, obj):
         # Read permissions allowed for any authenticated user
         if request.method in permissions.SAFE_METHODS:
             return True
-        # Write permissions only to owner
-        return hasattr(obj, 'patient') and obj.patient == request.user
+        # Write permissions only for staff with appropriate permissions
+        if not request.user or not request.user.is_authenticated:
+            return False
+        if request.user.is_staff:
+            return True
+        # Check if user has permission to change this type of object
+        if hasattr(obj, '_meta'):
+            app_label = obj._meta.app_label
+            return request.user.has_perm(f'{app_label}.change_{obj._meta.model_name}')
+        return False

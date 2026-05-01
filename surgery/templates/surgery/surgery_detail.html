@@ -7,6 +7,6 @@
   <p><strong>Scheduled Date:</strong> {{ surgery.scheduled_date }}</p>
   <p><strong>Operating Room:</strong> {{ surgery.operating_room }}</p>
   <p><strong>Procedure:</strong> {{ surgery.procedure }}</p>
-  <p><strong>Status:</strong> {{ surgery.status }}</p>
+  <p><strong>Status:</strong> {{ surgery.get_status_display }}</p>
   <p><strong>Notes:</strong> {{ surgery.notes }}</p>
 {% endblock %}

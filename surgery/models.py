@@ -1,6 +1,7 @@
 from django.db import models
 from patients.models import Patient
 from staff.models import Staff
+from simple_history.models import HistoricalRecords
 
 
 class Surgery(models.Model):
@@ -34,3 +35,5 @@ class Surgery(models.Model):
 
     def __str__(self):
         return f"Surgery for {self.patient} by {self.surgeon} on {self.scheduled_date}"
+
+    history = HistoricalRecords()

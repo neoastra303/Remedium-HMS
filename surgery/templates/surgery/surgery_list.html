@@ -25,7 +25,7 @@
                 <td>{{ surgery.surgeon }}</td>
                 <td>{{ surgery.procedure }}</td>
                 <td>{{ surgery.scheduled_date|date:"M d, Y H:i" }}</td>
-                <td>{{ surgery.status }}</td>
+                <td>{{ surgery.get_status_display }}</td>
                 <td>
                     <a href="{% url 'surgery_detail' surgery.pk %}" class="btn btn-info btn-sm">View</a>
                     <a href="{% url 'surgery_update' surgery.pk %}" class="btn btn-warning btn-sm">Edit</a>

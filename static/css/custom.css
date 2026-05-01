@@ -218,3 +218,28 @@ body {
 .btn-group .btn {
     padding: 0.4rem 0.75rem;
 }
+
+/* ── Mobile Responsiveness ── */
+@media (max-width: 767.98px) {
+    /* Hide non-essential table columns on mobile */
+    .table .d-mobile-none { display: none !important; }
+
+    /* Stack action buttons vertically */
+    .btn-group { flex-direction: column; }
+    .btn-group .btn { border-radius: 8px !important; margin-bottom: 2px; }
+
+    /* Reduce card padding */
+    .card-body { padding: 1rem !important; }
+
+    /* Navbar brand smaller */
+    .navbar-brand { font-size: 1.1rem; }
+
+    /* Full-width buttons on mobile */
+    .mobile-full { width: 100%; }
+
+    /* Tighter table cells */
+    .table td, .table th { padding: 0.6rem 0.5rem; font-size: 0.85rem; }
+
+    /* Hide sidebar on mobile dashboard */
+    .col-lg-4 .card:last-child { display: none; }
+}

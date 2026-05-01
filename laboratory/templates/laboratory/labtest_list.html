@@ -27,7 +27,7 @@
                 <td>{{ test.doctor }}</td>
                 <td>{{ test.requested_date|date:"M d, Y" }}</td>
                 <td>{{ test.result }}</td>
-                <td>{{ test.status }}</td>
+                <td>{{ test.get_status_display }}</td>
                 <td>
                     <a href="{% url 'labtest_detail' test.pk %}" class="btn btn-info btn-sm">View</a>
                     <a href="{% url 'labtest_update' test.pk %}" class="btn btn-warning btn-sm">Edit</a>

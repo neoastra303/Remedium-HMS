@@ -2,6 +2,7 @@ from django.db import models
 from patients.models import Patient
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
+from simple_history.models import HistoricalRecords
 
 
 class PatientCare(models.Model):
@@ -111,6 +112,8 @@ class PatientCare(models.Model):
         help_text="Staff member who recorded the monitoring"
     )
 
+    history = HistoricalRecords()
+
     def clean(self):
         super().clean()
         
@@ -136,7 +139,7 @@ class PatientCare(models.Model):
     def bmi(self):
         """Calculate BMI if height and weight are available."""
         if self.weight and self.height:
-            height_m = self.height / 100  # Convert cm to meters
+            height_m = float(self.height) / 100  # Convert cm to meters
             return round(float(self.weight) / (height_m ** 2), 2)
         return None
     

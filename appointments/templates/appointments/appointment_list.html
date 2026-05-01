@@ -25,7 +25,7 @@
                 <td>{{ appointment.doctor }}</td>
                 <td>{{ appointment.appointment_date|date:"M d, Y" }}</td>
                 <td>{{ appointment.appointment_time|time:"h:i A" }}</td>
-                <td>{{ appointment.status }}</td>
+                <td>{{ appointment.get_status_display }}</td>
                 <td>
                     <a href="{% url 'appointment_detail' appointment.pk %}" class="btn btn-info btn-sm">View</a>
                     <a href="{% url 'appointment_update' appointment.pk %}" class="btn btn-warning btn-sm">Edit</a>

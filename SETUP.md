@@ -384,6 +384,12 @@ Remedium-HMS/
    DB_PORT=5432
    ```
 
+   **Production-specific vars (optional):**
+   ```env
+   ALLOWED_HOSTS=your_production_domain.com,www.your_production_domain.com
+   CORS_ALLOWED_ORIGINS=https://your_frontend_domain.com
+   ```
+
 4. Install PostgreSQL adapter: `pip install psycopg2-binary`
 5. Run migrations: `python manage.py migrate`
 

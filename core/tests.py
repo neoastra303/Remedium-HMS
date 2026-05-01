@@ -178,26 +178,24 @@ class TestInvoiceAPI:
         response = api_client.post(f'/api/v1/invoices/{invoice.pk}/mark_paid/')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-
 @pytest.mark.django_db
 class TestAuthToken:
     """Test token auth endpoint with rate limiting."""
 
     def test_token_auth_works(self, api_client, admin_user):
         response = api_client.post(
-            '/api-token-auth/',
+            '/api/v1/token/',
             {'username': 'admin@test.com', 'password': 'adminpass123'}
         )
         assert response.status_code == status.HTTP_200_OK
-        assert 'token' in response.data
+        assert 'access' in response.data
 
     def test_invalid_credentials(self, api_client):
         response = api_client.post(
-            '/api-token-auth/',
+            '/api/v1/token/',
             {'username': 'bad', 'password': 'wrong'}
         )
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 @pytest.mark.django_db
 class TestLabTestAPI:

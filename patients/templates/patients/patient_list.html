@@ -26,7 +26,7 @@
                 <tr class="bg-light">
                     <th class="ps-4 py-3">Patient Profile</th>
                     <th class="py-3">Unique ID</th>
-                    <th class="py-3">Date of Birth</th>
+                    <th class="py-3 d-mobile-none">Date of Birth</th>
                     <th class="py-3">Status</th>
                     <th class="pe-4 py-3 text-end">Operations</th>
                 </tr>
@@ -44,7 +44,7 @@
                         </div>
                     </td>
                     <td class="fw-medium text-primary">{{ patient.unique_id }}</td>
-                    <td>{{ patient.date_of_birth|date:"M d, Y" }}</td>
+                    <td class="d-mobile-none">{{ patient.date_of_birth|date:"M d, Y" }}</td>
                     <td>
                         {% if patient.is_admitted %}
                             <span class="badge bg-medical-blue rounded-pill">Admitted</span>
@@ -65,11 +65,7 @@
     </div>
 </div>
 
-{% if is_paginated %}
-<nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center">
-        {% if page_obj.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Previous</a></li>
+{% include 'partials/pagination.html' %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Previous</a></li>
         {% else %}
             <li class="page-item disabled"><a class="page-link">Previous</a></li>
         {% endif %}

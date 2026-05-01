@@ -46,10 +46,12 @@ class Appointment(models.Model):
         new_start = self.appointment_date
         new_end = self.appointment_date + duration
 
+        # Check for overlapping appointments: existing appointment that starts before new_end AND ends after new_start
+        # Since we don't store end time, we assume all appointments are 30 minutes
         overlapping = Appointment.objects.filter(
             doctor=self.doctor,
-            appointment_date__lt=new_end,       # existing start < new end
-            appointment_date__gte=new_start,     # existing start >= new start
+            appointment_date__lt=new_end,  # existing start < new end
+            appointment_date__gte=new_start - duration,  # existing start >= (new start - duration)
             status="Scheduled"
         ).exclude(id=self.id)
 

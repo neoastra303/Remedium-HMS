@@ -88,10 +88,9 @@ body {
 }
 
 .card-header {
-    background: rgba(255, 255, 255, 0.4);
-    border-bottom: 1px solid var(--glass-border);
+    background: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
     font-weight: 600;
-    color: var(--primary-blue);
 }
 
 /* Buttons */
@@ -252,4 +251,166 @@ body {
 
     /* Hide sidebar on mobile dashboard */
     .col-lg-4 .card:last-child { display: none; }
+}
+
+/* ── Dashboard Components ─────────────────────────────────────────── */
+
+/* Stat Cards — consistent style with left accent border */
+.stat-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 1.25rem 1.25rem 1rem;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+}
+.stat-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    border-radius: 4px 0 0 4px;
+}
+.stat-card--blue::before  { background: #0062ff; }
+.stat-card--teal::before  { background: #0891b2; }
+.stat-card--green::before { background: #16a34a; }
+.stat-card--amber::before { background: #d97706; }
+
+.stat-card__icon {
+    font-size: 1.4rem;
+    margin-bottom: 0.75rem;
+}
+.stat-card--blue  .stat-card__icon { color: #0062ff; }
+.stat-card--teal  .stat-card__icon { color: #0891b2; }
+.stat-card--green .stat-card__icon { color: #16a34a; }
+.stat-card--amber .stat-card__icon { color: #d97706; }
+
+.stat-card__label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #94a3b8;
+    margin-bottom: 0.25rem;
+}
+.stat-card__value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+.stat-card__sub {
+    font-size: 0.72rem;
+    color: #94a3b8;
+}
+
+/* Section label */
+.section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #94a3b8;
+    margin-bottom: 0.75rem;
+}
+
+/* Quick Action cards */
+.quick-action {
+    display: block;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 14px;
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.quick-action:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.09);
+    border-color: rgba(0,98,255,0.2);
+}
+.quick-action__icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    margin: 0 auto 0.6rem;
+}
+.quick-action__title { font-size: 0.82rem; font-weight: 600; color: #0f172a; }
+.quick-action__sub   { font-size: 0.7rem; color: #94a3b8; }
+
+/* Clean card header (no blue color override) */
+.card-header-clean {
+    padding: 0.9rem 1.25rem;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    background: #fff;
+    font-size: 0.875rem;
+    color: #0f172a;
+}
+
+/* Appointment row */
+.appt-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    transition: background 0.12s;
+    color: inherit;
+}
+.appt-row:last-child { border-bottom: none; }
+.appt-row:hover { background: #f8fafc; }
+.appt-row__avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #0062ff, #7b2ff7);
+    color: #fff; font-size: 0.72rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.appt-row__info { flex: 1; min-width: 0; }
+.appt-row__name { font-size: 0.82rem; font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.appt-row__meta { font-size: 0.7rem; color: #94a3b8; }
+.appt-row__badge {
+    font-size: 0.68rem; font-weight: 600; padding: 0.25rem 0.6rem;
+    border-radius: 20px; white-space: nowrap; flex-shrink: 0;
+}
+.appt-row__badge--scheduled  { background: #eff6ff; color: #1d4ed8; }
+.appt-row__badge--completed  { background: #f0fdf4; color: #15803d; }
+.appt-row__badge--cancelled  { background: #fef2f2; color: #b91c1c; }
+
+/* Department row */
+.dept-row { margin-bottom: 0.9rem; }
+.dept-row__top { display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 500; margin-bottom: 0.3rem; color: #334155; }
+
+/* Patient row in sidebar */
+.patient-row {
+    display: flex; align-items: center; gap: 0.65rem;
+    padding: 0.4rem 0; color: inherit;
+    transition: opacity 0.12s;
+}
+.patient-row:hover { opacity: 0.75; }
+.patient-row__avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #f1f5f9; color: #64748b;
+    font-size: 0.68rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.patient-row__name { font-size: 0.8rem; font-weight: 600; color: #0f172a; }
+.patient-row__meta { font-size: 0.68rem; color: #94a3b8; }
+
+/* Empty state inside card */
+.empty-state {
+    text-align: center; padding: 2.5rem 1rem; color: #cbd5e1;
+}
+.empty-state i { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+.empty-state p { font-size: 0.8rem; margin: 0; }
+
+/* Status dot */
+.status-dot {
+    width: 7px; height: 7px; border-radius: 50%; display: inline-block;
 }

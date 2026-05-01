@@ -7,7 +7,7 @@ from .serializers import ExternalIntegrationSerializer
 
 
 class ExternalIntegrationViewSet(viewsets.ModelViewSet):
-    queryset = ExternalIntegration.objects.all()
+    queryset = ExternalIntegration.objects.all().order_by('system_name')
     serializer_class = ExternalIntegrationSerializer
     permission_classes = [IsAdminUser]
 

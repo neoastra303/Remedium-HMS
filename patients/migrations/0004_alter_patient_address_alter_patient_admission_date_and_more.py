@@ -160,7 +160,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="patient",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("discharge_date__isnull", True),
                     ("discharge_date__gte", models.F("admission_date")),
                     _connector="OR",

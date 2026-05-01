@@ -13,6 +13,7 @@ class IntegrationListView(LoginRequiredMixin, generic.ListView):
     template_name = 'integration/integration_list.html'
     context_object_name = 'integrations'
     paginate_by = 10
+    ordering = ['system_name']
 
     def get_queryset(self):
         return super().get_queryset().order_by(self.request.GET.get('order_by', 'system_name'))

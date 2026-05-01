@@ -7,7 +7,7 @@
 
 {% if surgeries %}
 <div class="table-responsive">
-    <table class="table table-striped table-hover">
+    <table class="table table-hover align-middle mb-0">
         <thead>
             <tr>
                 <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=patient">Patient {% if request.GET.order_by == 'patient' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>
@@ -37,11 +37,7 @@
     </table>
 </div>
 
-{% if is_paginated %}
-<nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center">
-        {% if page_obj.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Previous</a></li>
+{% include 'partials/pagination.html' %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}">Previous</a></li>
         {% else %}
             <li class="page-item disabled"><a class="page-link">Previous</a></li>
         {% endif %}

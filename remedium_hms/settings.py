@@ -239,6 +239,10 @@ Redis is used for caching (configure via REDIS_URL env var). Set REDIS_ENABLED=f
     'COMPONENT_SPLIT_REQUEST': True,
     'ENUM_NAME_OVERRIDES': {
         'PatientGenderEnum': 'patients.models.Patient.GENDER_CHOICES',
+        'AppointmentStatusEnum': [('Scheduled', 'Scheduled'), ('Completed', 'Completed'), ('Cancelled', 'Cancelled')],
+        'SurgeryStatusEnum': [('Scheduled', 'Scheduled'), ('Completed', 'Completed'), ('Cancelled', 'Cancelled')],
+        'PatientCareStatusEnum': 'care_monitoring.models.PatientCare.STATUS_CHOICES',
+        'NotificationStatusEnum': 'notifications.models.Notification.STATUSES',
     },
     'SERVERS': [
         {'url': 'http://localhost:8000', 'description': 'Development server'},

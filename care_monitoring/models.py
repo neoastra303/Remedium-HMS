@@ -1,5 +1,6 @@
 from django.db import models
 from patients.models import Patient
+from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from simple_history.models import HistoricalRecords
@@ -46,7 +47,7 @@ class PatientCare(models.Model):
         decimal_places=1,
         blank=True,
         null=True,
-        validators=[MinValueValidator(35.0), MaxValueValidator(45.0)],
+        validators=[MinValueValidator(Decimal("35.0")), MaxValueValidator(Decimal("45.0"))],
         help_text="Body temperature in Celsius"
     )
     heart_rate = models.PositiveIntegerField(
@@ -78,7 +79,7 @@ class PatientCare(models.Model):
         decimal_places=2,
         blank=True,
         null=True,
-        validators=[MinValueValidator(0.00), MaxValueValidator(100.00)],
+        validators=[MinValueValidator(Decimal("0.00")), MaxValueValidator(Decimal("100.00"))],
         help_text="Oxygen saturation percentage"
     )
     weight = models.DecimalField(
@@ -86,7 +87,7 @@ class PatientCare(models.Model):
         decimal_places=2,
         blank=True,
         null=True,
-        validators=[MinValueValidator(0.1), MaxValueValidator(500.0)],
+        validators=[MinValueValidator(Decimal("0.1")), MaxValueValidator(Decimal("500.0"))],
         help_text="Weight in kilograms"
     )
     height = models.DecimalField(
@@ -94,7 +95,7 @@ class PatientCare(models.Model):
         decimal_places=2,
         blank=True,
         null=True,
-        validators=[MinValueValidator(0.1), MaxValueValidator(250.0)],
+        validators=[MinValueValidator(Decimal("0.1")), MaxValueValidator(Decimal("250.0"))],
         help_text="Height in centimeters"
     )
     

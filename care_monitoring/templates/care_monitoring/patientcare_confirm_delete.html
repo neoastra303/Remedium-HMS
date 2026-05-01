@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<h1 class="mb-4">Delete Care Monitoring Entry</h1>
-
-<div class="alert alert-warning" role="alert">
-    <p>Are you sure you want to delete the care monitoring entry for <strong>{{ object.patient }}</strong> on <strong>{{ object.date }}</strong>?</p>
-</div>
-
-<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-action-url="{% url 'care_monitoring:patientcare_delete' object.pk %}" data-item-name="Care Monitoring Entry for {{ object.patient }} on {{ object.date }}">
-    Delete Entry
-</button>
-<a href="{% url 'care_monitoring:patientcare_list' %}" class="btn btn-secondary">Cancel</a>
+<div class="row justify-content-center"><div class="col-md-6">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4 text-center">
+            <i class="bi bi-exclamation-triangle display-4 text-danger mb-3"></i>
+            <h5 class="fw-bold">Confirm Deletion</h5>
+            <p class="text-muted">Are you sure you want to delete <strong>{{ object }}</strong>? This cannot be undone.</p>
+            <form method="post">{% csrf_token %}
+                <button type="submit" class="btn btn-danger me-2"><i class="bi bi-trash me-1"></i>Delete</button>
+                <a href="{% url 'care_monitoring:patientcare_delete' %}" class="btn btn-outline-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div></div>
 {% endblock %}

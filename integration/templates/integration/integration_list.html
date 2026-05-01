@@ -107,12 +107,7 @@
     </div>
 
     <!-- Pagination -->
-    {% if is_paginated %}
-    <nav class="mt-5">
-        <ul class="pagination justify-content-center">
-            {% if page_obj.has_previous %}
-                <li class="page-item"><a class="page-link rounded-circle mx-1 border-0 shadow-sm" href="?page={{ page_obj.previous_page_number }}"><i class="bi bi-chevron-left"></i></a></li>
-            {% endif %}
+    {% include 'partials/pagination.html' %}
             
             <li class="page-item active"><a class="page-link rounded-circle mx-1 border-0 shadow-sm">{{ page_obj.number }}</a></li>
 

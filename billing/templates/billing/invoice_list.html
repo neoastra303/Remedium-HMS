@@ -7,7 +7,7 @@
 
 {% if invoices %}
 <div class="table-responsive">
-    <table class="table table-striped table-hover">
+    <table class="table table-hover align-middle mb-0">
         <thead>
             <tr>
                 <th scope="col"><a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}order_by=id">Invoice # {% if request.GET.order_by == 'id' %}<i class="bi bi-arrow-up"></i>{% endif %}</a></th>

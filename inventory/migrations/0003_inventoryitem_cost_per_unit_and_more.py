@@ -124,14 +124,14 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="inventoryitem",
             constraint=models.CheckConstraint(
-                check=models.Q(("quantity__gte", 0)),
+                condition=models.Q(("quantity__gte", 0)),
                 name="inventory_quantity_non_negative",
             ),
         ),
         migrations.AddConstraint(
             model_name="inventoryitem",
             constraint=models.CheckConstraint(
-                check=models.Q(("reorder_level__gte", 0)),
+                condition=models.Q(("reorder_level__gte", 0)),
                 name="inventory_reorder_level_non_negative",
             ),
         ),

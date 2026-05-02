@@ -326,3 +326,83 @@ class TestAPIDocumentation:
         response = api_client.get('/api/v1/schema/')
         assert response.data['info']['title'] == 'Remedium Hospital Management System API'
         assert response.data['info']['version'] == '1.0.0'
+
+
+@pytest.mark.django_db
+class TestCoreViews:
+    """Test core HTML views — homepage, health check, audit log."""
+
+    def test_homepage_unauthenticated(self, client):
+        response = client.get('/')
+        assert response.status_code == 200
+
+    def test_homepage_authenticated(self, client, admin_user):
+        client.force_login(admin_user)
+        response = client.get('/')
+        assert response.status_code == 200
+        assert b'Welcome' in response.content
+
+    def test_health_check(self, client):
+        response = client.get('/health/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['status'] == 'healthy'
+        assert data['database'] == 'connected'
+
+    def test_audit_log_requires_admin(self, client, doctor_user):
+        client.force_login(doctor_user)
+        response = client.get('/audit-log/')
+        assert response.status_code in (302, 403)
+
+    def test_audit_log_accessible_to_admin(self, client, admin_user):
+        client.force_login(admin_user)
+        response = client.get('/audit-log/')
+        assert response.status_code == 200
+
+    def test_logout_redirects(self, client, admin_user):
+        client.force_login(admin_user)
+        response = client.post('/logout/')
+        assert response.status_code == 302
+
+
+@pytest.mark.django_db
+class TestBillingAPIExtended:
+    """Additional billing API coverage."""
+
+    def test_overdue_invoices(self, api_client, admin_user, patient):
+        from datetime import date, timedelta
+        Invoice.objects.create(
+            patient=patient,
+            total_amount=200.00,
+            paid=False,
+            issue_date=date.today() - timedelta(days=30),
+            due_date=date.today() - timedelta(days=10),
+        )
+        api_client.force_authenticate(user=admin_user)
+        response = api_client.get('/api/v1/invoices/overdue/')
+        assert response.status_code == 200
+        assert len(response.data) >= 1
+
+    def test_mark_paid_with_payment_method(self, api_client, admin_user, patient):
+        invoice = Invoice.objects.create(
+            patient=patient, total_amount=150.00, paid=False
+        )
+        api_client.force_authenticate(user=admin_user)
+        response = api_client.post(
+            f'/api/v1/invoices/{invoice.pk}/mark_paid/',
+            {'amount': '150.00', 'payment_method': 'CARD', 'transaction_id': 'TXN123'},
+            format='json',
+        )
+        assert response.status_code == 200
+        invoice.refresh_from_db()
+        assert invoice.paid is True
+        payment = invoice.payments.first()
+        assert payment.payment_method == 'CARD'
+        assert payment.transaction_id == 'TXN123'
+
+    def test_invoice_search(self, api_client, admin_user, patient):
+        Invoice.objects.create(patient=patient, total_amount=50.00)
+        api_client.force_authenticate(user=admin_user)
+        response = api_client.get('/api/v1/invoices/', {'search': patient.unique_id})
+        assert response.status_code == 200
+        assert response.data['count'] >= 1

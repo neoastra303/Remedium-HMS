@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>500 — Server Error | Remedium HMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f8fafc; font-family: 'Inter', sans-serif; }
+        .error-code { font-size: 6rem; font-weight: 800; color: #e2e8f0; line-height: 1; }
+        .error-icon { font-size: 3rem; color: #dc2626; }
+    </style>
+</head>
+<body>
+    <div class="text-center px-4">
+        <div class="error-code">500</div>
+        <i class="bi bi-exclamation-triangle error-icon mb-3 d-block"></i>
+        <h4 class="fw-bold mb-2">Internal Server Error</h4>
+        <p class="text-muted mb-4">Something went wrong on our end. Please try again or contact your administrator.</p>
+        <a href="/" class="btn btn-primary rounded-pill px-4">
+            <i class="bi bi-house me-2"></i>Back to Dashboard
+        </a>
+    </div>
+</body>
+</html>

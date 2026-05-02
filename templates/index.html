@@ -198,7 +198,6 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header-clean"><span class="fw-semibold">Admin</span></div>
                 <div class="list-group list-group-flush rounded-bottom-3">
-                    {% for url_name, icon, label in "user_list,people,User Accounts|audit_log,journal-text,Audit Logs|admin:index,gear,Django Admin"|split:"|" %}{% endfor %}
                     <a href="{% url 'user_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-2 border-0">
                         <span class="small text-body"><i class="bi bi-people me-2 text-muted"></i>User Accounts</span>
                         <i class="bi bi-chevron-right small text-muted"></i>

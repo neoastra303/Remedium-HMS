@@ -86,6 +86,12 @@ def audit_log(request):
         list(Appointment.history.all()[:20]) + list(Invoice.history.all()[:20]),
         key=lambda x: x.history_date, reverse=True
     )[:50]
+    # Annotate each entry with model name (can't access _meta in templates)
+    for entry in all_history:
+        try:
+            entry.model_name = entry.instance._meta.verbose_name.title()
+        except Exception:
+            entry.model_name = type(entry).__name__.replace('Historical', '')
     return render(request, 'core/audit_logs.html', {'history': all_history})
 
 

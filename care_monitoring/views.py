@@ -74,41 +74,11 @@ class PatientCareDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic
     raise_exception = True
 
 
-class PatientVitalTrendsView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
-    model = Patient
-    template_name = 'care_monitoring/vital_trends.html'
-    context_object_name = 'patient'
+class PatientVitalTrendsView(LoginRequiredMixin, PermissionRequiredMixin, generic.View):
+    """Redirect to patient detail — vitals chart is embedded in the Vitals tab."""
     permission_required = 'care_monitoring.care_monitoring_view_patientcare'
     raise_exception = True
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        care_records = PatientCare.objects.filter(patient=self.object).order_by('monitoring_date')
-
-        dates = []
-        heart_rates = []
-        temperatures = []
-        systolic = []
-        diastolic = []
-        oxygen = []
-
-        for record in care_records:
-            dates.append(record.monitoring_date.strftime("%Y-%m-%d %H:%M"))
-            heart_rates.append(record.heart_rate if record.heart_rate else 0)
-            temperatures.append(float(record.temperature) if record.temperature else 0)
-            systolic.append(record.blood_pressure_systolic if record.blood_pressure_systolic else 0)
-            diastolic.append(record.blood_pressure_diastolic if record.blood_pressure_diastolic else 0)
-            oxygen.append(float(record.oxygen_saturation) if record.oxygen_saturation else 0)
-
-        context['chart_data'] = json.dumps({
-            'dates': dates,
-            'heart_rates': heart_rates,
-            'temperatures': temperatures,
-            'systolic': systolic,
-            'diastolic': diastolic,
-            'oxygen': oxygen,
-        })
-
-        context['latest_care'] = care_records.last()
-
-        return context
+    def get(self, request, pk):
+        from django.shortcuts import redirect
+        return redirect('patient_detail', pk=pk)

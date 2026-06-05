@@ -4,7 +4,7 @@ djangorestframework==3.14.0
 python-decouple==3.8
 Pillow==10.1.0
 django-crispy-forms==2.1
-crispy-bootstrap5==2.0.2
+crispy-bootstrap5==2026.3
 psycopg2-binary==2.9.9
 gunicorn==21.2.0
 whitenoise==6.6.0

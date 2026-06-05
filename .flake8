@@ -1,0 +1,23 @@
+[flake8]
+max-line-length = 127
+max-complexity = 10
+exclude = 
+    .git,
+    __pycache__,
+    docs/source/conf.py,
+    build,
+    dist,
+    venv,
+    .venv,
+    env,
+    migrations,
+    .eggs,
+    *.egg
+ignore = 
+    E501,
+    E203,
+    W503,
+    F401
+per-file-ignores =
+    __init__.py: F401
+    conftest.py: F401

@@ -82,10 +82,12 @@ class InvoicePrintView(LoginRequiredMixin, PermissionRequiredMixin, generic.Deta
         return context
 
 
-class PaymentCreateView(LoginRequiredMixin, generic.CreateView):
+class PaymentCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Payment
     fields = ['amount', 'payment_method', 'transaction_id']
     template_name = 'billing/payment_form.html'
+    permission_required = 'billing.billing_change_invoice'
+    raise_exception = True
 
     def form_valid(self, form):
         form.instance.invoice = get_object_or_404(Invoice, pk=self.kwargs['invoice_pk'])

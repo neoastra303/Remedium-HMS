@@ -1,13 +1,17 @@
-"""Project-wide pytest fixtures."""
+"""Project-wide pytest configuration and fixtures."""
 import os
 import pytest
 from rest_framework.test import APIClient
 
-# Ensure SECRET_KEY is long enough for JWT (≥32 bytes) during tests
-os.environ.setdefault(
-    'SECRET_KEY',
-    'test-secret-key-for-pytest-that-is-long-enough-for-jwt-hmac-sha256-minimum-32-bytes'
-)
+
+def pytest_configure(config):
+    """Set test environment variables before Django initialises."""
+    os.environ.setdefault(
+        'SECRET_KEY',
+        'test-secret-key-for-pytest-that-is-long-enough-for-jwt-hmac-sha256-minimum-32-bytes'
+    )
+    os.environ.setdefault('DB_ENGINE', 'django.db.backends.sqlite3')
+    os.environ.setdefault('DB_NAME', ':memory:')
 
 
 @pytest.fixture

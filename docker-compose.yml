@@ -22,6 +22,20 @@ services:
       start_period: 30s
     restart: unless-stopped
 
+  redis:
+    image: redis:7-alpine
+    container_name: remedium_cache
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
   web:
     build: .
     container_name: remedium_hms_app
@@ -32,8 +46,10 @@ services:
     ports:
       - "8000:8000"
     environment:
+      DJANGO_SETTINGS_MODULE: remedium_hms.settings_production
       DEBUG: ${DEBUG:-False}
       SECRET_KEY: ${SECRET_KEY:?error SECRET_KEY is required}
+      FIELD_ENCRYPTION_KEY: ${FIELD_ENCRYPTION_KEY:?error FIELD_ENCRYPTION_KEY is required}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
       DB_ENGINE: django.db.backends.postgresql
       DB_NAME: ${DB_NAME:-remedium_hms}
@@ -41,8 +57,11 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-changeme_use_env_file}
       DB_HOST: postgres
       DB_PORT: 5432
+      REDIS_URL: redis://redis:6379/1
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     volumes:
       - ./logs:/app/logs
@@ -58,4 +77,5 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
   staticfiles_volume:

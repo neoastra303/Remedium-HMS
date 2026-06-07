@@ -139,7 +139,7 @@ class TestPrescriptionAPIWithOpenFDA:
     """Test Prescription API with OpenFDA endpoints."""
 
     def _create_user(self):
-        return User.objects.create_user('pharm@test.com', 'pharm@test.com', 'pharmpass')
+        return User.objects.create_user('pharm@test.com', 'pharm@test.com', 'pharmpass', is_staff=True)
 
     def _create_patient(self):
         return Patient.objects.create(

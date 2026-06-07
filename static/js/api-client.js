@@ -4,7 +4,7 @@
  */
 
 class APIClient {
-    constructor(baseUrl = '/api') {
+    constructor(baseUrl = '/api/v1') {
         this.baseUrl = baseUrl;
         this.csrfToken = this.getCsrfToken();
     }

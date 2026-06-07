@@ -1,10 +1,8 @@
-import secrets
-
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required, permission_required as perm_decorator
-from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordResetForm
 from django.contrib import messages
 from django.views import generic
 from .forms import StaffForm, StaffWithUserForm
@@ -18,10 +16,14 @@ class StaffListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListVie
     paginate_by = 10  # Add pagination
     permission_required = 'staff.staff_view_staff'
     raise_exception = True
+    ALLOWED_ORDER_BY = ['last_name', 'first_name', 'staff_id', 'role', 'department',
+                        '-last_name', '-first_name', '-staff_id', '-role', '-department']
 
     def get_queryset(self):
         queryset = super().get_queryset()
         order_by = self.request.GET.get('order_by', 'last_name') # Default sort by last_name
+        if order_by not in self.ALLOWED_ORDER_BY:
+            order_by = 'last_name'
         return queryset.order_by(order_by)
 
 
@@ -64,10 +66,12 @@ class StaffDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.Delet
     raise_exception = True
 
 
-class ShiftCreateView(LoginRequiredMixin, generic.CreateView):
+class ShiftCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Shift
     fields = ['day_of_week', 'start_time', 'end_time']
     template_name = 'staff/shift_form.html'
+    permission_required = 'staff.staff_change_staff'
+    raise_exception = True
 
     def form_valid(self, form):
         form.instance.staff = get_object_or_404(Staff, pk=self.kwargs['staff_pk'])
@@ -77,9 +81,11 @@ class ShiftCreateView(LoginRequiredMixin, generic.CreateView):
         return reverse('staff_detail', kwargs={'pk': self.kwargs['staff_pk']})
 
 
-class ShiftDeleteView(LoginRequiredMixin, generic.DeleteView):
+class ShiftDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Shift
     template_name = 'staff/shift_confirm_delete.html'
+    permission_required = 'staff.staff_change_staff'
+    raise_exception = True
 
     def get_success_url(self):
         return reverse('staff_detail', kwargs={'pk': self.object.staff.pk})
@@ -128,9 +134,17 @@ def admin_reset_password(request, pk):
     staff = get_object_or_404(Staff, pk=pk)
     if staff.user:
         user = staff.user
-        temp_password = secrets.token_urlsafe(12)
-        user.set_password(temp_password)
-        user.save()
-        messages.success(request, f"Password for {user.username} has been reset. New password: {temp_password}")
+        if user.email:
+            form = PasswordResetForm({'email': user.email})
+            if form.is_valid():
+                form.save(request=request, use_https=request.is_secure())
+                messages.success(request, f"A password reset email has been sent to {user.email}.")
+        else:
+            user.set_unusable_password()
+            user.save(update_fields=['password'])
+            messages.warning(
+                request,
+                f"Password login for {user.username} has been disabled because the account has no email address."
+            )
 
     return redirect('user_list')

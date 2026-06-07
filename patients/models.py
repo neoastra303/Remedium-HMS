@@ -141,7 +141,6 @@ class Patient(models.Model):
                 })
     
     def save(self, *args, **kwargs):
-        """Normalize common input variants before saving."""
         # Allow gender to be provided as display values like "Male" as well as codes like "M"
         if self.gender:
             gender_map = {
@@ -151,16 +150,6 @@ class Patient(models.Model):
                 "Prefer not to say": "P",
             }
             self.gender = gender_map.get(self.gender, self.gender)
-
-        # Normalize phone numbers: strip non-digit chars, prepend + if missing
-        for field_name in ['phone', 'emergency_contact_phone']:
-            phone_value = getattr(self, field_name, None)
-            if phone_value:
-                digits = "".join(ch for ch in phone_value if ch.isdigit())
-                if digits:
-                    # Prepend + if not already present
-                    setattr(self, field_name, f"+{digits}")
-
         super().save(*args, **kwargs)
     
     @property

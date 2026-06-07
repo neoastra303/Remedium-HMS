@@ -77,13 +77,14 @@ class InvoicesModule {
 
         let html = '';
         invoices.forEach(invoice => {
+            const patientName = AJAXHelpers.escapeHTML(invoice.patient_detail?.full_name || '-');
             const statusBadge = invoice.paid ? 
                 '<span class="badge bg-success">Paid</span>' : 
                 '<span class="badge bg-warning">Unpaid</span>';
             
             html += `
                 <tr>
-                    <td>${invoice.patient_detail.full_name}</td>
+                    <td>${patientName}</td>
                     <td>${AJAXHelpers.formatCurrency(invoice.total_amount)}</td>
                     <td>${AJAXHelpers.formatDate(invoice.issue_date)}</td>
                     <td>${AJAXHelpers.formatDate(invoice.due_date)}</td>
@@ -156,13 +157,14 @@ class InvoicesModule {
         
         if (result.success) {
             const invoice = result.data;
+            const escape = AJAXHelpers.escapeHTML;
             const modal = new bootstrap.Modal(document.getElementById('invoiceDetailModal'));
-            
+             
             document.getElementById('invoiceDetailContent').innerHTML = `
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>Invoice #:</strong> ${invoice.id}</p>
-                        <p><strong>Patient:</strong> ${invoice.patient_detail.full_name}</p>
+                        <p><strong>Invoice #:</strong> ${escape(invoice.id)}</p>
+                        <p><strong>Patient:</strong> ${escape(invoice.patient_detail?.full_name || '-')}</p>
                         <p><strong>Total Amount:</strong> ${AJAXHelpers.formatCurrency(invoice.total_amount)}</p>
                     </div>
                     <div class="col-md-6">
@@ -171,7 +173,7 @@ class InvoicesModule {
                         <p><strong>Status:</strong> ${invoice.paid ? '<span class="badge bg-success">Paid</span>' : '<span class="badge bg-warning">Unpaid</span>'}</p>
                     </div>
                 </div>
-                ${invoice.details ? `<hr><p><strong>Details:</strong></p><p>${invoice.details}</p>` : ''}
+                ${invoice.details ? `<hr><p><strong>Details:</strong></p><p>${escape(invoice.details)}</p>` : ''}
                 ${!invoice.paid ? `<button class="btn btn-success" onclick="invoicesModule.markAsPaid(${invoice.id})">Mark as Paid</button>` : ''}
             `;
             

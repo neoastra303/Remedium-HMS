@@ -83,8 +83,9 @@ class TestPatientModel:
         )
         assert patient.is_admitted is False
 
-    def test_phone_normalization(self):
-        """Test phone number normalization."""
+    def test_phone_invalid_format_rejected(self):
+        """Phone numbers with dashes are invalid and must be rejected."""
+        from django.core.exceptions import ValidationError
         patient = Patient(
             unique_id="PAT007",
             first_name="Test",
@@ -93,8 +94,8 @@ class TestPatientModel:
             gender="M",
             phone="555-123-4567",
         )
-        patient.save()
-        assert patient.phone.startswith("+")
+        with pytest.raises(ValidationError):
+            patient.full_clean()
 
     def test_valid_phone_with_plus(self):
         """Test valid phone with country code."""

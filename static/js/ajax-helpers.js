@@ -4,6 +4,17 @@
  */
 
 class AJAXHelpers {
+    static escapeHTML(value) {
+        if (value === null || value === undefined) return '';
+        return String(value).replace(/[&<>"']/g, (char) => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[char]));
+    }
+
     /**
      * Show toast notification
      */
@@ -12,7 +23,7 @@ class AJAXHelpers {
             <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="d-flex">
                     <div class="toast-body">
-                        ${message}
+                        ${this.escapeHTML(message)}
                     </div>
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
@@ -122,7 +133,7 @@ class AJAXHelpers {
                     value = value ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-danger">No</span>';
                 }
                 
-                html += `<td>${value || '-'}</td>`;
+                html += `<td>${this.escapeHTML(value) || '-'}</td>`;
             });
 
             if (actionCallback) {
@@ -279,7 +290,7 @@ class AJAXHelpers {
     static showAlert(title, message, type = 'info') {
         const alertHTML = `
             <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                <strong>${title}</strong><br>${message}
+                <strong>${this.escapeHTML(title)}</strong><br>${this.escapeHTML(message)}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         `;

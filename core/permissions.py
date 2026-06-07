@@ -11,9 +11,16 @@ from staff.models import Staff
 
 
 class IsAdminUser(permissions.BasePermission):
-    """Only admin users (is_staff) can access."""
+    """Only Django staff users or HMS administrators can access."""
     def has_permission(self, request, view):
-        return request.user and request.user.is_staff
+        if not request.user or not request.user.is_authenticated:
+            return False
+        if request.user.is_staff:
+            return True
+        try:
+            return request.user.staff_profile.role == 'ADMIN'
+        except (AttributeError, Staff.DoesNotExist):
+            return False
 
 
 class IsAdminOrDoctor(permissions.BasePermission):
@@ -31,7 +38,7 @@ class IsAdminOrDoctor(permissions.BasePermission):
 
 class IsClinicalStaff(permissions.BasePermission):
     """Any clinical staff (doctor, nurse, surgeon, etc.) can access."""
-    MEDICAL_ROLES = ['DOCTOR', 'NURSE', 'SURGEON', 'ANESTHESIOLOGIST', 'RADIOLOGIST', 'PHARMACIST']
+    MEDICAL_ROLES = ['DOCTOR', 'NURSE', 'SURGEON', 'ANESTHESIOLOGIST', 'RADIOLOGIST', 'PHARMACIST', 'LAB_TECH']
 
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
@@ -45,13 +52,48 @@ class IsClinicalStaff(permissions.BasePermission):
 
 
 class IsBillingStaff(permissions.BasePermission):
-    """Admin or billing-related staff can access."""
+    """Admin, receptionists, and billing-related staff can access invoices."""
+    ALLOWED_ROLES = ['ADMIN', 'RECEPTIONIST', 'BILLING']
+
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
         if request.user.is_staff:
             return True
-        return request.user.has_perm('billing.view_invoice')
+        try:
+            return request.user.staff_profile.role in self.ALLOWED_ROLES
+        except (AttributeError, Staff.DoesNotExist):
+            return False
+
+
+class IsLabStaff(permissions.BasePermission):
+    """Admin, lab techs, radiologists, doctors, and nurses can access lab tests."""
+    ALLOWED_ROLES = ['ADMIN', 'LAB_TECH', 'RADIOLOGIST', 'DOCTOR', 'NURSE']
+
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        if request.user.is_staff:
+            return True
+        try:
+            return request.user.staff_profile.role in self.ALLOWED_ROLES
+        except (AttributeError, Staff.DoesNotExist):
+            return False
+
+
+class IsPharmacyStaff(permissions.BasePermission):
+    """Admin, pharmacists, doctors, and nurses can access prescriptions."""
+    ALLOWED_ROLES = ['ADMIN', 'PHARMACIST', 'DOCTOR', 'NURSE']
+
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        if request.user.is_staff:
+            return True
+        try:
+            return request.user.staff_profile.role in self.ALLOWED_ROLES
+        except (AttributeError, Staff.DoesNotExist):
+            return False
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):

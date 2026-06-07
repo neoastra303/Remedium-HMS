@@ -6,10 +6,12 @@ from .models import PatientDocument
 from patients.models import Patient
 
 
-class PatientDocumentListView(LoginRequiredMixin, generic.ListView):
+class PatientDocumentListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = PatientDocument
     template_name = 'medical_records/patient_document_list.html'
     context_object_name = 'documents'
+    permission_required = 'medical_records.medical_records_view_document'
+    raise_exception = True
 
     def get_queryset(self):
         self.patient = get_object_or_404(Patient, pk=self.kwargs['patient_pk'])
@@ -21,10 +23,12 @@ class PatientDocumentListView(LoginRequiredMixin, generic.ListView):
         return context
 
 
-class PatientDocumentCreateView(LoginRequiredMixin, generic.CreateView):
+class PatientDocumentCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = PatientDocument
     fields = ['document_type', 'title', 'file', 'notes']
     template_name = 'medical_records/patient_document_form.html'
+    permission_required = 'medical_records.medical_records_add_document'
+    raise_exception = True
 
     def form_valid(self, form):
         form.instance.patient = get_object_or_404(Patient, pk=self.kwargs['patient_pk'])

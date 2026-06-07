@@ -1,10 +1,10 @@
 # Remedium Hospital Management System
 
-![Django](https://img.shields.io/badge/Django-5.0.9-092E20?style=for-the-badge&logo=django)
+![Django](https://img.shields.io/badge/Django-5.2.14-092E20?style=for-the-badge&logo=django)
 ![Python](https://img.shields.io/badge/Python-3.13-3776AB?style=for-the-badge&logo=python)
-![DRF](https://img.shields.io/badge/DRF-3.14-A30000?style=for-the-badge&logo=django)
-![Tests](https://img.shields.io/badge/Tests-104%20Passing-brightgreen?style=for-the-badge)
-![Coverage](https://img.shields.io/badge/Coverage-72%25-yellowgreen?style=for-the-badge)
+![DRF](https://img.shields.io/badge/DRF-3.16-A30000?style=for-the-badge&logo=django)
+![Tests](https://img.shields.io/badge/Tests-113%20Passing-brightgreen?style=for-the-badge)
+![Coverage](https://img.shields.io/badge/Coverage-75%25-yellowgreen?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
 Comprehensive REST API-driven Hospital Management System with 14 Django apps, role-based access, FDA drug integration, and interactive API documentation.
@@ -52,7 +52,7 @@ Comprehensive REST API-driven Hospital Management System with 14 Django apps, ro
 
 ### Platform
 - **14 Django Apps** — Modular, maintainable architecture
-- **104 Automated Tests** — 72% coverage across all apps
+- **113 Automated Tests** — 75% coverage across all apps
 - **Role-Based Access** — Admin, Doctor, Nurse, Receptionist, Pharmacist, Lab Technician
 - **Audit Trails** — Historical records on all clinical models
 - **API Documentation** — Swagger UI + ReDoc (OpenAPI 3.0)
@@ -63,12 +63,12 @@ Comprehensive REST API-driven Hospital Management System with 14 Django apps, ro
 
 | Layer | Technology |
 |---|---|
-| **Backend** | Django 5.0.9, Python 3.13 |
-| **API** | Django REST Framework 3.14 |
+| **Backend** | Django 5.2.14, Python 3.13 |
+| **API** | Django REST Framework 3.16 |
 | **Database** | SQLite (dev) → PostgreSQL (prod) |
 | **Frontend** | Bootstrap 5.3, Bootstrap Icons, Chart.js |
 | **API Docs** | drf-spectacular (OpenAPI 3.0) |
-| **Testing** | pytest + pytest-cov (104 tests) |
+| **Testing** | pytest + pytest-cov (113 tests) |
 | **Security** | Rate limiting, Fernet encryption, HSTS |
 | **Deployment** | Docker, Gunicorn, Whitenoise |
 | **CI/CD** | GitHub Actions (flake8, bandit, pytest) |
@@ -160,7 +160,7 @@ python -m pytest --cov=. --cov-report=term-missing
 python -m pytest pharmacy/tests.py -v
 ```
 
-**Results:** 104 passed, 0 failed, 72% coverage
+**Results:** 113 passed, 0 failed, 75% coverage
 
 ## 📁 Project Structure
 
@@ -237,8 +237,8 @@ See `DEPLOYMENT.md` for full production guide.
 |---|---|
 | **Django Apps** | 14 |
 | **API Endpoints** | 50+ |
-| **Tests** | 104 |
-| **Coverage** | 72% |
+| **Tests** | 113 |
+| **Coverage** | 75% |
 | **Commits** | 100+ |
 | **Models** | 25+ |
 | **Templates** | 78 |

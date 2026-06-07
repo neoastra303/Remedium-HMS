@@ -1,15 +1,15 @@
 from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from .models import Staff
 from .serializers import StaffSerializer
+from core.permissions import IsAdminUser
 
 
 class StaffViewSet(viewsets.ModelViewSet):
     queryset = Staff.objects.all()
     serializer_class = StaffSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['staff_id', 'first_name', 'last_name', 'email', 'role']
     ordering_fields = ['hire_date', 'first_name', 'last_name']

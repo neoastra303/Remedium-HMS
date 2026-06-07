@@ -23,6 +23,12 @@ class Appointment(models.Model):
     doctor = models.ForeignKey("staff.Staff", on_delete=models.CASCADE)
     appointment_date = models.DateTimeField()
     reason = models.TextField(blank=True, null=True)
+    STATUS_CHOICES = [
+        ("Scheduled", "Scheduled"),
+        ("Completed", "Completed"),
+        ("Cancelled", "Cancelled"),
+    ]
+
     status = models.CharField(
         max_length=20,
         choices=[

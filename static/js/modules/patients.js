@@ -81,7 +81,7 @@ class PatientsModule {
                 <button type="button" class="btn btn-warning btn-sm" onclick="patientsModule.editPatient(${patient.id})">
                     <i class="bi bi-pencil"></i> Edit
                 </button>
-                <button type="button" class="btn btn-danger btn-sm" onclick="patientsModule.deletePatient(${patient.id}, '${patient.full_name}')">
+                <button type="button" class="btn btn-danger btn-sm" onclick="patientsModule.deletePatient(${patient.id}, 'this patient')">
                     <i class="bi bi-trash"></i> Delete
                 </button>
             </div>
@@ -115,27 +115,28 @@ class PatientsModule {
         
         if (result.success) {
             const patient = result.data;
+            const escape = AJAXHelpers.escapeHTML;
             const modal = new bootstrap.Modal(document.getElementById('patientDetailModal'));
-            
+             
             document.getElementById('patientDetailContent').innerHTML = `
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>ID:</strong> ${patient.unique_id}</p>
-                        <p><strong>Name:</strong> ${patient.full_name}</p>
+                        <p><strong>ID:</strong> ${escape(patient.unique_id)}</p>
+                        <p><strong>Name:</strong> ${escape(patient.full_name)}</p>
                         <p><strong>DOB:</strong> ${AJAXHelpers.formatDate(patient.date_of_birth)}</p>
-                        <p><strong>Age:</strong> ${patient.age} years</p>
-                        <p><strong>Gender:</strong> ${patient.gender}</p>
+                        <p><strong>Age:</strong> ${escape(patient.age)} years</p>
+                        <p><strong>Gender:</strong> ${escape(patient.gender)}</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Phone:</strong> ${AJAXHelpers.formatPhoneNumber(patient.phone)}</p>
-                        <p><strong>Email:</strong> ${patient.email || '-'}</p>
-                        <p><strong>Insurance:</strong> ${patient.insurance_provider || '-'}</p>
+                        <p><strong>Phone:</strong> ${escape(AJAXHelpers.formatPhoneNumber(patient.phone))}</p>
+                        <p><strong>Email:</strong> ${escape(patient.email || '-')}</p>
+                        <p><strong>Insurance:</strong> ${escape(patient.insurance_provider || '-')}</p>
                         <p><strong>Status:</strong> ${patient.is_admitted ? '<span class="badge bg-danger">Admitted</span>' : '<span class="badge bg-success">Discharged</span>'}</p>
                     </div>
                 </div>
                 <hr>
                 <p><strong>Medical History:</strong></p>
-                <p>${patient.medical_history || 'No medical history recorded'}</p>
+                <p>${escape(patient.medical_history || 'No medical history recorded')}</p>
                 ${patient.is_admitted ? `<button class="btn btn-warning" onclick="patientsModule.dischargePatient(${patient.id})">Discharge Patient</button>` : ''}
             `;
             

@@ -56,10 +56,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const colorMap = { success: 'bg-success', danger: 'bg-danger', info: 'bg-info', warning: 'bg-warning text-dark' };
         const container = document.querySelector('.toast-container') || createToastContainer();
         const id = 'toast-' + Date.now();
+        const safeMessage = window.AJAXHelpers ? AJAXHelpers.escapeHTML(message) : String(message).replace(/[&<>"']/g, function (char) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char];
+        });
         const html = `
             <div id="${id}" class="toast align-items-center text-white ${colorMap[type] || 'bg-secondary'} border-0" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="d-flex">
-                    <div class="toast-body">${message}</div>
+                    <div class="toast-body">${safeMessage}</div>
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
             </div>`;

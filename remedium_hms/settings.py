@@ -51,11 +51,13 @@ INSTALLED_APPS = [
     'crispy_forms',
     "crispy_bootstrap5",
     "rest_framework.authtoken",
+    "rest_framework_simplejwt.token_blacklist",
     'drf_spectacular',
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -156,6 +158,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
@@ -239,8 +242,7 @@ Redis is used for caching (configure via REDIS_URL env var). Set REDIS_ENABLED=f
     'COMPONENT_SPLIT_REQUEST': True,
     'ENUM_NAME_OVERRIDES': {
         'PatientGenderEnum': 'patients.models.Patient.GENDER_CHOICES',
-        'AppointmentStatusEnum': [('Scheduled', 'Scheduled'), ('Completed', 'Completed'), ('Cancelled', 'Cancelled')],
-        'SurgeryStatusEnum': [('Scheduled', 'Scheduled'), ('Completed', 'Completed'), ('Cancelled', 'Cancelled')],
+        'StatusEnum': 'appointments.models.Appointment.STATUS_CHOICES',
         'PatientCareStatusEnum': 'care_monitoring.models.PatientCare.STATUS_CHOICES',
         'NotificationStatusEnum': 'notifications.models.Notification.STATUSES',
     },
@@ -270,6 +272,10 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@remediumhms.com')
+
+# Dedicated encryption key for application secrets stored in the database.
+# Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+FIELD_ENCRYPTION_KEY = config('FIELD_ENCRYPTION_KEY', default='')
 
 # Logging Configuration
 LOGGING = {
@@ -325,7 +331,7 @@ if REDIS_ENABLED:
     CACHES = {
         'default': {
             'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': f'{REDIS_URL}/1',
+            'LOCATION': REDIS_URL,
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             }
@@ -357,6 +363,12 @@ SIMPLE_JWT = {
 
 # Security Headers
 X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+REFERRER_POLICY = 'same-origin'
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
 # These are disabled by default for development, enable in production via settings_production.py or env vars
 SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=0, cast=int)
 SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)

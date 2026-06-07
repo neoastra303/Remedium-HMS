@@ -20,11 +20,9 @@ class ExternalIntegrationModelTest(TestCase):
         self.assertEqual(self.integration.status, "Inactive")
         self.assertEqual(str(self.integration), "Test EMR (Electronic Medical Records)")
 
-    def test_trigger_sync(self):
-        self.integration.trigger_sync()
-        self.assertEqual(self.integration.status, "Active")
-        self.assertIsNotNone(self.integration.last_sync)
-        self.assertEqual(self.integration.last_sync_result['status'], 'success')
+    def test_trigger_sync_raises_not_implemented(self):
+        with self.assertRaises(NotImplementedError):
+            self.integration.trigger_sync()
 
 
 class ExternalIntegrationAPITest(APITestCase):
@@ -48,7 +46,5 @@ class ExternalIntegrationAPITest(APITestCase):
     def test_sync_action(self):
         url = reverse('integration-sync', args=[self.integration.pk])
         response = self.client.post(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['status'], 'success')
-        self.integration.refresh_from_db()
-        self.assertEqual(self.integration.status, 'Active')
+        self.assertEqual(response.status_code, status.HTTP_501_NOT_IMPLEMENTED)
+        self.assertEqual(response.data['status'], 'not_implemented')

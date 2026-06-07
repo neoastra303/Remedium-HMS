@@ -77,13 +77,13 @@ class AppointmentsModule {
 
         let html = '';
         appointments.forEach(apt => {
-            const statusBadge = `<span class="badge bg-${this.getStatusColor(apt.status)}">${apt.status}</span>`;
+            const statusBadge = `<span class="badge bg-${this.getStatusColor(apt.status)}">${AJAXHelpers.escapeHTML(apt.status)}</span>`;
             html += `
                 <tr>
-                    <td>${apt.patient_detail.full_name}</td>
-                    <td>${apt.doctor_detail.full_name}</td>
+                    <td>${AJAXHelpers.escapeHTML(apt.patient_detail?.full_name || '-')}</td>
+                    <td>${AJAXHelpers.escapeHTML(apt.doctor_detail?.full_name || '-')}</td>
                     <td>${AJAXHelpers.formatDateTime(apt.appointment_date)}</td>
-                    <td>${apt.reason || '-'}</td>
+                    <td>${AJAXHelpers.escapeHTML(apt.reason || '-')}</td>
                     <td>${statusBadge}</td>
                     <td>
                         <div class="btn-group btn-group-sm" role="group">
@@ -146,18 +146,19 @@ class AppointmentsModule {
         
         if (result.success) {
             const apt = result.data;
+            const escape = AJAXHelpers.escapeHTML;
             const modal = new bootstrap.Modal(document.getElementById('appointmentDetailModal'));
             
             document.getElementById('appointmentDetailContent').innerHTML = `
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>Patient:</strong> ${apt.patient_detail.full_name}</p>
-                        <p><strong>Doctor:</strong> ${apt.doctor_detail.full_name}</p>
+                        <p><strong>Patient:</strong> ${escape(apt.patient_detail?.full_name || '-')}</p>
+                        <p><strong>Doctor:</strong> ${escape(apt.doctor_detail?.full_name || '-')}</p>
                         <p><strong>Date & Time:</strong> ${AJAXHelpers.formatDateTime(apt.appointment_date)}</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Reason:</strong> ${apt.reason || '-'}</p>
-                        <p><strong>Status:</strong> <span class="badge bg-${this.getStatusColor(apt.status)}">${apt.status}</span></p>
+                        <p><strong>Reason:</strong> ${escape(apt.reason || '-')}</p>
+                        <p><strong>Status:</strong> <span class="badge bg-${this.getStatusColor(apt.status)}">${escape(apt.status)}</span></p>
                     </div>
                 </div>
             `;

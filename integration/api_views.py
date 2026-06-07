@@ -1,9 +1,9 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
 from .models import ExternalIntegration
 from .serializers import ExternalIntegrationSerializer
+from core.permissions import IsAdminUser
 
 
 class ExternalIntegrationViewSet(viewsets.ModelViewSet):
@@ -22,6 +22,11 @@ class ExternalIntegrationViewSet(viewsets.ModelViewSet):
                 "message": f"Sync triggered for {integration.system_name}",
                 "last_sync": integration.last_sync
             })
+        except NotImplementedError as e:
+            return Response({
+                "status": "not_implemented",
+                "message": str(e)
+            }, status=status.HTTP_501_NOT_IMPLEMENTED)
         except Exception as e:
             return Response({
                 "status": "error",

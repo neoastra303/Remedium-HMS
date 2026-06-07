@@ -87,7 +87,7 @@ class StaffModule {
                 <button type="button" class="btn btn-warning btn-sm" onclick="staffModule.editStaff(${member.id})">
                     <i class="bi bi-pencil"></i> Edit
                 </button>
-                <button type="button" class="btn btn-danger btn-sm" onclick="staffModule.deleteStaff(${member.id}, '${member.full_name}')">
+                <button type="button" class="btn btn-danger btn-sm" onclick="staffModule.deleteStaff(${member.id}, 'this staff member')">
                     <i class="bi bi-trash"></i> Delete
                 </button>
             </div>
@@ -138,24 +138,25 @@ class StaffModule {
         
         if (result.success) {
             const member = result.data;
+            const escape = AJAXHelpers.escapeHTML;
             const modal = new bootstrap.Modal(document.getElementById('staffDetailModal'));
             
             document.getElementById('staffDetailContent').innerHTML = `
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>ID:</strong> ${member.staff_id}</p>
-                        <p><strong>Name:</strong> ${member.full_name}</p>
-                        <p><strong>Role:</strong> ${member.role}</p>
-                        <p><strong>Department:</strong> ${member.department || '-'}</p>
+                        <p><strong>ID:</strong> ${escape(member.staff_id)}</p>
+                        <p><strong>Name:</strong> ${escape(member.full_name)}</p>
+                        <p><strong>Role:</strong> ${escape(member.role)}</p>
+                        <p><strong>Department:</strong> ${escape(member.department || '-')}</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Phone:</strong> ${AJAXHelpers.formatPhoneNumber(member.phone)}</p>
-                        <p><strong>Email:</strong> ${member.email || '-'}</p>
+                        <p><strong>Phone:</strong> ${escape(AJAXHelpers.formatPhoneNumber(member.phone))}</p>
+                        <p><strong>Email:</strong> ${escape(member.email || '-')}</p>
                         <p><strong>Hire Date:</strong> ${AJAXHelpers.formatDate(member.hire_date)}</p>
                         <p><strong>Status:</strong> ${member.is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>'}</p>
                     </div>
                 </div>
-                ${member.schedule ? `<hr><p><strong>Schedule:</strong></p><p>${member.schedule}</p>` : ''}
+                ${member.schedule ? `<hr><p><strong>Schedule:</strong></p><p>${escape(member.schedule)}</p>` : ''}
             `;
             
             modal.show();

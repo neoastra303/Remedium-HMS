@@ -48,6 +48,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Initial commit of project files ([`fbeb48c`])
 
 ### Fixed
+- CI/CD â€” align Python versions, split dev deps, fix gitignore, drop python-ci.yml ([`d6b601c`])
 - media serving, 404/500 pages, README stats, audit log, vital trends redirect, +9 tests (113 total, 75% coverage) ([`21f5ba7`])
 - dashboard â€” add admitted_patients stat, fix progress bar normalization, fix now context, fix status badge, replace dark admin card with light ([`cf9293a`])
 - modernize all list/delete templates, fix validators, fix migration deprecations, fix ordering warnings, fix enum naming ([`5a3e7d4`])

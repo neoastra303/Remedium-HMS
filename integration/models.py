@@ -1,17 +1,16 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from cryptography.fernet import Fernet
 
 
 def get_encryption_key():
-    """Get or create encryption key from Django settings."""
-    # Use SECRET_KEY as basis for encryption (not ideal but better than plaintext)
-    import hashlib
-    key = hashlib.sha256(settings.SECRET_KEY.encode()).digest()
-    # Fernet requires 32 url-safe base64-encoded bytes
-    import base64
-    return base64.urlsafe_b64encode(key)
+    """Return the dedicated Fernet key used for database-stored secrets."""
+    key = getattr(settings, 'FIELD_ENCRYPTION_KEY', '')
+    if not key:
+        raise ImproperlyConfigured("FIELD_ENCRYPTION_KEY must be set before storing integration API keys.")
+    return key.encode()
 
 
 def encrypt_value(value):
@@ -63,15 +62,14 @@ class ExternalIntegration(models.Model):
     notes = models.TextField(blank=True, null=True)
 
     def trigger_sync(self):
-        """Placeholder for actual synchronization logic."""
-        # Here we would normally use requests or a task queue like Celery
-        self.status = 'Synchronizing'
-        self.save()
-        # Simulation of successful sync
-        self.last_sync = timezone.now()
-        self.status = 'Active'
-        self.last_sync_result = {"status": "success", "message": "Records synchronized."}
-        self.save()
+        """Trigger synchronization with the external system.
+
+        Not yet implemented. Wire up a real HTTP call or a Celery task here.
+        """
+        raise NotImplementedError(
+            f"trigger_sync() is not implemented for {self.system_name}. "
+            "Integrate a real HTTP call or a Celery task before calling this method."
+        )
 
     def __str__(self):
         return f"{self.system_name} ({self.get_system_type_display()})"

@@ -25,6 +25,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- stage all unstaged working-tree changes from 13-commit backlog ([`5dd1a38`])
 - add full-stack production showcase document ([`da6cc7e`])
 - rewrite README with architecture diagram, badges, and API documentation ([`e706352`])
 - finalize app configuration and management commands ([`b62e336`])

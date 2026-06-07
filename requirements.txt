@@ -1,22 +1,4 @@
-Django==5.0.9
-djangorestframework==3.14.0
-djangorestframework-simplejwt==5.3.1
-django-redis==5.4.0
-redis==5.0.1
-python-decouple==3.8
-Pillow==10.1.0
-django-crispy-forms==2.3.0
-crispy-bootstrap5==2025.6
-psycopg2-binary==2.9.9
-django-filter==23.5
-django-cors-headers==4.3.1
-django-simple-history==3.4.0
-gunicorn==21.2.0
-whitenoise==6.6.0
-drf-spectacular==0.27.0
-requests==2.31.0
-
-# Testing
-pytest==7.4.3
-pytest-django==4.7.0
-pytest-cov==4.1.0
+# Local development — includes all production and dev/test dependencies
+# For production deployments use requirements-prod.txt
+-r requirements-prod.txt
+-r requirements-dev.txt

@@ -5,9 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] - 2026-05-01
+## [Unreleased] - 2026-06-07
 
 ### Added
+- professional dashboard redesign â€” consistent stat cards, component CSS, appointment rows, fix card-header color ([`d8353b1`])
+- UI/UX overhaul â€” grouped patient form, login redesign, empty states, card hover fix, form spinners, delete toasts ([`3e8f1ee`])
+- UI/UX overhaul â€” tabbed patient detail, crispy forms, print invoices, notification bell, Chart.js vitals, mobile CSS, fix all tests ([`6551e1a`])
+- fix home URL bug, add whitenoise, 24 API tests, invoice counter, changelog CI check ([`cedd6c1`])
+- add REST API for hospital/inventory/surgery/care_monitoring, fix Redis default, add reporting tests, automate changelog ([`c7df2cb`])
 - add seed_demo management command for realistic demo data ([`4053926`])
 - add API documentation with drf-spectacular ([`8915812`])
 - integrate OpenFDA drug lookup with UI panel ([`168256e`])
@@ -43,6 +48,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Initial commit of project files ([`fbeb48c`])
 
 ### Fixed
+- media serving, 404/500 pages, README stats, audit log, vital trends redirect, +9 tests (113 total, 75% coverage) ([`21f5ba7`])
+- dashboard â€” add admitted_patients stat, fix progress bar normalization, fix now context, fix status badge, replace dark admin card with light ([`cf9293a`])
+- modernize all list/delete templates, fix validators, fix migration deprecations, fix ordering warnings, fix enum naming ([`5a3e7d4`])
+- create all missing templates, rebuild old-style detail pages, add hospital templates ([`6b65df1`])
+- resolve all broken URL names â€” remove app_name from urls.py files, register all CRUD routes globally ([`c9d2af1`])
+- register all missing list URLs, add InventoryItemDetailView, fix integration views, fix surgery select_related bug ([`c10a17d`])
 - resolve settings security issues and rate limiting ([`1ed5b98`])
 
 

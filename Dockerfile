@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.13-slim
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
@@ -23,8 +23,10 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p logs staticfiles media
 
-# Collect static files
-RUN python manage.py collectstatic --noinput
+# Collect static files. collectstatic only needs SECRET_KEY; other keys
+# are not used during this phase, so a dummy SECRET_KEY is sufficient.
+RUN SECRET_KEY=build-only-secret-key-for-static-collection-not-for-runtime \
+    python manage.py collectstatic --noinput
 
 # Create non-root user and set permissions
 RUN adduser --disabled-password --no-create-home appuser \

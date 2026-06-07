@@ -55,3 +55,14 @@ Thumbs.db
 # AI tool artifacts
 .qwen/
 **/models_fixed.py
+
+# Test & coverage artifacts
+.coverage
+coverage.xml
+.pytest_cache/
+pytest_tmp/
+htmlcov/
+
+# Project artifacts
+1.1
+scripts/

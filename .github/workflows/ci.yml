@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.11', '3.12']
+        python-version: ['3.12', '3.13']
 
     services:
       postgres:
@@ -40,15 +40,16 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements*.txt') }}
         restore-keys: |
+          ${{ runner.os }}-pip-${{ matrix.python-version }}-
           ${{ runner.os }}-pip-
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements-prod.txt
-        pip install pytest pytest-django pytest-cov flake8 cryptography bandit safety
+        pip install -r requirements-dev.txt
 
     - name: Lint with flake8
       run: |
@@ -57,7 +58,7 @@ jobs:
 
     - name: Security scan with bandit
       run: |
-        bandit -r . -ll --exclude venv,venv3,*/migrations/*,*/tests.py
+        bandit -r . -ll --exclude venv,venv3,*/migrations/*,*/tests.py,*/tests_features.py
 
     - name: Run Django checks
       env:
@@ -82,12 +83,12 @@ jobs:
         DB_HOST: localhost
         DB_PORT: 5432
       run: |
-        pytest --cov=. --cov-report=xml --cov-report=term-missing
+        pytest --cov=. --cov-report=xml --cov-report=term-missing --override-ini="addopts="
 
-    - name: Upload coverage to GitHub
+    - name: Upload coverage report
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-report
+        name: coverage-report-${{ matrix.python-version }}
         path: coverage.xml
 
   changelog:
@@ -112,15 +113,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python 3.12
+    - name: Set up Python 3.13
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
+        python-version: '3.13'
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r requirements-prod.txt
+        pip install -r requirements-dev.txt
 
     - name: Run collectstatic dry-run
       env:

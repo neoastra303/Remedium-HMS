@@ -12,7 +12,9 @@ class WardAdmin(admin.ModelAdmin):
 class RoomAdmin(admin.ModelAdmin):
     list_display = ['ward', 'room_number', 'capacity']
     list_filter = ['ward', 'capacity']
-    search_fields = ['room_number', 'ward__name']r(HospitalService)
+    search_fields = ['room_number', 'ward__name']
+
+@admin.register(HospitalService)
 class HospitalServiceAdmin(admin.ModelAdmin):
     list_display = ['name', 'category', 'base_price', 'is_active']
     list_filter = ['category', 'is_active']

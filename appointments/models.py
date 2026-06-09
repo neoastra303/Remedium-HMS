@@ -25,19 +25,19 @@ class Appointment(models.Model):
     reason = models.TextField(blank=True, null=True)
     STATUS_CHOICES = [
         ("Scheduled", "Scheduled"),
+        ("Waiting", "Waiting/Arrived"),
+        ("In Progress", "In Progress"),
         ("Completed", "Completed"),
         ("Cancelled", "Cancelled"),
     ]
 
     status = models.CharField(
         max_length=20,
-        choices=[
-            ("Scheduled", "Scheduled"),
-            ("Completed", "Completed"),
-            ("Cancelled", "Cancelled"),
-        ],
+        choices=STATUS_CHOICES,
         default="Scheduled",
+        db_index=True
     )
+    arrived_at = models.DateTimeField(blank=True, null=True, help_text="Time when patient arrived at clinic")
 
     history = HistoricalRecords()
 

@@ -5,9 +5,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] - 2026-06-09
+## [Unreleased] - 2026-06-10
 
 ### Added
+- full-stack UI upgrades for flexible data relations ([`d14427e`])
 - professional dashboard redesign â€” consistent stat cards, component CSS, appointment rows, fix card-header color ([`9cca972`])
 - UI/UX overhaul â€” grouped patient form, login redesign, empty states, card hover fix, form spinners, delete toasts ([`79b2786`])
 - UI/UX overhaul â€” tabbed patient detail, crispy forms, print invoices, notification bell, Chart.js vitals, mobile CSS, fix all tests ([`712de13`])

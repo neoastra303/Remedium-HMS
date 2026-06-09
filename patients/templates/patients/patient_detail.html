@@ -27,6 +27,9 @@
         <a href="{% url 'patient_history' patient.pk %}" class="btn btn-sm btn-outline-secondary">
             <i class="bi bi-clock-history me-1"></i>History
         </a>
+        <a href="{% url 'invoice_create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-outline-success">
+            <i class="bi bi-currency-dollar me-1"></i>Quick Pay
+        </a>
         <a href="{% url 'patient_delete' patient.pk %}" class="btn btn-sm btn-outline-danger">
             <i class="bi bi-trash me-1"></i>Delete
         </a>

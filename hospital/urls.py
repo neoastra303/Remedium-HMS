@@ -18,4 +18,5 @@ urlpatterns = [
 
     # Service Catalog
     path('services/', views.HospitalServiceListView.as_view(), name='service_list'),
+    path('occupancy/', views.OccupancyMapView.as_view(), name='occupancy_map'),
     ]

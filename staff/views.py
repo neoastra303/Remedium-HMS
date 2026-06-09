@@ -9,6 +9,50 @@ from .forms import StaffForm, StaffWithUserForm
 from .models import Staff, Shift
 
 
+from django.utils import timezone
+from django.db.models import Count, Q
+from medical_records.models import Encounter
+
+class DoctorAvailabilityView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+    """
+    Dashboard view for receptionists to see current doctor load and availability.
+    """
+    model = Staff
+    template_name = 'staff/doctor_availability.html'
+    context_object_name = 'doctors'
+    permission_required = 'staff.staff_view_staff'
+    raise_exception = True
+
+    def get_queryset(self):
+        # Filter for medical staff (Doctors, Surgeons, etc.)
+        medical_roles = ['DOCTOR', 'SURGEON', 'ANESTHESIOLOGIST', 'RADIOLOGIST']
+        now = timezone.now()
+        current_day = now.weekday()
+        current_time = now.time()
+
+        queryset = Staff.objects.filter(role__in=medical_roles, is_active=True).annotate(
+            active_cases_count=Count(
+                'encounters', 
+                filter=Q(encounters__end_time__isnull=True)
+            )
+        ).prefetch_related('shifts')
+
+        # Determine if each doctor is currently on shift
+        for doctor in queryset:
+            doctor.on_shift = doctor.shifts.filter(
+                day_of_week=current_day,
+                start_time__lte=current_time,
+                end_time__gte=current_time
+            ).exists()
+        
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['now'] = timezone.now()
+        return context
+
+
 class StaffListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Staff
     template_name = 'staff/staff_list.html'

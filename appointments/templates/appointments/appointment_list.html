@@ -24,11 +24,18 @@
                     <td>{{ appointment.doctor }}</td>
                     <td>{{ appointment.appointment_date|date:"M d, Y H:i" }}</td>
                     <td>
-                        {% if appointment.status == 'Scheduled' %}<span class="badge bg-primary rounded-pill">{{ appointment.get_status_display }}</span>
-                        {% elif appointment.status == 'Completed' %}<span class="badge bg-success rounded-pill">{{ appointment.get_status_display }}</span>
+                        {% if appointment.status == 'Scheduled' %}<span class="badge bg-primary rounded-pill">Scheduled</span>
+                        {% elif appointment.status == 'Waiting' %}<span class="badge bg-warning text-dark rounded-pill">Waiting</span>
+                        {% elif appointment.status == 'In Progress' %}<span class="badge bg-info rounded-pill">In Progress</span>
+                        {% elif appointment.status == 'Completed' %}<span class="badge bg-success rounded-pill">Completed</span>
                         {% else %}<span class="badge bg-secondary rounded-pill">{{ appointment.get_status_display }}</span>{% endif %}
                     </td>
                     <td class="pe-4 text-end">
+                        {% if appointment.status == 'Scheduled' %}
+                            <a href="{% url 'check_in_appointment' appointment.pk %}" class="btn btn-sm btn-success text-white me-1" title="Check-in Patient">
+                                <i class="bi bi-person-check"></i>
+                            </a>
+                        {% endif %}
                         <a href="{% url 'appointment_detail' appointment.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
                         <a href="{% url 'appointment_update' appointment.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'appointment_delete' appointment.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>

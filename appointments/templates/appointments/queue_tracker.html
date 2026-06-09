@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-list-ol me-2 text-primary"></i>Live Waiting Queue</h4>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">Patient</th>
+                    <th>Doctor</th>
+                    <th>Arrival Time</th>
+                    <th>Status</th>
+                    <th class="pe-4 text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for q in queue %}
+                <tr>
+                    <td class="ps-4 fw-medium">{{ q.patient.full_name }}</td>
+                    <td>{{ q.doctor.full_name }}</td>
+                    <td class="text-muted small">{{ q.arrived_at|time:"H:i" }}</td>
+                    <td>
+                        {% if q.status == 'Waiting' %}<span class="badge bg-warning text-dark rounded-pill">Waiting</span>
+                        {% else %}<span class="badge bg-info rounded-pill">In Progress</span>{% endif %}
+                    </td>
+                    <td class="pe-4 text-end">
+                        <a href="{% url 'appointment_detail' q.pk %}" class="btn btn-sm btn-outline-primary">Details</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center py-4 text-muted">No patients in queue.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

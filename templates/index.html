@@ -97,6 +97,17 @@
                             <div class="quick-action__sub">Schedule</div>
                         </a>
                     </div>
+                    {% if is_hms_receptionist or is_hms_admin %}
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'doctor_availability' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-danger bg-opacity-10 text-danger">
+                                <i class="bi bi-person-check"></i>
+                            </div>
+                            <div class="quick-action__title">Doctor Load</div>
+                            <div class="quick-action__sub">Availability</div>
+                        </a>
+                    </div>
+                    {% endif %}
                     {% if is_hms_admin %}
                     <div class="col-6 col-md-3">
                         <a href="{% url 'staff_create' %}" class="quick-action text-decoration-none">

@@ -1,16 +1,18 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy, reverse
 from django.views import generic
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required as perm_decorator
+from django.utils import timezone
 from .models import Appointment
 from .forms import AppointmentForm
-from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
 class AppointmentListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Appointment
     template_name = 'appointments/appointment_list.html'
     context_object_name = 'appointments'
-    paginate_by = 10  # Add pagination
+    paginate_by = 10
     permission_required = 'appointments.appointments_view_appointment'
     raise_exception = True
 
@@ -28,7 +30,7 @@ class AppointmentCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic
     model = Appointment
     form_class = AppointmentForm
     template_name = 'appointments/appointment_form.html'
-    success_url = reverse_lazy('appointment_list')  # Redirect to the list view after success
+    success_url = reverse_lazy('appointment_list')
     permission_required = 'appointments.appointments_add_appointment'
     raise_exception = True
 
@@ -37,7 +39,7 @@ class AppointmentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic
     model = Appointment
     form_class = AppointmentForm
     template_name = 'appointments/appointment_form.html'
-    success_url = reverse_lazy('appointment_list')  # Redirect to the list view after success
+    success_url = reverse_lazy('appointment_list')
     permission_required = 'appointments.appointments_change_appointment'
     raise_exception = True
 
@@ -45,17 +47,34 @@ class AppointmentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic
 class AppointmentDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Appointment
     template_name = 'appointments/appointment_confirm_delete.html'
-    success_url = reverse_lazy('appointment_list')  # Redirect to the list view after success
+    success_url = reverse_lazy('appointment_list')
     permission_required = 'appointments.appointments_delete_appointment'
     raise_exception = True
 
 
 class AppointmentDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Appointment
-    template_name = 'appointments/appointment_detail.html'
     context_object_name = 'appointment'
     permission_required = 'appointments.appointments_view_appointment'
     raise_exception = True
 
 
-# Create your views here.
+@login_required
+@perm_decorator('appointments.change_appointment')
+def check_in_appointment(request, pk):
+    appointment = get_object_or_404(Appointment, pk=pk)
+    appointment.status = 'Waiting'
+    appointment.arrived_at = timezone.now()
+    appointment.save()
+    return redirect('appointment_list')
+
+
+class QueueTrackerView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+    model = Appointment
+    template_name = 'appointments/queue_tracker.html'
+    context_object_name = 'queue'
+    permission_required = 'appointments.appointments_view_appointment'
+    raise_exception = True
+
+    def get_queryset(self):
+        return Appointment.objects.filter(status__in=['Waiting', 'In Progress']).select_related('patient', 'doctor').order_by('appointment_date')

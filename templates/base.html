@@ -37,6 +37,7 @@
                             <li><a class="dropdown-item {% if request.resolver_match.app_name == 'medical_records' %}active{% endif %}" href="{% url 'patient_list' %}"><i class="bi bi-folder2-open me-2"></i> Medical Records</a></li>
                             <li><a class="dropdown-item {% if request.resolver_match.app_name == 'appointments' %}active{% endif %}" href="{% url 'appointment_list' %}"><i class="bi bi-calendar-event me-2"></i> Appointments</a></li>
                             {% if is_hms_admin or is_hms_receptionist %}
+                            <li><a class="dropdown-item {% if request.resolver_match.url_name == 'doctor_availability' %}active{% endif %}" href="{% url 'doctor_availability' %}"><i class="bi bi-person-check me-2"></i> Doctor Load</a></li>
                             <li><a class="dropdown-item {% if request.resolver_match.app_name == 'billing' %}active{% endif %}" href="{% url 'invoice_list' %}"><i class="bi bi-cash-stack me-2"></i> Billing</a></li>
                             {% endif %}
                             <li><a class="dropdown-item {% if request.resolver_match.app_name == 'surgery' %}active{% endif %}" href="{% url 'surgery_list' %}"><i class="bi bi-scissors me-2"></i> Surgery</a></li>
@@ -61,6 +62,7 @@
                             {% endif %}
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{% url 'hospital:service_list' %}"><i class="bi bi-card-checklist me-2"></i> Services</a></li>
+                            <li><a class="dropdown-item" href="{% url 'hospital:occupancy_map' %}"><i class="bi bi-grid-3x3-gap me-2"></i> Bed Map</a></li>
                         </ul>
                     </li>
                     {% endif %}

@@ -21,6 +21,21 @@ class HospitalServiceListView(LoginRequiredMixin, PermissionRequiredMixin, gener
         return queryset
 
 
+class OccupancyMapView(LoginRequiredMixin, PermissionRequiredMixin, generic.TemplateView):
+    template_name = 'hospital/occupancy_map.html'
+    permission_required = 'hospital.view_ward'
+    raise_exception = True
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Prefetch wards with rooms, and rooms with patients
+        context['wards'] = Ward.objects.prefetch_related(
+            'rooms', 
+            'rooms__patient_set'
+        ).all()
+        return context
+
+
 class WardListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Ward
     template_name = 'hospital/ward_list.html'

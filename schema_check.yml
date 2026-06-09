@@ -1,0 +1,4777 @@
+openapi: 3.0.3
+info:
+  title: Remedium Hospital Management System API
+  version: 1.0.0
+  description: "\nComprehensive REST API for the Remedium Hospital Management System.\n\
+    \n## Authentication\nAll API endpoints require authentication. Obtain JWT tokens\
+    \ via `/api/v1/token/`:\n```\nAuthorization: Bearer <your-access-token>\n```\n\
+    \n## Versioning\nAll API endpoints are versioned under `/api/v1/`.\n\n## Rate\
+    \ Limiting\n- Anonymous users: 100 requests/hour\n- Authenticated users: 1000\
+    \ requests/hour\n\n## Caching\nRedis is used for caching (configure via REDIS_URL\
+    \ env var). Set REDIS_ENABLED=false to use local memory cache.\n\n## Resources\n\
+    - **Patients** - Patient demographics and medical records\n- **Staff** - Staff\
+    \ directory and user management\n- **Appointments** - Appointment scheduling and\
+    \ management\n- **Invoices** - Billing and payment tracking\n- **Lab Tests** -\
+    \ Laboratory test management\n- **Prescriptions** - Pharmacy and prescription\
+    \ management\n- **Integrations** - External system integrations (Admin only)\n\
+    \    "
+  contact:
+    name: Remedium HMS Support
+    email: support@remediumhms.com
+  license:
+    name: MIT License
+paths:
+  /api/v1/appointments/:
+    get:
+      operationId: api_v1_appointments_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAppointmentList'
+          description: ''
+    post:
+      operationId: api_v1_appointments_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AppointmentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppointmentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+  /api/v1/appointments/{id}/:
+    get:
+      operationId: api_v1_appointments_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this appointment.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+    put:
+      operationId: api_v1_appointments_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this appointment.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AppointmentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppointmentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+    patch:
+      operationId: api_v1_appointments_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this appointment.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAppointmentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAppointmentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAppointmentRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+    delete:
+      operationId: api_v1_appointments_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this appointment.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/appointments/scheduled/:
+    get:
+      operationId: api_v1_appointments_scheduled_retrieve
+      description: Get all scheduled appointments.
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+  /api/v1/appointments/upcoming/:
+    get:
+      operationId: api_v1_appointments_upcoming_retrieve
+      description: Get upcoming appointments.
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+  /api/v1/care-monitoring/:
+    get:
+      operationId: api_v1_care_monitoring_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPatientCareList'
+          description: ''
+    post:
+      operationId: api_v1_care_monitoring_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientCareRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatientCareRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatientCareRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientCare'
+          description: ''
+  /api/v1/care-monitoring/{id}/:
+    get:
+      operationId: api_v1_care_monitoring_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this patient care.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientCare'
+          description: ''
+    put:
+      operationId: api_v1_care_monitoring_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this patient care.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientCareRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatientCareRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatientCareRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientCare'
+          description: ''
+    patch:
+      operationId: api_v1_care_monitoring_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this patient care.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientCareRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientCareRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientCareRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientCare'
+          description: ''
+    delete:
+      operationId: api_v1_care_monitoring_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this patient care.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/care-monitoring/critical/:
+    get:
+      operationId: api_v1_care_monitoring_critical_retrieve
+      description: Return records where patient status is Critical.
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientCare'
+          description: ''
+  /api/v1/integrations/:
+    get:
+      operationId: api_v1_integrations_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedExternalIntegrationList'
+          description: ''
+    post:
+      operationId: api_v1_integrations_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalIntegrationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExternalIntegrationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExternalIntegrationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalIntegration'
+          description: ''
+  /api/v1/integrations/{id}/:
+    get:
+      operationId: api_v1_integrations_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this external integration.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalIntegration'
+          description: ''
+    put:
+      operationId: api_v1_integrations_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this external integration.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalIntegrationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExternalIntegrationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExternalIntegrationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalIntegration'
+          description: ''
+    patch:
+      operationId: api_v1_integrations_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this external integration.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedExternalIntegrationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedExternalIntegrationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedExternalIntegrationRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalIntegration'
+          description: ''
+    delete:
+      operationId: api_v1_integrations_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this external integration.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/integrations/{id}/sync/:
+    post:
+      operationId: api_v1_integrations_sync_create
+      description: Trigger a manual synchronization for this integration.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this external integration.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalIntegrationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExternalIntegrationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExternalIntegrationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalIntegration'
+          description: ''
+  /api/v1/inventory/:
+    get:
+      operationId: api_v1_inventory_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInventoryItemList'
+          description: ''
+    post:
+      operationId: api_v1_inventory_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InventoryItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InventoryItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
+  /api/v1/inventory/{id}/:
+    get:
+      operationId: api_v1_inventory_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this inventory item.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
+    put:
+      operationId: api_v1_inventory_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this inventory item.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InventoryItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InventoryItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
+    patch:
+      operationId: api_v1_inventory_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this inventory item.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedInventoryItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedInventoryItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedInventoryItemRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
+    delete:
+      operationId: api_v1_inventory_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this inventory item.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/inventory/low_stock/:
+    get:
+      operationId: api_v1_inventory_low_stock_retrieve
+      description: Return items that need reordering.
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
+  /api/v1/invoices/:
+    get:
+      operationId: api_v1_invoices_list
+      description: Retrieve a paginated list of all invoices in the system.
+      summary: List all invoices
+      parameters:
+      - in: query
+        name: insurance_claimed
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: paid
+        schema:
+          type: boolean
+      - in: query
+        name: patient
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvoiceList'
+          description: ''
+    post:
+      operationId: api_v1_invoices_create
+      description: Generate a new invoice record.
+      summary: Create invoice
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InvoiceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InvoiceRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+          description: ''
+  /api/v1/invoices/{id}/:
+    get:
+      operationId: api_v1_invoices_retrieve
+      description: Retrieve detailed information about a specific invoice by ID.
+      summary: Get invoice details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this invoice.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+          description: ''
+    put:
+      operationId: api_v1_invoices_update
+      description: Update all fields of an existing invoice.
+      summary: Update invoice
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this invoice.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InvoiceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InvoiceRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+          description: ''
+    patch:
+      operationId: api_v1_invoices_partial_update
+      description: Update specific fields of an existing invoice.
+      summary: Partial update invoice
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this invoice.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedInvoiceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedInvoiceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedInvoiceRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+          description: ''
+    delete:
+      operationId: api_v1_invoices_destroy
+      description: Remove an invoice record from the system.
+      summary: Delete invoice
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this invoice.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/invoices/{id}/mark_paid/:
+    post:
+      operationId: api_v1_invoices_mark_paid_create
+      description: Create a payment record to mark an invoice as paid. Defaults to
+        full payment if amount is not specified.
+      summary: Mark invoice as paid
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this invoice.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardError'
+          description: ''
+  /api/v1/invoices/overdue/:
+    get:
+      operationId: api_v1_invoices_overdue_list
+      description: Retrieve all unpaid invoices where the due date has already passed.
+      summary: List overdue invoices
+      parameters:
+      - in: query
+        name: insurance_claimed
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: paid
+        schema:
+          type: boolean
+      - in: query
+        name: patient
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvoiceList'
+          description: ''
+  /api/v1/invoices/unpaid/:
+    get:
+      operationId: api_v1_invoices_unpaid_list
+      description: Retrieve all invoices that have not yet been marked as fully paid.
+      summary: List unpaid invoices
+      parameters:
+      - in: query
+        name: insurance_claimed
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: paid
+        schema:
+          type: boolean
+      - in: query
+        name: patient
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvoiceList'
+          description: ''
+  /api/v1/lab-tests/:
+    get:
+      operationId: api_v1_lab_tests_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLabTestList'
+          description: ''
+    post:
+      operationId: api_v1_lab_tests_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabTestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LabTestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LabTestRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabTest'
+          description: ''
+  /api/v1/lab-tests/{id}/:
+    get:
+      operationId: api_v1_lab_tests_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this lab test.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabTest'
+          description: ''
+    put:
+      operationId: api_v1_lab_tests_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this lab test.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabTestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LabTestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LabTestRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabTest'
+          description: ''
+    patch:
+      operationId: api_v1_lab_tests_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this lab test.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLabTestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLabTestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLabTestRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabTest'
+          description: ''
+    delete:
+      operationId: api_v1_lab_tests_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this lab test.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/patients/:
+    get:
+      operationId: api_v1_patients_list
+      description: Retrieve a paginated list of all patients in the system.
+      summary: List all patients
+      parameters:
+      - in: query
+        name: gender
+        schema:
+          type: string
+          enum:
+          - F
+          - M
+          - O
+          - P
+        description: |-
+          Patient's gender
+
+          * `M` - Male
+          * `F` - Female
+          * `O` - Other
+          * `P` - Prefer not to say
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: room
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: ward
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPatientFullList'
+          description: ''
+    post:
+      operationId: api_v1_patients_create
+      description: Create a new patient record in the system.
+      summary: Register new patient
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientFullRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatientFullRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatientFullRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientFull'
+          description: ''
+  /api/v1/patients/{id}/:
+    get:
+      operationId: api_v1_patients_retrieve
+      description: Retrieve detailed information about a specific patient by ID.
+      summary: Get patient details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this patient.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientFull'
+          description: ''
+    put:
+      operationId: api_v1_patients_update
+      description: Update all fields of an existing patient record.
+      summary: Update patient
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this patient.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientFullRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatientFullRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatientFullRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientFull'
+          description: ''
+    patch:
+      operationId: api_v1_patients_partial_update
+      description: Update specific fields of an existing patient record.
+      summary: Partial update patient
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this patient.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientFullRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientFullRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientFullRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientFull'
+          description: ''
+    delete:
+      operationId: api_v1_patients_destroy
+      description: Permanently remove a patient record from the system.
+      summary: Delete patient
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this patient.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/patients/{id}/discharge/:
+    post:
+      operationId: api_v1_patients_discharge_create
+      description: Mark a patient as discharged. Sets the discharge date to the current
+        time.
+      summary: Discharge patient
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this patient.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientFull'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardError'
+          description: ''
+  /api/v1/patients/admitted_patients/:
+    get:
+      operationId: api_v1_patients_admitted_patients_list
+      description: Retrieve a list of all patients currently admitted to the hospital
+        (those with an admission date but no discharge date).
+      summary: List admitted patients
+      parameters:
+      - in: query
+        name: gender
+        schema:
+          type: string
+          enum:
+          - F
+          - M
+          - O
+          - P
+        description: |-
+          Patient's gender
+
+          * `M` - Male
+          * `F` - Female
+          * `O` - Other
+          * `P` - Prefer not to say
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: room
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: ward
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPatientFullList'
+          description: ''
+  /api/v1/prescriptions/:
+    get:
+      operationId: api_v1_prescriptions_list
+      description: |-
+        Manage prescriptions and access drug information.
+
+        list: Return all prescriptions.
+        retrieve: Return a specific prescription.
+        drug_info: Return FDA drug label information for a medication.
+        adverse_events: Return FDA adverse event summary for a medication.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPrescriptionList'
+          description: ''
+    post:
+      operationId: api_v1_prescriptions_create
+      description: |-
+        Manage prescriptions and access drug information.
+
+        list: Return all prescriptions.
+        retrieve: Return a specific prescription.
+        drug_info: Return FDA drug label information for a medication.
+        adverse_events: Return FDA adverse event summary for a medication.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrescriptionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PrescriptionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PrescriptionRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prescription'
+          description: ''
+  /api/v1/prescriptions/{id}/:
+    get:
+      operationId: api_v1_prescriptions_retrieve
+      description: |-
+        Manage prescriptions and access drug information.
+
+        list: Return all prescriptions.
+        retrieve: Return a specific prescription.
+        drug_info: Return FDA drug label information for a medication.
+        adverse_events: Return FDA adverse event summary for a medication.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this prescription.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prescription'
+          description: ''
+    put:
+      operationId: api_v1_prescriptions_update
+      description: |-
+        Manage prescriptions and access drug information.
+
+        list: Return all prescriptions.
+        retrieve: Return a specific prescription.
+        drug_info: Return FDA drug label information for a medication.
+        adverse_events: Return FDA adverse event summary for a medication.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this prescription.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrescriptionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PrescriptionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PrescriptionRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prescription'
+          description: ''
+    patch:
+      operationId: api_v1_prescriptions_partial_update
+      description: |-
+        Manage prescriptions and access drug information.
+
+        list: Return all prescriptions.
+        retrieve: Return a specific prescription.
+        drug_info: Return FDA drug label information for a medication.
+        adverse_events: Return FDA adverse event summary for a medication.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this prescription.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPrescriptionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPrescriptionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPrescriptionRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prescription'
+          description: ''
+    delete:
+      operationId: api_v1_prescriptions_destroy
+      description: |-
+        Manage prescriptions and access drug information.
+
+        list: Return all prescriptions.
+        retrieve: Return a specific prescription.
+        drug_info: Return FDA drug label information for a medication.
+        adverse_events: Return FDA adverse event summary for a medication.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this prescription.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/prescriptions/adverse-events/:
+    get:
+      operationId: api_v1_prescriptions_adverse_events_retrieve
+      description: |-
+        Get FDA adverse event report summary for a medication from OpenFDA.
+
+        Query parameter `q` is required (drug name).
+
+        Returns the top 10 most reported adverse reactions and total report count.
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prescription'
+          description: ''
+  /api/v1/prescriptions/drug-info/:
+    get:
+      operationId: api_v1_prescriptions_drug_info_retrieve
+      description: |-
+        Get FDA drug label information from OpenFDA.
+
+        Query parameter `q` is required (drug name).
+
+        Returns generic name, brand names, manufacturer, warnings,
+        adverse reactions, dosage info, and drug interactions.
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prescription'
+          description: ''
+  /api/v1/rooms/:
+    get:
+      operationId: api_v1_rooms_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRoomList'
+          description: ''
+    post:
+      operationId: api_v1_rooms_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoomRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoomRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+          description: ''
+  /api/v1/rooms/{id}/:
+    get:
+      operationId: api_v1_rooms_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+          description: ''
+    put:
+      operationId: api_v1_rooms_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoomRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoomRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+          description: ''
+    patch:
+      operationId: api_v1_rooms_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRoomRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRoomRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRoomRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+          description: ''
+    delete:
+      operationId: api_v1_rooms_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/staff/:
+    get:
+      operationId: api_v1_staff_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStaffList'
+          description: ''
+    post:
+      operationId: api_v1_staff_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StaffRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StaffRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+          description: ''
+  /api/v1/staff/{id}/:
+    get:
+      operationId: api_v1_staff_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this staff.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+          description: ''
+    put:
+      operationId: api_v1_staff_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this staff.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StaffRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StaffRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+          description: ''
+    patch:
+      operationId: api_v1_staff_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this staff.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStaffRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStaffRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStaffRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+          description: ''
+    delete:
+      operationId: api_v1_staff_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this staff.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/staff/by_department/:
+    get:
+      operationId: api_v1_staff_by_department_retrieve
+      description: Get staff by department.
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+          description: ''
+  /api/v1/staff/medical_staff/:
+    get:
+      operationId: api_v1_staff_medical_staff_retrieve
+      description: Get all medical staff.
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+          description: ''
+  /api/v1/surgeries/:
+    get:
+      operationId: api_v1_surgeries_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSurgeryList'
+          description: ''
+    post:
+      operationId: api_v1_surgeries_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SurgeryRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SurgeryRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SurgeryRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Surgery'
+          description: ''
+  /api/v1/surgeries/{id}/:
+    get:
+      operationId: api_v1_surgeries_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this surgery.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Surgery'
+          description: ''
+    put:
+      operationId: api_v1_surgeries_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this surgery.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SurgeryRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SurgeryRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SurgeryRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Surgery'
+          description: ''
+    patch:
+      operationId: api_v1_surgeries_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this surgery.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSurgeryRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSurgeryRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSurgeryRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Surgery'
+          description: ''
+    delete:
+      operationId: api_v1_surgeries_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this surgery.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/surgeries/scheduled/:
+    get:
+      operationId: api_v1_surgeries_scheduled_retrieve
+      description: Return all scheduled (upcoming) surgeries.
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Surgery'
+          description: ''
+  /api/v1/token/:
+    post:
+      operationId: api_v1_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/v1/token/refresh/:
+    post:
+      operationId: api_v1_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/v1/token/verify/:
+    post:
+      operationId: api_v1_token_verify_create
+      description: |-
+        Takes a token and indicates if it is valid.  This view provides no
+        information about a token's fitness for a particular use.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
+  /api/v1/wards/:
+    get:
+      operationId: api_v1_wards_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedWardList'
+          description: ''
+    post:
+      operationId: api_v1_wards_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WardRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WardRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WardRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ward'
+          description: ''
+  /api/v1/wards/{id}/:
+    get:
+      operationId: api_v1_wards_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ward.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ward'
+          description: ''
+    put:
+      operationId: api_v1_wards_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ward.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WardRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WardRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WardRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ward'
+          description: ''
+    patch:
+      operationId: api_v1_wards_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ward.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedWardRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedWardRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedWardRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ward'
+          description: ''
+    delete:
+      operationId: api_v1_wards_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ward.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    Appointment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+        patient_detail:
+          allOf:
+          - $ref: '#/components/schemas/PatientFull'
+          readOnly: true
+        doctor:
+          type: integer
+        doctor_detail:
+          allOf:
+          - $ref: '#/components/schemas/Staff'
+          readOnly: true
+        appointment_date:
+          type: string
+          format: date-time
+        reason:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+      required:
+      - appointment_date
+      - doctor
+      - doctor_detail
+      - id
+      - patient
+      - patient_detail
+    AppointmentRequest:
+      type: object
+      properties:
+        patient:
+          type: integer
+        doctor:
+          type: integer
+        appointment_date:
+          type: string
+          format: date-time
+        reason:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+      required:
+      - appointment_date
+      - doctor
+      - patient
+    BlankEnum:
+      enum:
+      - ''
+    CategoryEnum:
+      enum:
+      - MEDICAL_SUPPLIES
+      - PHARMACEUTICALS
+      - EQUIPMENT
+      - CONSUMABLES
+      - SURGICAL_INSTRUMENTS
+      - LABORATORY
+      - OFFICE_SUPPLIES
+      - MAINTENANCE
+      - PPE
+      - OTHER
+      type: string
+      description: |-
+        * `MEDICAL_SUPPLIES` - Medical Supplies
+        * `PHARMACEUTICALS` - Pharmaceuticals
+        * `EQUIPMENT` - Medical Equipment
+        * `CONSUMABLES` - Consumables
+        * `SURGICAL_INSTRUMENTS` - Surgical Instruments
+        * `LABORATORY` - Laboratory Supplies
+        * `OFFICE_SUPPLIES` - Office Supplies
+        * `MAINTENANCE` - Maintenance Supplies
+        * `PPE` - Personal Protective Equipment
+        * `OTHER` - Other
+    DepartmentEnum:
+      enum:
+      - EMERGENCY
+      - CARDIOLOGY
+      - NEUROLOGY
+      - ORTHOPEDICS
+      - PEDIATRICS
+      - SURGERY
+      - ICU
+      - ONCOLOGY
+      - RADIOLOGY
+      - LABORATORY
+      - PHARMACY
+      - ADMINISTRATION
+      - MAINTENANCE
+      - SECURITY
+      - OTHER
+      type: string
+      description: |-
+        * `EMERGENCY` - Emergency Department
+        * `CARDIOLOGY` - Cardiology
+        * `NEUROLOGY` - Neurology
+        * `ORTHOPEDICS` - Orthopedics
+        * `PEDIATRICS` - Pediatrics
+        * `SURGERY` - Surgery
+        * `ICU` - Intensive Care Unit
+        * `ONCOLOGY` - Oncology
+        * `RADIOLOGY` - Radiology
+        * `LABORATORY` - Laboratory
+        * `PHARMACY` - Pharmacy
+        * `ADMINISTRATION` - Administration
+        * `MAINTENANCE` - Maintenance
+        * `SECURITY` - Security
+        * `OTHER` - Other
+    ExternalIntegration:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        system_name:
+          type: string
+          maxLength: 100
+        system_type:
+          $ref: '#/components/schemas/SystemTypeEnum'
+        api_endpoint:
+          type: string
+          format: uri
+          maxLength: 200
+        last_sync:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          maxLength: 50
+        last_sync_result:
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+      required:
+      - api_endpoint
+      - id
+      - system_name
+    ExternalIntegrationRequest:
+      type: object
+      properties:
+        system_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        system_type:
+          $ref: '#/components/schemas/SystemTypeEnum'
+        api_endpoint:
+          type: string
+          format: uri
+          minLength: 1
+          maxLength: 200
+        api_key:
+          type: string
+          writeOnly: true
+          nullable: true
+          description: Encrypted API Key (use set_api_key/get_api_key methods)
+          maxLength: 512
+        last_sync:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          minLength: 1
+          maxLength: 50
+        last_sync_result:
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+      required:
+      - api_endpoint
+      - system_name
+    InventoryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          description: Name of the inventory item
+          maxLength: 100
+        category:
+          allOf:
+          - $ref: '#/components/schemas/CategoryEnum'
+          description: |-
+            Category of the inventory item
+
+            * `MEDICAL_SUPPLIES` - Medical Supplies
+            * `PHARMACEUTICALS` - Pharmaceuticals
+            * `EQUIPMENT` - Medical Equipment
+            * `CONSUMABLES` - Consumables
+            * `SURGICAL_INSTRUMENTS` - Surgical Instruments
+            * `LABORATORY` - Laboratory Supplies
+            * `OFFICE_SUPPLIES` - Office Supplies
+            * `MAINTENANCE` - Maintenance Supplies
+            * `PPE` - Personal Protective Equipment
+            * `OTHER` - Other
+        quantity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          description: Current quantity in stock
+        unit:
+          allOf:
+          - $ref: '#/components/schemas/UnitEnum'
+          description: |-
+            Unit of measurement
+
+            * `PIECE` - Piece
+            * `BOX` - Box
+            * `PACK` - Pack
+            * `BOTTLE` - Bottle
+            * `VIAL` - Vial
+            * `TUBE` - Tube
+            * `KG` - Kilogram
+            * `GRAM` - Gram
+            * `LITER` - Liter
+            * `ML` - Milliliter
+            * `SET` - Set
+            * `OTHER` - Other
+        reorder_level:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          description: Minimum quantity before reordering
+        cost_per_unit:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+          description: Cost per unit
+        supplier:
+          type: string
+          nullable: true
+          description: Supplier name
+          maxLength: 100
+        expiry_date:
+          type: string
+          format: date
+          nullable: true
+          description: Expiry date for perishable items
+        last_updated:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Last updated timestamp
+        created_date:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Date when item was added to inventory
+        needs_reorder:
+          type: boolean
+          readOnly: true
+        is_expired:
+          type: boolean
+          readOnly: true
+        total_value:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+      required:
+      - category
+      - created_date
+      - id
+      - is_expired
+      - last_updated
+      - name
+      - needs_reorder
+      - quantity
+      - total_value
+      - unit
+    InventoryItemRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: Name of the inventory item
+          maxLength: 100
+        category:
+          allOf:
+          - $ref: '#/components/schemas/CategoryEnum'
+          description: |-
+            Category of the inventory item
+
+            * `MEDICAL_SUPPLIES` - Medical Supplies
+            * `PHARMACEUTICALS` - Pharmaceuticals
+            * `EQUIPMENT` - Medical Equipment
+            * `CONSUMABLES` - Consumables
+            * `SURGICAL_INSTRUMENTS` - Surgical Instruments
+            * `LABORATORY` - Laboratory Supplies
+            * `OFFICE_SUPPLIES` - Office Supplies
+            * `MAINTENANCE` - Maintenance Supplies
+            * `PPE` - Personal Protective Equipment
+            * `OTHER` - Other
+        quantity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          description: Current quantity in stock
+        unit:
+          allOf:
+          - $ref: '#/components/schemas/UnitEnum'
+          description: |-
+            Unit of measurement
+
+            * `PIECE` - Piece
+            * `BOX` - Box
+            * `PACK` - Pack
+            * `BOTTLE` - Bottle
+            * `VIAL` - Vial
+            * `TUBE` - Tube
+            * `KG` - Kilogram
+            * `GRAM` - Gram
+            * `LITER` - Liter
+            * `ML` - Milliliter
+            * `SET` - Set
+            * `OTHER` - Other
+        reorder_level:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          description: Minimum quantity before reordering
+        cost_per_unit:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+          description: Cost per unit
+        supplier:
+          type: string
+          nullable: true
+          description: Supplier name
+          maxLength: 100
+        expiry_date:
+          type: string
+          format: date
+          nullable: true
+          description: Expiry date for perishable items
+      required:
+      - category
+      - name
+      - quantity
+      - unit
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+        patient_detail:
+          allOf:
+          - $ref: '#/components/schemas/PatientFull'
+          readOnly: true
+        issue_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        paid:
+          type: boolean
+        insurance_claimed:
+          type: boolean
+        details:
+          type: string
+          nullable: true
+      required:
+      - id
+      - patient
+      - patient_detail
+      - total_amount
+    InvoiceRequest:
+      type: object
+      properties:
+        patient:
+          type: integer
+        issue_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        paid:
+          type: boolean
+        insurance_claimed:
+          type: boolean
+        details:
+          type: string
+          nullable: true
+      required:
+      - patient
+      - total_amount
+    LabTest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        test_name:
+          type: string
+          maxLength: 100
+        requested_date:
+          type: string
+          format: date-time
+          readOnly: true
+        result_date:
+          type: string
+          format: date-time
+          nullable: true
+        result:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/LabTestStatusEnum'
+        patient:
+          type: integer
+      required:
+      - id
+      - patient
+      - requested_date
+      - test_name
+    LabTestRequest:
+      type: object
+      properties:
+        test_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        result_date:
+          type: string
+          format: date-time
+          nullable: true
+        result:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/LabTestStatusEnum'
+        patient:
+          type: integer
+      required:
+      - patient
+      - test_name
+    LabTestStatusEnum:
+      enum:
+      - Requested
+      - Completed
+      - Cancelled
+      type: string
+      description: |-
+        * `Requested` - Requested
+        * `Completed` - Completed
+        * `Cancelled` - Cancelled
+    NullEnum:
+      enum:
+      - null
+    PaginatedAppointmentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Appointment'
+    PaginatedExternalIntegrationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalIntegration'
+    PaginatedInventoryItemList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryItem'
+    PaginatedInvoiceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Invoice'
+    PaginatedLabTestList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LabTest'
+    PaginatedPatientCareList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatientCare'
+    PaginatedPatientFullList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatientFull'
+    PaginatedPrescriptionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Prescription'
+    PaginatedRoomList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Room'
+    PaginatedStaffList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Staff'
+    PaginatedSurgeryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Surgery'
+    PaginatedWardList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ward'
+    PatchedAppointmentRequest:
+      type: object
+      properties:
+        patient:
+          type: integer
+        doctor:
+          type: integer
+        appointment_date:
+          type: string
+          format: date-time
+        reason:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+    PatchedExternalIntegrationRequest:
+      type: object
+      properties:
+        system_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        system_type:
+          $ref: '#/components/schemas/SystemTypeEnum'
+        api_endpoint:
+          type: string
+          format: uri
+          minLength: 1
+          maxLength: 200
+        api_key:
+          type: string
+          writeOnly: true
+          nullable: true
+          description: Encrypted API Key (use set_api_key/get_api_key methods)
+          maxLength: 512
+        last_sync:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          minLength: 1
+          maxLength: 50
+        last_sync_result:
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+    PatchedInventoryItemRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: Name of the inventory item
+          maxLength: 100
+        category:
+          allOf:
+          - $ref: '#/components/schemas/CategoryEnum'
+          description: |-
+            Category of the inventory item
+
+            * `MEDICAL_SUPPLIES` - Medical Supplies
+            * `PHARMACEUTICALS` - Pharmaceuticals
+            * `EQUIPMENT` - Medical Equipment
+            * `CONSUMABLES` - Consumables
+            * `SURGICAL_INSTRUMENTS` - Surgical Instruments
+            * `LABORATORY` - Laboratory Supplies
+            * `OFFICE_SUPPLIES` - Office Supplies
+            * `MAINTENANCE` - Maintenance Supplies
+            * `PPE` - Personal Protective Equipment
+            * `OTHER` - Other
+        quantity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          description: Current quantity in stock
+        unit:
+          allOf:
+          - $ref: '#/components/schemas/UnitEnum'
+          description: |-
+            Unit of measurement
+
+            * `PIECE` - Piece
+            * `BOX` - Box
+            * `PACK` - Pack
+            * `BOTTLE` - Bottle
+            * `VIAL` - Vial
+            * `TUBE` - Tube
+            * `KG` - Kilogram
+            * `GRAM` - Gram
+            * `LITER` - Liter
+            * `ML` - Milliliter
+            * `SET` - Set
+            * `OTHER` - Other
+        reorder_level:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          description: Minimum quantity before reordering
+        cost_per_unit:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+          description: Cost per unit
+        supplier:
+          type: string
+          nullable: true
+          description: Supplier name
+          maxLength: 100
+        expiry_date:
+          type: string
+          format: date
+          nullable: true
+          description: Expiry date for perishable items
+    PatchedInvoiceRequest:
+      type: object
+      properties:
+        patient:
+          type: integer
+        issue_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        paid:
+          type: boolean
+        insurance_claimed:
+          type: boolean
+        details:
+          type: string
+          nullable: true
+    PatchedLabTestRequest:
+      type: object
+      properties:
+        test_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        result_date:
+          type: string
+          format: date-time
+          nullable: true
+        result:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/LabTestStatusEnum'
+        patient:
+          type: integer
+    PatchedPatientCareRequest:
+      type: object
+      properties:
+        patient:
+          type: integer
+          description: Patient being monitored
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PatientCareStatusEnum'
+          description: |-
+            Patient's current status
+
+            * `STABLE` - Stable
+            * `CRITICAL` - Critical
+            * `IMPROVING` - Improving
+            * `DETERIORATING` - Deteriorating
+            * `DISCHARGED` - Discharged
+            * `OBSERVATION` - Under Observation
+        temperature:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,1})?$
+          nullable: true
+          description: Body temperature in Celsius
+        heart_rate:
+          type: integer
+          maximum: 200
+          minimum: 30
+          nullable: true
+          description: Heart rate (beats per minute)
+        blood_pressure_systolic:
+          type: integer
+          maximum: 250
+          minimum: 60
+          nullable: true
+          description: Systolic blood pressure (mmHg)
+        blood_pressure_diastolic:
+          type: integer
+          maximum: 150
+          minimum: 30
+          nullable: true
+          description: Diastolic blood pressure (mmHg)
+        respiratory_rate:
+          type: integer
+          maximum: 50
+          minimum: 8
+          nullable: true
+          description: Respiratory rate (breaths per minute)
+        oxygen_saturation:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+          description: Oxygen saturation percentage
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+          description: Weight in kilograms
+        height:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+          description: Height in centimeters
+        notes:
+          type: string
+          nullable: true
+          description: Additional notes and observations
+        monitored_by:
+          type: integer
+          nullable: true
+          description: Staff member who recorded the monitoring
+    PatchedPatientFullRequest:
+      type: object
+      description: Clinical staff view - includes all fields including PHI.
+      properties:
+        unique_id:
+          type: string
+          minLength: 1
+          description: Unique patient identifier
+          maxLength: 20
+        first_name:
+          type: string
+          minLength: 1
+          description: Patient's first name
+          maxLength: 50
+        last_name:
+          type: string
+          minLength: 1
+          description: Patient's last name
+          maxLength: 50
+        date_of_birth:
+          type: string
+          format: date
+          description: Patient's date of birth
+        gender:
+          allOf:
+          - $ref: '#/components/schemas/PatientGenderEnum'
+          description: |-
+            Patient's gender
+
+            * `M` - Male
+            * `F` - Female
+            * `O` - Other
+            * `P` - Prefer not to say
+        address:
+          type: string
+          nullable: true
+          description: Patient's address
+        phone:
+          type: string
+          nullable: true
+          description: Patient's phone number
+          pattern: ^\+?\d{9,15}$
+          maxLength: 20
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Patient's email address
+          maxLength: 254
+        insurance_provider:
+          type: string
+          nullable: true
+          description: Insurance provider name
+          maxLength: 100
+        emergency_contact_name:
+          type: string
+          nullable: true
+          description: Emergency contact name
+          maxLength: 100
+        emergency_contact_phone:
+          type: string
+          nullable: true
+          description: Emergency contact phone number
+          pattern: ^\+?\d{9,15}$
+          maxLength: 20
+        medical_history:
+          type: string
+          nullable: true
+          description: Patient's medical history
+        admission_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: Hospital admission date and time
+        discharge_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: Hospital discharge date and time
+        ward:
+          type: integer
+          nullable: true
+          description: Assigned ward
+        room:
+          type: integer
+          nullable: true
+          description: Assigned room
+    PatchedPrescriptionRequest:
+      type: object
+      properties:
+        patient:
+          type: integer
+        drug_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        dosage:
+          type: string
+          minLength: 1
+          maxLength: 50
+        frequency:
+          type: string
+          minLength: 1
+          maxLength: 50
+        prescribed_by:
+          type: integer
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+    PatchedRoomRequest:
+      type: object
+      properties:
+        ward:
+          type: integer
+        room_number:
+          type: string
+          minLength: 1
+          maxLength: 20
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+    PatchedStaffRequest:
+      type: object
+      properties:
+        staff_id:
+          type: string
+          minLength: 1
+          description: Unique staff identifier
+          maxLength: 20
+        first_name:
+          type: string
+          minLength: 1
+          description: Staff member's first name
+          maxLength: 50
+        last_name:
+          type: string
+          minLength: 1
+          description: Staff member's last name
+          maxLength: 50
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: |-
+            Staff member's role/position
+
+            * `DOCTOR` - Doctor
+            * `NURSE` - Nurse
+            * `ADMIN` - Administrator
+            * `TECH` - Technician
+            * `PHARMACIST` - Pharmacist
+            * `RECEPTIONIST` - Receptionist
+            * `SURGEON` - Surgeon
+            * `ANESTHESIOLOGIST` - Anesthesiologist
+            * `RADIOLOGIST` - Radiologist
+            * `LAB_TECH` - Laboratory Technician
+            * `SECURITY` - Security
+            * `MAINTENANCE` - Maintenance
+            * `OTHER` - Other
+        department:
+          nullable: true
+          description: |-
+            Department where staff member works
+
+            * `EMERGENCY` - Emergency Department
+            * `CARDIOLOGY` - Cardiology
+            * `NEUROLOGY` - Neurology
+            * `ORTHOPEDICS` - Orthopedics
+            * `PEDIATRICS` - Pediatrics
+            * `SURGERY` - Surgery
+            * `ICU` - Intensive Care Unit
+            * `ONCOLOGY` - Oncology
+            * `RADIOLOGY` - Radiology
+            * `LABORATORY` - Laboratory
+            * `PHARMACY` - Pharmacy
+            * `ADMINISTRATION` - Administration
+            * `MAINTENANCE` - Maintenance
+            * `SECURITY` - Security
+            * `OTHER` - Other
+          oneOf:
+          - $ref: '#/components/schemas/DepartmentEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        phone:
+          type: string
+          minLength: 1
+          description: Staff member's phone number
+          pattern: ^\+?\d{9,15}$
+          maxLength: 20
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Staff member's email address
+          maxLength: 254
+        schedule:
+          type: string
+          nullable: true
+          description: Staff member's work schedule
+        is_active:
+          type: boolean
+          description: Whether the staff member is currently active
+    PatchedSurgeryRequest:
+      type: object
+      properties:
+        patient:
+          type: integer
+        surgeon:
+          type: integer
+        scheduled_date:
+          type: string
+          format: date-time
+        operating_room:
+          type: string
+          minLength: 1
+          maxLength: 50
+        procedure:
+          type: string
+          minLength: 1
+          maxLength: 100
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        notes:
+          type: string
+          nullable: true
+    PatchedWardRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+    PatientCare:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+          description: Patient being monitored
+        patient_name:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PatientCareStatusEnum'
+          description: |-
+            Patient's current status
+
+            * `STABLE` - Stable
+            * `CRITICAL` - Critical
+            * `IMPROVING` - Improving
+            * `DETERIORATING` - Deteriorating
+            * `DISCHARGED` - Discharged
+            * `OBSERVATION` - Under Observation
+        monitoring_date:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Date and time of monitoring
+        temperature:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,1})?$
+          nullable: true
+          description: Body temperature in Celsius
+        heart_rate:
+          type: integer
+          maximum: 200
+          minimum: 30
+          nullable: true
+          description: Heart rate (beats per minute)
+        blood_pressure_systolic:
+          type: integer
+          maximum: 250
+          minimum: 60
+          nullable: true
+          description: Systolic blood pressure (mmHg)
+        blood_pressure_diastolic:
+          type: integer
+          maximum: 150
+          minimum: 30
+          nullable: true
+          description: Diastolic blood pressure (mmHg)
+        blood_pressure:
+          type: string
+          readOnly: true
+        respiratory_rate:
+          type: integer
+          maximum: 50
+          minimum: 8
+          nullable: true
+          description: Respiratory rate (breaths per minute)
+        oxygen_saturation:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+          description: Oxygen saturation percentage
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+          description: Weight in kilograms
+        height:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+          description: Height in centimeters
+        bmi:
+          type: number
+          format: double
+          readOnly: true
+        notes:
+          type: string
+          nullable: true
+          description: Additional notes and observations
+        monitored_by:
+          type: integer
+          nullable: true
+          description: Staff member who recorded the monitoring
+        is_vital_signs_critical:
+          type: boolean
+          readOnly: true
+      required:
+      - blood_pressure
+      - bmi
+      - id
+      - is_vital_signs_critical
+      - monitoring_date
+      - patient
+      - patient_name
+      - status
+    PatientCareRequest:
+      type: object
+      properties:
+        patient:
+          type: integer
+          description: Patient being monitored
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PatientCareStatusEnum'
+          description: |-
+            Patient's current status
+
+            * `STABLE` - Stable
+            * `CRITICAL` - Critical
+            * `IMPROVING` - Improving
+            * `DETERIORATING` - Deteriorating
+            * `DISCHARGED` - Discharged
+            * `OBSERVATION` - Under Observation
+        temperature:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,1})?$
+          nullable: true
+          description: Body temperature in Celsius
+        heart_rate:
+          type: integer
+          maximum: 200
+          minimum: 30
+          nullable: true
+          description: Heart rate (beats per minute)
+        blood_pressure_systolic:
+          type: integer
+          maximum: 250
+          minimum: 60
+          nullable: true
+          description: Systolic blood pressure (mmHg)
+        blood_pressure_diastolic:
+          type: integer
+          maximum: 150
+          minimum: 30
+          nullable: true
+          description: Diastolic blood pressure (mmHg)
+        respiratory_rate:
+          type: integer
+          maximum: 50
+          minimum: 8
+          nullable: true
+          description: Respiratory rate (breaths per minute)
+        oxygen_saturation:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+          description: Oxygen saturation percentage
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+          description: Weight in kilograms
+        height:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+          description: Height in centimeters
+        notes:
+          type: string
+          nullable: true
+          description: Additional notes and observations
+        monitored_by:
+          type: integer
+          nullable: true
+          description: Staff member who recorded the monitoring
+      required:
+      - patient
+      - status
+    PatientCareStatusEnum:
+      enum:
+      - STABLE
+      - CRITICAL
+      - IMPROVING
+      - DETERIORATING
+      - DISCHARGED
+      - OBSERVATION
+      type: string
+      description: |-
+        * `STABLE` - Stable
+        * `CRITICAL` - Critical
+        * `IMPROVING` - Improving
+        * `DETERIORATING` - Deteriorating
+        * `DISCHARGED` - Discharged
+        * `OBSERVATION` - Under Observation
+    PatientFull:
+      type: object
+      description: Clinical staff view - includes all fields including PHI.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        unique_id:
+          type: string
+          description: Unique patient identifier
+          maxLength: 20
+        first_name:
+          type: string
+          description: Patient's first name
+          maxLength: 50
+        last_name:
+          type: string
+          description: Patient's last name
+          maxLength: 50
+        full_name:
+          type: string
+          readOnly: true
+        date_of_birth:
+          type: string
+          format: date
+          description: Patient's date of birth
+        age:
+          type: integer
+          readOnly: true
+        gender:
+          allOf:
+          - $ref: '#/components/schemas/PatientGenderEnum'
+          description: |-
+            Patient's gender
+
+            * `M` - Male
+            * `F` - Female
+            * `O` - Other
+            * `P` - Prefer not to say
+        address:
+          type: string
+          nullable: true
+          description: Patient's address
+        phone:
+          type: string
+          nullable: true
+          description: Patient's phone number
+          pattern: ^\+?\d{9,15}$
+          maxLength: 20
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Patient's email address
+          maxLength: 254
+        insurance_provider:
+          type: string
+          nullable: true
+          description: Insurance provider name
+          maxLength: 100
+        emergency_contact_name:
+          type: string
+          nullable: true
+          description: Emergency contact name
+          maxLength: 100
+        emergency_contact_phone:
+          type: string
+          nullable: true
+          description: Emergency contact phone number
+          pattern: ^\+?\d{9,15}$
+          maxLength: 20
+        medical_history:
+          type: string
+          nullable: true
+          description: Patient's medical history
+        admission_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: Hospital admission date and time
+        discharge_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: Hospital discharge date and time
+        is_admitted:
+          type: boolean
+          readOnly: true
+        ward:
+          type: integer
+          nullable: true
+          description: Assigned ward
+        room:
+          type: integer
+          nullable: true
+          description: Assigned room
+      required:
+      - age
+      - date_of_birth
+      - first_name
+      - full_name
+      - gender
+      - id
+      - is_admitted
+      - last_name
+      - unique_id
+    PatientFullRequest:
+      type: object
+      description: Clinical staff view - includes all fields including PHI.
+      properties:
+        unique_id:
+          type: string
+          minLength: 1
+          description: Unique patient identifier
+          maxLength: 20
+        first_name:
+          type: string
+          minLength: 1
+          description: Patient's first name
+          maxLength: 50
+        last_name:
+          type: string
+          minLength: 1
+          description: Patient's last name
+          maxLength: 50
+        date_of_birth:
+          type: string
+          format: date
+          description: Patient's date of birth
+        gender:
+          allOf:
+          - $ref: '#/components/schemas/PatientGenderEnum'
+          description: |-
+            Patient's gender
+
+            * `M` - Male
+            * `F` - Female
+            * `O` - Other
+            * `P` - Prefer not to say
+        address:
+          type: string
+          nullable: true
+          description: Patient's address
+        phone:
+          type: string
+          nullable: true
+          description: Patient's phone number
+          pattern: ^\+?\d{9,15}$
+          maxLength: 20
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Patient's email address
+          maxLength: 254
+        insurance_provider:
+          type: string
+          nullable: true
+          description: Insurance provider name
+          maxLength: 100
+        emergency_contact_name:
+          type: string
+          nullable: true
+          description: Emergency contact name
+          maxLength: 100
+        emergency_contact_phone:
+          type: string
+          nullable: true
+          description: Emergency contact phone number
+          pattern: ^\+?\d{9,15}$
+          maxLength: 20
+        medical_history:
+          type: string
+          nullable: true
+          description: Patient's medical history
+        admission_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: Hospital admission date and time
+        discharge_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: Hospital discharge date and time
+        ward:
+          type: integer
+          nullable: true
+          description: Assigned ward
+        room:
+          type: integer
+          nullable: true
+          description: Assigned room
+      required:
+      - date_of_birth
+      - first_name
+      - gender
+      - last_name
+      - unique_id
+    PatientGenderEnum:
+      enum:
+      - M
+      - F
+      - O
+      - P
+      type: string
+      description: |-
+        * `M` - Male
+        * `F` - Female
+        * `O` - Other
+        * `P` - Prefer not to say
+    Prescription:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+        drug_name:
+          type: string
+          maxLength: 100
+        dosage:
+          type: string
+          maxLength: 50
+        frequency:
+          type: string
+          maxLength: 50
+        prescribed_date:
+          type: string
+          format: date-time
+          readOnly: true
+        prescribed_by:
+          type: integer
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+      required:
+      - dosage
+      - drug_name
+      - frequency
+      - id
+      - patient
+      - prescribed_date
+    PrescriptionRequest:
+      type: object
+      properties:
+        patient:
+          type: integer
+        drug_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        dosage:
+          type: string
+          minLength: 1
+          maxLength: 50
+        frequency:
+          type: string
+          minLength: 1
+          maxLength: 50
+        prescribed_by:
+          type: integer
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+      required:
+      - dosage
+      - drug_name
+      - frequency
+      - patient
+    RoleEnum:
+      enum:
+      - DOCTOR
+      - NURSE
+      - ADMIN
+      - TECH
+      - PHARMACIST
+      - RECEPTIONIST
+      - SURGEON
+      - ANESTHESIOLOGIST
+      - RADIOLOGIST
+      - LAB_TECH
+      - SECURITY
+      - MAINTENANCE
+      - OTHER
+      type: string
+      description: |-
+        * `DOCTOR` - Doctor
+        * `NURSE` - Nurse
+        * `ADMIN` - Administrator
+        * `TECH` - Technician
+        * `PHARMACIST` - Pharmacist
+        * `RECEPTIONIST` - Receptionist
+        * `SURGEON` - Surgeon
+        * `ANESTHESIOLOGIST` - Anesthesiologist
+        * `RADIOLOGIST` - Radiologist
+        * `LAB_TECH` - Laboratory Technician
+        * `SECURITY` - Security
+        * `MAINTENANCE` - Maintenance
+        * `OTHER` - Other
+    Room:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        ward:
+          type: integer
+        ward_name:
+          type: string
+          readOnly: true
+        room_number:
+          type: string
+          maxLength: 20
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+      required:
+      - capacity
+      - id
+      - room_number
+      - ward
+      - ward_name
+    RoomRequest:
+      type: object
+      properties:
+        ward:
+          type: integer
+        room_number:
+          type: string
+          minLength: 1
+          maxLength: 20
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+      required:
+      - capacity
+      - room_number
+      - ward
+    Staff:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        staff_id:
+          type: string
+          description: Unique staff identifier
+          maxLength: 20
+        first_name:
+          type: string
+          description: Staff member's first name
+          maxLength: 50
+        last_name:
+          type: string
+          description: Staff member's last name
+          maxLength: 50
+        full_name:
+          type: string
+          readOnly: true
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: |-
+            Staff member's role/position
+
+            * `DOCTOR` - Doctor
+            * `NURSE` - Nurse
+            * `ADMIN` - Administrator
+            * `TECH` - Technician
+            * `PHARMACIST` - Pharmacist
+            * `RECEPTIONIST` - Receptionist
+            * `SURGEON` - Surgeon
+            * `ANESTHESIOLOGIST` - Anesthesiologist
+            * `RADIOLOGIST` - Radiologist
+            * `LAB_TECH` - Laboratory Technician
+            * `SECURITY` - Security
+            * `MAINTENANCE` - Maintenance
+            * `OTHER` - Other
+        department:
+          nullable: true
+          description: |-
+            Department where staff member works
+
+            * `EMERGENCY` - Emergency Department
+            * `CARDIOLOGY` - Cardiology
+            * `NEUROLOGY` - Neurology
+            * `ORTHOPEDICS` - Orthopedics
+            * `PEDIATRICS` - Pediatrics
+            * `SURGERY` - Surgery
+            * `ICU` - Intensive Care Unit
+            * `ONCOLOGY` - Oncology
+            * `RADIOLOGY` - Radiology
+            * `LABORATORY` - Laboratory
+            * `PHARMACY` - Pharmacy
+            * `ADMINISTRATION` - Administration
+            * `MAINTENANCE` - Maintenance
+            * `SECURITY` - Security
+            * `OTHER` - Other
+          oneOf:
+          - $ref: '#/components/schemas/DepartmentEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        phone:
+          type: string
+          description: Staff member's phone number
+          pattern: ^\+?\d{9,15}$
+          maxLength: 20
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Staff member's email address
+          maxLength: 254
+        schedule:
+          type: string
+          nullable: true
+          description: Staff member's work schedule
+        hire_date:
+          type: string
+          format: date
+          readOnly: true
+          description: Date when staff member was hired
+        is_active:
+          type: boolean
+          description: Whether the staff member is currently active
+        is_medical_staff:
+          type: boolean
+          readOnly: true
+      required:
+      - first_name
+      - full_name
+      - hire_date
+      - id
+      - is_medical_staff
+      - last_name
+      - phone
+      - role
+      - staff_id
+    StaffRequest:
+      type: object
+      properties:
+        staff_id:
+          type: string
+          minLength: 1
+          description: Unique staff identifier
+          maxLength: 20
+        first_name:
+          type: string
+          minLength: 1
+          description: Staff member's first name
+          maxLength: 50
+        last_name:
+          type: string
+          minLength: 1
+          description: Staff member's last name
+          maxLength: 50
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: |-
+            Staff member's role/position
+
+            * `DOCTOR` - Doctor
+            * `NURSE` - Nurse
+            * `ADMIN` - Administrator
+            * `TECH` - Technician
+            * `PHARMACIST` - Pharmacist
+            * `RECEPTIONIST` - Receptionist
+            * `SURGEON` - Surgeon
+            * `ANESTHESIOLOGIST` - Anesthesiologist
+            * `RADIOLOGIST` - Radiologist
+            * `LAB_TECH` - Laboratory Technician
+            * `SECURITY` - Security
+            * `MAINTENANCE` - Maintenance
+            * `OTHER` - Other
+        department:
+          nullable: true
+          description: |-
+            Department where staff member works
+
+            * `EMERGENCY` - Emergency Department
+            * `CARDIOLOGY` - Cardiology
+            * `NEUROLOGY` - Neurology
+            * `ORTHOPEDICS` - Orthopedics
+            * `PEDIATRICS` - Pediatrics
+            * `SURGERY` - Surgery
+            * `ICU` - Intensive Care Unit
+            * `ONCOLOGY` - Oncology
+            * `RADIOLOGY` - Radiology
+            * `LABORATORY` - Laboratory
+            * `PHARMACY` - Pharmacy
+            * `ADMINISTRATION` - Administration
+            * `MAINTENANCE` - Maintenance
+            * `SECURITY` - Security
+            * `OTHER` - Other
+          oneOf:
+          - $ref: '#/components/schemas/DepartmentEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        phone:
+          type: string
+          minLength: 1
+          description: Staff member's phone number
+          pattern: ^\+?\d{9,15}$
+          maxLength: 20
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Staff member's email address
+          maxLength: 254
+        schedule:
+          type: string
+          nullable: true
+          description: Staff member's work schedule
+        is_active:
+          type: boolean
+          description: Whether the staff member is currently active
+      required:
+      - first_name
+      - last_name
+      - phone
+      - role
+      - staff_id
+    StandardError:
+      type: object
+      description: Standard format for all API error responses.
+      properties:
+        status:
+          type: string
+          default: error
+          description: Always 'error' for failure responses.
+        code:
+          type: integer
+          description: HTTP status code.
+        message:
+          type: string
+          description: A human-readable error message.
+        errors:
+          type: object
+          additionalProperties: {}
+          description: Detailed validation errors, mapping field names to lists of
+            messages.
+      required:
+      - code
+      - message
+    StatusEnum:
+      enum:
+      - Scheduled
+      - Completed
+      - Cancelled
+      type: string
+      description: |-
+        * `Scheduled` - Scheduled
+        * `Completed` - Completed
+        * `Cancelled` - Cancelled
+    Surgery:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+        patient_name:
+          type: string
+          readOnly: true
+        surgeon:
+          type: integer
+        surgeon_name:
+          type: string
+          readOnly: true
+        scheduled_date:
+          type: string
+          format: date-time
+        operating_room:
+          type: string
+          maxLength: 50
+        procedure:
+          type: string
+          maxLength: 100
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        notes:
+          type: string
+          nullable: true
+      required:
+      - id
+      - operating_room
+      - patient
+      - patient_name
+      - procedure
+      - scheduled_date
+      - surgeon
+      - surgeon_name
+    SurgeryRequest:
+      type: object
+      properties:
+        patient:
+          type: integer
+        surgeon:
+          type: integer
+        scheduled_date:
+          type: string
+          format: date-time
+        operating_room:
+          type: string
+          minLength: 1
+          maxLength: 50
+        procedure:
+          type: string
+          minLength: 1
+          maxLength: 100
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        notes:
+          type: string
+          nullable: true
+      required:
+      - operating_room
+      - patient
+      - procedure
+      - scheduled_date
+      - surgeon
+    SystemTypeEnum:
+      enum:
+      - EMR
+      - PHARMACY_HUB
+      - INSURANCE
+      - LAB_EQUIPMENT
+      type: string
+      description: |-
+        * `EMR` - Electronic Medical Records
+        * `PHARMACY_HUB` - External Pharmacy Hub
+        * `INSURANCE` - Insurance Gateway
+        * `LAB_EQUIPMENT` - Laboratory Equipment
+    TokenObtainPair:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - refresh
+    TokenObtainPairRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+      - username
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    TokenVerifyRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - token
+    UnitEnum:
+      enum:
+      - PIECE
+      - BOX
+      - PACK
+      - BOTTLE
+      - VIAL
+      - TUBE
+      - KG
+      - GRAM
+      - LITER
+      - ML
+      - SET
+      - OTHER
+      type: string
+      description: |-
+        * `PIECE` - Piece
+        * `BOX` - Box
+        * `PACK` - Pack
+        * `BOTTLE` - Bottle
+        * `VIAL` - Vial
+        * `TUBE` - Tube
+        * `KG` - Kilogram
+        * `GRAM` - Gram
+        * `LITER` - Liter
+        * `ML` - Milliliter
+        * `SET` - Set
+        * `OTHER` - Other
+    Ward:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+      required:
+      - capacity
+      - id
+      - name
+    WardRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+      required:
+      - capacity
+      - name
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+servers:
+- url: http://localhost:8000
+  description: Development server

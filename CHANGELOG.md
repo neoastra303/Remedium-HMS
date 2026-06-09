@@ -5,15 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] - 2026-06-07
+## [Unreleased] - 2026-06-09
 
 ### Added
-- professional dashboard redesign â€” consistent stat cards, component CSS, appointment rows, fix card-header color ([`d8353b1`])
-- UI/UX overhaul â€” grouped patient form, login redesign, empty states, card hover fix, form spinners, delete toasts ([`3e8f1ee`])
-- UI/UX overhaul â€” tabbed patient detail, crispy forms, print invoices, notification bell, Chart.js vitals, mobile CSS, fix all tests ([`6551e1a`])
-- fix home URL bug, add whitenoise, 24 API tests, invoice counter, changelog CI check ([`cedd6c1`])
-- add REST API for hospital/inventory/surgery/care_monitoring, fix Redis default, add reporting tests, automate changelog ([`c7df2cb`])
-- add seed_demo management command for realistic demo data ([`4053926`])
+- professional dashboard redesign â€” consistent stat cards, component CSS, appointment rows, fix card-header color ([`9cca972`])
+- UI/UX overhaul â€” grouped patient form, login redesign, empty states, card hover fix, form spinners, delete toasts ([`79b2786`])
+- UI/UX overhaul â€” tabbed patient detail, crispy forms, print invoices, notification bell, Chart.js vitals, mobile CSS, fix all tests ([`712de13`])
+- fix home URL bug, add whitenoise, 24 API tests, invoice counter, changelog CI check ([`2b9ecc2`])
+- add REST API for hospital/inventory/surgery/care_monitoring, fix Redis default, add reporting tests, automate changelog ([`6a1fad5`])
+- add seed_demo management command for realistic demo data ([`6824b78`])
 - add API documentation with drf-spectacular ([`8915812`])
 - integrate OpenFDA drug lookup with UI panel ([`168256e`])
 - add new API endpoints and audit trails ([`e0c37f9`])
@@ -25,8 +25,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
-- stage all unstaged working-tree changes from 13-commit backlog ([`5dd1a38`])
-- add full-stack production showcase document ([`da6cc7e`])
+- untrack .coverage and .env (now gitignored) ([`cbff4e3`])
+- stage all unstaged working-tree changes from 13-commit backlog ([`14d7246`])
+- add full-stack production showcase document ([`5fe06b9`])
+- add flake8 configuration file ([`de14bf1`])
+- Update crispy-bootstrap5 to available version 2026.3 ([`c1b9a33`])
+- Update crispy-bootstrap5 to available version 2026.3 ([`c6ec016`])
+- Revise email reporting instructions in SECURITY.md ([`6524a53`])
 - rewrite README with architecture diagram, badges, and API documentation ([`e706352`])
 - finalize app configuration and management commands ([`b62e336`])
 - add comprehensive test suite across all apps (93 tests) ([`d8f4417`])
@@ -49,13 +54,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Initial commit of project files ([`fbeb48c`])
 
 ### Fixed
-- CI/CD â€” align Python versions, split dev deps, fix gitignore, drop python-ci.yml ([`d6b601c`])
-- media serving, 404/500 pages, README stats, audit log, vital trends redirect, +9 tests (113 total, 75% coverage) ([`21f5ba7`])
-- dashboard â€” add admitted_patients stat, fix progress bar normalization, fix now context, fix status badge, replace dark admin card with light ([`cf9293a`])
-- modernize all list/delete templates, fix validators, fix migration deprecations, fix ordering warnings, fix enum naming ([`5a3e7d4`])
-- create all missing templates, rebuild old-style detail pages, add hospital templates ([`6b65df1`])
-- resolve all broken URL names â€” remove app_name from urls.py files, register all CRUD routes globally ([`c9d2af1`])
-- register all missing list URLs, add InventoryItemDetailView, fix integration views, fix surgery select_related bug ([`c10a17d`])
+- CI/CD â€” align Python versions, split dev deps, fix gitignore, drop python-ci.yml ([`9f9b993`])
+- media serving, 404/500 pages, README stats, audit log, vital trends redirect, +9 tests (113 total, 75% coverage) ([`112a6a3`])
+- dashboard â€” add admitted_patients stat, fix progress bar normalization, fix now context, fix status badge, replace dark admin card with light ([`1cadeda`])
+- modernize all list/delete templates, fix validators, fix migration deprecations, fix ordering warnings, fix enum naming ([`04c8297`])
+- create all missing templates, rebuild old-style detail pages, add hospital templates ([`476efa4`])
+- resolve all broken URL names â€” remove app_name from urls.py files, register all CRUD routes globally ([`36f95ed`])
+- register all missing list URLs, add InventoryItemDetailView, fix integration views, fix surgery select_related bug ([`d488831`])
+- add missing timezone import to billing/models.py ([`2ceec0a`])
+- add missing timezone import to patients/models.py ([`a66a328`])
+- update crispy-bootstrap5 to compatible existing version 2025.6 ([`8a70b02`])
+- update crispy-bootstrap5 to compatible existing version 2025.6 ([`0c0bd95`])
+- resolve django-crispy-forms and crispy-bootstrap5 dependency conflict in requirements.txt ([`79109d5`])
+- resolve django-crispy-forms and crispy-bootstrap5 dependency conflict ([`08dce19`])
 - resolve settings security issues and rate limiting ([`1ed5b98`])
 
 

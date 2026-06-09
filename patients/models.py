@@ -44,18 +44,22 @@ class Patient(models.Model):
     )
     first_name = models.CharField(
         max_length=50,
+        db_index=True,
         help_text="Patient's first name"
     )
     last_name = models.CharField(
         max_length=50,
+        db_index=True,
         help_text="Patient's last name"
     )
     date_of_birth = models.DateField(
+        db_index=True,
         help_text="Patient's date of birth"
     )
     gender = models.CharField(
         max_length=1,
         choices=GENDER_CHOICES,
+        db_index=True,
         help_text="Patient's gender"
     )
     address = models.TextField(
@@ -66,11 +70,13 @@ class Patient(models.Model):
     phone = models.CharField(
         validators=[phone_regex],
         max_length=20,
+        db_index=True,
         blank=True,
         null=True,
         help_text="Patient's phone number"
     )
     email = models.EmailField(
+        db_index=True,
         blank=True, 
         null=True,
         help_text="Patient's email address"

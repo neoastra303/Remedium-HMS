@@ -33,14 +33,24 @@ class Invoice(models.Model):
             ('billing_change_invoice', 'Can change invoice'),
             ('billing_delete_invoice', 'Can delete invoice'),
         ]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(total_amount__gte=0),
+                name='invoice_total_amount_non_negative'
+            ),
+            models.CheckConstraint(
+                condition=models.Q(due_date__gte=models.F('issue_date')),
+                name='invoice_due_after_issue'
+            ),
+        ]
 
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     invoice_number = models.CharField(max_length=20, unique=True, editable=False, blank=True)
     issue_date = models.DateField(default=timezone.now)
     due_date = models.DateField(default=timezone.now)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    paid = models.BooleanField(default=False)
-    insurance_claimed = models.BooleanField(default=False)
+    paid = models.BooleanField(default=False, db_index=True)
+    insurance_claimed = models.BooleanField(default=False, db_index=True)
     details = models.TextField(blank=True, null=True)
 
     history = HistoricalRecords()
@@ -72,12 +82,20 @@ class Payment(models.Model):
         ('ONLINE', 'Online Payment'),
     ]
     
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(amount__gt=0),
+                name='payment_amount_positive'
+            ),
+        ]
+
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='payments')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_date = models.DateTimeField(default=timezone.now)
-    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS)
-    transaction_id = models.CharField(max_length=100, blank=True, null=True)
-    status = models.CharField(max_length=20, default='COMPLETED')
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, db_index=True)
+    transaction_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
+    status = models.CharField(max_length=20, default='COMPLETED', db_index=True)
 
     history = HistoricalRecords()
     

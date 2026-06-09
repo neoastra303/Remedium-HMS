@@ -184,6 +184,10 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'core.api_utils.CustomRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
@@ -204,6 +208,7 @@ REST_FRAMEWORK = {
         'login_attempts': '20/hour',
     },
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'EXCEPTION_HANDLER': 'core.api_utils.custom_exception_handler',
 }
 
 # drf-spectacular API Documentation Settings

@@ -237,8 +237,8 @@ See `DEPLOYMENT.md` for full production guide.
 |---|---|
 | **Django Apps** | 14 |
 | **API Endpoints** | 50+ |
-| **Tests** | 113 |
-| **Coverage** | 75% |
+| **Tests** | 118 |
+| **Coverage** | 83% |
 | **Commits** | 100+ |
 | **Models** | 25+ |
 | **Templates** | 78 |

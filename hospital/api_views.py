@@ -9,16 +9,16 @@ class WardViewSet(viewsets.ModelViewSet):
     serializer_class = WardSerializer
     permission_classes = [IsAdminUser]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name']
-    ordering_fields = ['name', 'capacity']
-    ordering = ['name']
+    search_fields = ["name"]
+    ordering_fields = ["name", "capacity"]
+    ordering = ["name"]
 
 
 class RoomViewSet(viewsets.ModelViewSet):
-    queryset = Room.objects.select_related('ward').all()
+    queryset = Room.objects.select_related("ward").all()
     serializer_class = RoomSerializer
     permission_classes = [IsAdminUser]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['room_number', 'ward__name']
-    ordering_fields = ['room_number', 'ward__name']
-    ordering = ['ward__name', 'room_number']
+    search_fields = ["room_number", "ward__name"]
+    ordering_fields = ["room_number", "ward__name"]
+    ordering = ["ward__name", "room_number"]

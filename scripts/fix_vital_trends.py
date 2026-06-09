@@ -1,9 +1,9 @@
 import pathlib, re
 
-f = pathlib.Path('care_monitoring/views.py')
-txt = f.read_text(encoding='utf-8')
+f = pathlib.Path("care_monitoring/views.py")
+txt = f.read_text(encoding="utf-8")
 
-old = txt[txt.find('class PatientVitalTrendsView'):]
+old = txt[txt.find("class PatientVitalTrendsView") :]
 new_class = '''class PatientVitalTrendsView(LoginRequiredMixin, PermissionRequiredMixin, generic.View):
     """Redirect to patient detail — vitals chart is embedded in the Vitals tab."""
     permission_required = 'care_monitoring.care_monitoring_view_patientcare'
@@ -14,6 +14,6 @@ new_class = '''class PatientVitalTrendsView(LoginRequiredMixin, PermissionRequir
         return redirect('patient_detail', pk=pk)
 '''
 
-txt = txt[:txt.find('class PatientVitalTrendsView')] + new_class
-f.write_text(txt, encoding='utf-8')
-print('Done')
+txt = txt[: txt.find("class PatientVitalTrendsView")] + new_class
+f.write_text(txt, encoding="utf-8")
+print("Done")

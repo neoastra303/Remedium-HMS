@@ -6,39 +6,51 @@ Usage:
     permission_classes = [IsClinicalStaff]
     permission_classes = [IsAdminUser]
 """
+
 from rest_framework import permissions
 from staff.models import Staff
 
 
 class IsAdminUser(permissions.BasePermission):
     """Only Django staff users or HMS administrators can access."""
+
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
         if request.user.is_staff:
             return True
         try:
-            return request.user.staff_profile.role == 'ADMIN'
+            return request.user.staff_profile.role == "ADMIN"
         except (AttributeError, Staff.DoesNotExist):
             return False
 
 
 class IsAdminOrDoctor(permissions.BasePermission):
     """Admin users or doctors can access."""
+
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
         if request.user.is_staff:
             return True
         try:
-            return request.user.staff_profile.role in ['DOCTOR', 'SURGEON']
+            return request.user.staff_profile.role in ["DOCTOR", "SURGEON"]
         except (AttributeError, Staff.DoesNotExist):
             return False
 
 
 class IsClinicalStaff(permissions.BasePermission):
     """Any clinical staff (doctor, nurse, surgeon, etc.) can access."""
-    MEDICAL_ROLES = ['DOCTOR', 'NURSE', 'SURGEON', 'ANESTHESIOLOGIST', 'RADIOLOGIST', 'PHARMACIST', 'LAB_TECH']
+
+    MEDICAL_ROLES = [
+        "DOCTOR",
+        "NURSE",
+        "SURGEON",
+        "ANESTHESIOLOGIST",
+        "RADIOLOGIST",
+        "PHARMACIST",
+        "LAB_TECH",
+    ]
 
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
@@ -53,7 +65,8 @@ class IsClinicalStaff(permissions.BasePermission):
 
 class IsBillingStaff(permissions.BasePermission):
     """Admin, receptionists, and billing-related staff can access invoices."""
-    ALLOWED_ROLES = ['ADMIN', 'RECEPTIONIST', 'BILLING']
+
+    ALLOWED_ROLES = ["ADMIN", "RECEPTIONIST", "BILLING"]
 
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
@@ -68,7 +81,8 @@ class IsBillingStaff(permissions.BasePermission):
 
 class IsLabStaff(permissions.BasePermission):
     """Admin, lab techs, radiologists, doctors, and nurses can access lab tests."""
-    ALLOWED_ROLES = ['ADMIN', 'LAB_TECH', 'RADIOLOGIST', 'DOCTOR', 'NURSE']
+
+    ALLOWED_ROLES = ["ADMIN", "LAB_TECH", "RADIOLOGIST", "DOCTOR", "NURSE"]
 
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
@@ -83,7 +97,8 @@ class IsLabStaff(permissions.BasePermission):
 
 class IsPharmacyStaff(permissions.BasePermission):
     """Admin, pharmacists, doctors, and nurses can access prescriptions."""
-    ALLOWED_ROLES = ['ADMIN', 'PHARMACIST', 'DOCTOR', 'NURSE']
+
+    ALLOWED_ROLES = ["ADMIN", "PHARMACIST", "DOCTOR", "NURSE"]
 
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
@@ -98,6 +113,7 @@ class IsPharmacyStaff(permissions.BasePermission):
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """Object-level permission: only staff with appropriate permissions can edit, anyone authenticated can view."""
+
     def has_object_permission(self, request, view, obj):
         # Read permissions allowed for any authenticated user
         if request.method in permissions.SAFE_METHODS:
@@ -108,7 +124,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         if request.user.is_staff:
             return True
         # Check if user has permission to change this type of object
-        if hasattr(obj, '_meta'):
+        if hasattr(obj, "_meta"):
             app_label = obj._meta.app_label
-            return request.user.has_perm(f'{app_label}.change_{obj._meta.model_name}')
+            return request.user.has_perm(f"{app_label}.change_{obj._meta.model_name}")
         return False

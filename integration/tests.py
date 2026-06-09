@@ -12,7 +12,7 @@ class ExternalIntegrationModelTest(TestCase):
         self.integration = ExternalIntegration.objects.create(
             system_name="Test EMR",
             system_type="EMR",
-            api_endpoint="https://api.testemr.com/v1"
+            api_endpoint="https://api.testemr.com/v1",
         )
 
     def test_integration_creation(self):
@@ -28,23 +28,23 @@ class ExternalIntegrationModelTest(TestCase):
 class ExternalIntegrationAPITest(APITestCase):
     def setUp(self):
         self.user = User.objects.create_superuser(
-            username='admin', password='password', email='admin@test.com'
+            username="admin", password="password", email="admin@test.com"
         )
         self.client.force_authenticate(user=self.user)
         self.integration = ExternalIntegration.objects.create(
             system_name="Test EMR",
             system_type="EMR",
-            api_endpoint="https://api.testemr.com/v1"
+            api_endpoint="https://api.testemr.com/v1",
         )
 
     def test_list_integrations(self):
-        url = reverse('integration-list')
+        url = reverse("integration-list")
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_sync_action(self):
-        url = reverse('integration-sync', args=[self.integration.pk])
+        url = reverse("integration-sync", args=[self.integration.pk])
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_501_NOT_IMPLEMENTED)
-        self.assertEqual(response.data['status'], 'not_implemented')
+        self.assertEqual(response.data["status"], "not_implemented")

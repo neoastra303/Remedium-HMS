@@ -16,21 +16,23 @@ CHANGELOG = Path(__file__).parent.parent / "CHANGELOG.md"
 
 # Conventional commit prefixes → changelog section mapping
 SECTION_MAP = {
-    "feat":     "Added",
-    "fix":      "Fixed",
+    "feat": "Added",
+    "fix": "Fixed",
     "refactor": "Changed",
-    "perf":     "Changed",
-    "chore":    "Changed",
-    "docs":     "Changed",
-    "test":     "Changed",
-    "ci":       "Changed",
-    "style":    "Changed",
-    "revert":   "Removed",
+    "perf": "Changed",
+    "chore": "Changed",
+    "docs": "Changed",
+    "test": "Changed",
+    "ci": "Changed",
+    "style": "Changed",
+    "revert": "Removed",
 }
 
 
 def git(*args):
-    result = subprocess.run(["git"] + list(args), capture_output=True, text=True, check=True)
+    result = subprocess.run(
+        ["git"] + list(args), capture_output=True, text=True, check=True
+    )
     return result.stdout.strip()
 
 

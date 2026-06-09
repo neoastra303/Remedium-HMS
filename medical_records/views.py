@@ -6,65 +6,81 @@ from .models import PatientDocument, Encounter
 from patients.models import Patient
 
 
-class EncounterCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+class EncounterCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+):
     model = Encounter
-    fields = ['patient', 'doctor', 'encounter_type', 'reason_for_visit', 'clinical_notes', 'appointment']
-    template_name = 'medical_records/encounter_form.html'
-    permission_required = 'medical_records.medical_records_add_encounter'
+    fields = [
+        "patient",
+        "doctor",
+        "encounter_type",
+        "reason_for_visit",
+        "clinical_notes",
+        "appointment",
+    ]
+    template_name = "medical_records/encounter_form.html"
+    permission_required = "medical_records.medical_records_add_encounter"
     raise_exception = True
 
     def get_initial(self):
         initial = super().get_initial()
-        patient_pk = self.request.GET.get('patient')
-        appointment_pk = self.request.GET.get('appointment')
+        patient_pk = self.request.GET.get("patient")
+        appointment_pk = self.request.GET.get("appointment")
         if patient_pk:
-            initial['patient'] = get_object_or_404(Patient, pk=patient_pk)
+            initial["patient"] = get_object_or_404(Patient, pk=patient_pk)
         if appointment_pk:
             from appointments.models import Appointment
+
             appointment = get_object_or_404(Appointment, pk=appointment_pk)
-            initial['appointment'] = appointment
+            initial["appointment"] = appointment
             if not patient_pk:
-                initial['patient'] = appointment.patient
-            initial['doctor'] = appointment.doctor
-            initial['reason_for_visit'] = appointment.reason
+                initial["patient"] = appointment.patient
+            initial["doctor"] = appointment.doctor
+            initial["reason_for_visit"] = appointment.reason
         return initial
 
     def get_success_url(self):
-        return reverse('patient_detail', kwargs={'pk': self.object.patient.pk})
+        return reverse("patient_detail", kwargs={"pk": self.object.patient.pk})
 
 
-class PatientDocumentListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+class PatientDocumentListView(
+    LoginRequiredMixin, PermissionRequiredMixin, generic.ListView
+):
     model = PatientDocument
-    template_name = 'medical_records/patient_document_list.html'
-    context_object_name = 'documents'
-    permission_required = 'medical_records.medical_records_view_document'
+    template_name = "medical_records/patient_document_list.html"
+    context_object_name = "documents"
+    permission_required = "medical_records.medical_records_view_document"
     raise_exception = True
 
     def get_queryset(self):
-        self.patient = get_object_or_404(Patient, pk=self.kwargs['patient_pk'])
+        self.patient = get_object_or_404(Patient, pk=self.kwargs["patient_pk"])
         return PatientDocument.objects.filter(patient=self.patient)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['patient'] = self.patient
+        context["patient"] = self.patient
         return context
 
 
-class PatientDocumentCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+class PatientDocumentCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+):
     model = PatientDocument
-    fields = ['document_type', 'title', 'file', 'notes']
-    template_name = 'medical_records/patient_document_form.html'
-    permission_required = 'medical_records.medical_records_add_document'
+    fields = ["document_type", "title", "file", "notes"]
+    template_name = "medical_records/patient_document_form.html"
+    permission_required = "medical_records.medical_records_add_document"
     raise_exception = True
 
     def form_valid(self, form):
-        form.instance.patient = get_object_or_404(Patient, pk=self.kwargs['patient_pk'])
+        form.instance.patient = get_object_or_404(Patient, pk=self.kwargs["patient_pk"])
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('patient_document_list', kwargs={'patient_pk': self.kwargs['patient_pk']})
+        return reverse(
+            "patient_document_list", kwargs={"patient_pk": self.kwargs["patient_pk"]}
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['patient'] = get_object_or_404(Patient, pk=self.kwargs['patient_pk'])
+        context["patient"] = get_object_or_404(Patient, pk=self.kwargs["patient_pk"])
         return context

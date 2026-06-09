@@ -6,117 +6,120 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
-class HospitalServiceListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+class HospitalServiceListView(
+    LoginRequiredMixin, PermissionRequiredMixin, generic.ListView
+):
     model = HospitalService
-    template_name = 'hospital/service_list.html'
-    context_object_name = 'services'
+    template_name = "hospital/service_list.html"
+    context_object_name = "services"
     paginate_by = 15
-    permission_required = 'hospital.view_hospitalservice'
+    permission_required = "hospital.view_hospitalservice"
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        category = self.request.GET.get('category')
+        category = self.request.GET.get("category")
         if category:
             queryset = queryset.filter(category=category)
         return queryset
 
 
-class OccupancyMapView(LoginRequiredMixin, PermissionRequiredMixin, generic.TemplateView):
-    template_name = 'hospital/occupancy_map.html'
-    permission_required = 'hospital.view_ward'
+class OccupancyMapView(
+    LoginRequiredMixin, PermissionRequiredMixin, generic.TemplateView
+):
+    template_name = "hospital/occupancy_map.html"
+    permission_required = "hospital.view_ward"
     raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Prefetch wards with rooms, and rooms with patients
-        context['wards'] = Ward.objects.prefetch_related(
-            'rooms', 
-            'rooms__patient_set'
+        context["wards"] = Ward.objects.prefetch_related(
+            "rooms", "rooms__patient_set"
         ).all()
         return context
 
 
 class WardListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Ward
-    template_name = 'hospital/ward_list.html'
-    context_object_name = 'wards'
+    template_name = "hospital/ward_list.html"
+    context_object_name = "wards"
     paginate_by = 10
-    permission_required = 'hospital.view_ward'
+    permission_required = "hospital.view_ward"
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        order_by = self.request.GET.get('order_by', 'name')
+        order_by = self.request.GET.get("order_by", "name")
         return queryset.order_by(order_by)
 
 
 class WardDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Ward
-    template_name = 'hospital/ward_detail.html'
-    context_object_name = 'ward'
-    permission_required = 'hospital.view_ward'
+    template_name = "hospital/ward_detail.html"
+    context_object_name = "ward"
+    permission_required = "hospital.view_ward"
 
 
 class WardCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Ward
     form_class = WardForm
-    template_name = 'hospital/ward_form.html'
-    success_url = reverse_lazy('ward_list')
-    permission_required = 'hospital.add_ward'
+    template_name = "hospital/ward_form.html"
+    success_url = reverse_lazy("ward_list")
+    permission_required = "hospital.add_ward"
 
 
 class WardUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Ward
     form_class = WardForm
-    template_name = 'hospital/ward_form.html'
-    success_url = reverse_lazy('ward_list')
-    permission_required = 'hospital.change_ward'
+    template_name = "hospital/ward_form.html"
+    success_url = reverse_lazy("ward_list")
+    permission_required = "hospital.change_ward"
 
 
 class WardDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Ward
-    template_name = 'hospital/ward_confirm_delete.html'
-    success_url = reverse_lazy('ward_list')
-    permission_required = 'hospital.delete_ward'
+    template_name = "hospital/ward_confirm_delete.html"
+    success_url = reverse_lazy("ward_list")
+    permission_required = "hospital.delete_ward"
 
 
 class RoomListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Room
-    template_name = 'hospital/room_list.html'
-    context_object_name = 'rooms'
+    template_name = "hospital/room_list.html"
+    context_object_name = "rooms"
     paginate_by = 10
-    permission_required = 'hospital.view_room'
+    permission_required = "hospital.view_room"
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        order_by = self.request.GET.get('order_by', 'room_number')
+        order_by = self.request.GET.get("order_by", "room_number")
         return queryset.order_by(order_by)
 
 
 class RoomDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Room
-    template_name = 'hospital/room_detail.html'
-    context_object_name = 'room'
-    permission_required = 'hospital.view_room'
+    template_name = "hospital/room_detail.html"
+    context_object_name = "room"
+    permission_required = "hospital.view_room"
 
 
 class RoomCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Room
     form_class = RoomForm
-    template_name = 'hospital/room_form.html'
-    success_url = reverse_lazy('room_list')
-    permission_required = 'hospital.add_room'
+    template_name = "hospital/room_form.html"
+    success_url = reverse_lazy("room_list")
+    permission_required = "hospital.add_room"
 
 
 class RoomUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Room
     form_class = RoomForm
-    template_name = 'hospital/room_form.html'
-    success_url = reverse_lazy('room_list')
-    permission_required = 'hospital.change_room'
+    template_name = "hospital/room_form.html"
+    success_url = reverse_lazy("room_list")
+    permission_required = "hospital.change_room"
 
 
 class RoomDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Room
-    template_name = 'hospital/room_confirm_delete.html'
-    success_url = reverse_lazy('room_list')
-    permission_required = 'hospital.delete_room'
+    template_name = "hospital/room_confirm_delete.html"
+    success_url = reverse_lazy("room_list")
+    permission_required = "hospital.delete_room"

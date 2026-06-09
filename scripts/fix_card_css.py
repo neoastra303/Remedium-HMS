@@ -1,7 +1,7 @@
 import pathlib, re
 
-f = pathlib.Path('static/css/custom.css')
-txt = f.read_text(encoding='utf-8')
+f = pathlib.Path("static/css/custom.css")
+txt = f.read_text(encoding="utf-8")
 
 old = """/* Cards */
 .card {
@@ -44,10 +44,10 @@ new = """/* Cards — solid white for data, glass only where explicitly applied 
 }"""
 
 if old in txt:
-    f.write_text(txt.replace(old, new), encoding='utf-8')
-    print('Done')
+    f.write_text(txt.replace(old, new), encoding="utf-8")
+    print("Done")
 else:
-    print('Pattern not found, trying line-by-line')
-    lines = txt.split('\n')
+    print("Pattern not found, trying line-by-line")
+    lines = txt.split("\n")
     for i, l in enumerate(lines[64:78], 65):
-        print(f'{i}: {repr(l)}')
+        print(f"{i}: {repr(l)}")

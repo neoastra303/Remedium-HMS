@@ -1,4 +1,5 @@
 """Tests for medical_records app."""
+
 import pytest
 import io
 from datetime import timedelta
@@ -15,20 +16,18 @@ class TestPatientDocumentModel:
 
     def _create_patient(self):
         return Patient.objects.create(
-            unique_id='PAT_DOC',
-            first_name='Test',
-            last_name='Patient',
+            unique_id="PAT_DOC",
+            first_name="Test",
+            last_name="Patient",
             date_of_birth=timezone.now().date() - timedelta(days=365 * 30),
-            gender='M',
+            gender="M",
         )
 
     def _create_pdf_file(self):
         """Create a minimal PDF-like file for testing."""
-        content = b'%PDF-1.4 dummy content'
+        content = b"%PDF-1.4 dummy content"
         return SimpleUploadedFile(
-            "test_document.pdf",
-            content,
-            content_type='application/pdf'
+            "test_document.pdf", content, content_type="application/pdf"
         )
 
     def test_create_patient_document(self):
@@ -36,23 +35,30 @@ class TestPatientDocumentModel:
         pdf_file = self._create_pdf_file()
         doc = PatientDocument.objects.create(
             patient=patient,
-            document_type='LAB_REPORT',
-            title='Blood Test Results',
+            document_type="LAB_REPORT",
+            title="Blood Test Results",
             file=pdf_file,
         )
         assert doc.pk is not None
-        assert doc.document_type == 'LAB_REPORT'
-        assert 'Blood Test' in str(doc)
+        assert doc.document_type == "LAB_REPORT"
+        assert "Blood Test" in str(doc)
 
     def test_document_types(self):
         """Test valid document type choices."""
         patient = self._create_patient()
         pdf_file = self._create_pdf_file()
-        for doc_type in ['LAB_REPORT', 'XRAY', 'MRI', 'PRESCRIPTION', 'INSURANCE', 'OTHER']:
+        for doc_type in [
+            "LAB_REPORT",
+            "XRAY",
+            "MRI",
+            "PRESCRIPTION",
+            "INSURANCE",
+            "OTHER",
+        ]:
             doc = PatientDocument(
                 patient=patient,
                 document_type=doc_type,
-                title=f'{doc_type} Document',
+                title=f"{doc_type} Document",
                 file=pdf_file,
             )
             doc.full_clean()  # Should not raise
@@ -62,13 +68,13 @@ class TestPatientDocumentModel:
         patient = self._create_patient()
         doc_file = SimpleUploadedFile(
             "test.docx",
-            b'mock word content',
-            content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            b"mock word content",
+            content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         )
         doc = PatientDocument(
             patient=patient,
-            document_type='OTHER',
-            title='Invalid Doc',
+            document_type="OTHER",
+            title="Invalid Doc",
             file=doc_file,
         )
         with pytest.raises(ValidationError):
@@ -81,9 +87,9 @@ class TestPatientDocumentModel:
         pdf2 = self._create_pdf_file()
         pdf2.name = "test2.pdf"
         PatientDocument.objects.create(
-            patient=patient, document_type='LAB_REPORT', title='Doc 1', file=pdf1
+            patient=patient, document_type="LAB_REPORT", title="Doc 1", file=pdf1
         )
         PatientDocument.objects.create(
-            patient=patient, document_type='XRAY', title='Doc 2', file=pdf2
+            patient=patient, document_type="XRAY", title="Doc 2", file=pdf2
         )
         assert patient.documents.count() == 2

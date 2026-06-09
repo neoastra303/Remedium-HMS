@@ -1,4 +1,5 @@
 """Tests for appointments app."""
+
 import pytest
 from datetime import timedelta
 from django.core.exceptions import ValidationError

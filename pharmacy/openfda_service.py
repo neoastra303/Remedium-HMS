@@ -4,6 +4,7 @@ OpenFDA API integration service.
 Provides drug information from the FDA's public API.
 Results are cached to avoid repeated API calls.
 """
+
 import logging
 from datetime import timedelta
 from django.core.cache import cache
@@ -113,10 +114,12 @@ def search_adverse_events(drug_name: str) -> dict:
 
         results = []
         for item in data.get("results", []):
-            results.append({
-                "reaction": item.get("term", ""),
-                "count": item.get("count", 0),
-            })
+            results.append(
+                {
+                    "reaction": item.get("term", ""),
+                    "count": item.get("count", 0),
+                }
+            )
 
         result = {
             "drug_name": drug_name,

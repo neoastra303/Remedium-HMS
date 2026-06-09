@@ -6,8 +6,8 @@ from simple_history.models import HistoricalRecords
 
 # Shared phone validator - same as Patient model
 phone_regex = RegexValidator(
-    regex=r'^\+?\d{9,15}$',
-    message="Phone number must be 9-15 digits, optionally with a leading +."
+    regex=r"^\+?\d{9,15}$",
+    message="Phone number must be 9-15 digits, optionally with a leading +.",
 )
 
 
@@ -17,130 +17,114 @@ class Staff(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='staff_profile',
-        help_text="System user account associated with this staff member"
+        related_name="staff_profile",
+        help_text="System user account associated with this staff member",
     )
     ROLE_CHOICES = [
-        ('DOCTOR', 'Doctor'),
-        ('NURSE', 'Nurse'),
-        ('ADMIN', 'Administrator'),
-        ('TECH', 'Technician'),
-        ('PHARMACIST', 'Pharmacist'),
-        ('RECEPTIONIST', 'Receptionist'),
-        ('SURGEON', 'Surgeon'),
-        ('ANESTHESIOLOGIST', 'Anesthesiologist'),
-        ('RADIOLOGIST', 'Radiologist'),
-        ('LAB_TECH', 'Laboratory Technician'),
-        ('SECURITY', 'Security'),
-        ('MAINTENANCE', 'Maintenance'),
-        ('OTHER', 'Other'),
+        ("DOCTOR", "Doctor"),
+        ("NURSE", "Nurse"),
+        ("ADMIN", "Administrator"),
+        ("TECH", "Technician"),
+        ("PHARMACIST", "Pharmacist"),
+        ("RECEPTIONIST", "Receptionist"),
+        ("SURGEON", "Surgeon"),
+        ("ANESTHESIOLOGIST", "Anesthesiologist"),
+        ("RADIOLOGIST", "Radiologist"),
+        ("LAB_TECH", "Laboratory Technician"),
+        ("SECURITY", "Security"),
+        ("MAINTENANCE", "Maintenance"),
+        ("OTHER", "Other"),
     ]
-    
+
     DEPARTMENT_CHOICES = [
-        ('EMERGENCY', 'Emergency Department'),
-        ('CARDIOLOGY', 'Cardiology'),
-        ('NEUROLOGY', 'Neurology'),
-        ('ORTHOPEDICS', 'Orthopedics'),
-        ('PEDIATRICS', 'Pediatrics'),
-        ('SURGERY', 'Surgery'),
-        ('ICU', 'Intensive Care Unit'),
-        ('ONCOLOGY', 'Oncology'),
-        ('RADIOLOGY', 'Radiology'),
-        ('LABORATORY', 'Laboratory'),
-        ('PHARMACY', 'Pharmacy'),
-        ('ADMINISTRATION', 'Administration'),
-        ('MAINTENANCE', 'Maintenance'),
-        ('SECURITY', 'Security'),
-        ('OTHER', 'Other'),
+        ("EMERGENCY", "Emergency Department"),
+        ("CARDIOLOGY", "Cardiology"),
+        ("NEUROLOGY", "Neurology"),
+        ("ORTHOPEDICS", "Orthopedics"),
+        ("PEDIATRICS", "Pediatrics"),
+        ("SURGERY", "Surgery"),
+        ("ICU", "Intensive Care Unit"),
+        ("ONCOLOGY", "Oncology"),
+        ("RADIOLOGY", "Radiology"),
+        ("LABORATORY", "Laboratory"),
+        ("PHARMACY", "Pharmacy"),
+        ("ADMINISTRATION", "Administration"),
+        ("MAINTENANCE", "Maintenance"),
+        ("SECURITY", "Security"),
+        ("OTHER", "Other"),
     ]
-    
+
     class Meta:
-        app_label = 'staff'
+        app_label = "staff"
         permissions = [
-            ('staff_view_staff', 'Can view staff'),
-            ('staff_add_staff', 'Can add staff'),
-            ('staff_change_staff', 'Can change staff'),
-            ('staff_delete_staff', 'Can delete staff'),
+            ("staff_view_staff", "Can view staff"),
+            ("staff_add_staff", "Can add staff"),
+            ("staff_change_staff", "Can change staff"),
+            ("staff_delete_staff", "Can delete staff"),
         ]
         constraints = [
             models.UniqueConstraint(
-                fields=['email'],
+                fields=["email"],
                 condition=models.Q(email__isnull=False),
-                name='unique_staff_email'
+                name="unique_staff_email",
             ),
         ]
 
     # Uses shared phone_validator defined at module level
-    
+
     staff_id = models.CharField(
-        max_length=20, 
-        unique=True,
-        help_text="Unique staff identifier"
+        max_length=20, unique=True, help_text="Unique staff identifier"
     )
-    first_name = models.CharField(
-        max_length=50,
-        help_text="Staff member's first name"
-    )
-    last_name = models.CharField(
-        max_length=50,
-        help_text="Staff member's last name"
-    )
+    first_name = models.CharField(max_length=50, help_text="Staff member's first name")
+    last_name = models.CharField(max_length=50, help_text="Staff member's last name")
     role = models.CharField(
-        max_length=20,
-        choices=ROLE_CHOICES,
-        help_text="Staff member's role/position"
+        max_length=20, choices=ROLE_CHOICES, help_text="Staff member's role/position"
     )
     department = models.CharField(
         max_length=20,
         choices=DEPARTMENT_CHOICES,
-        blank=True, 
+        blank=True,
         null=True,
-        help_text="Department where staff member works"
+        help_text="Department where staff member works",
     )
     phone = models.CharField(
-        validators=[phone_regex],
-        max_length=20,
-        help_text="Staff member's phone number"
+        validators=[phone_regex], max_length=20, help_text="Staff member's phone number"
     )
     email = models.EmailField(
-        blank=True, 
-        null=True,
-        help_text="Staff member's email address"
+        blank=True, null=True, help_text="Staff member's email address"
     )
     schedule = models.TextField(
-        blank=True, 
-        null=True,
-        help_text="Staff member's work schedule"
+        blank=True, null=True, help_text="Staff member's work schedule"
     )
     hire_date = models.DateField(
-        auto_now_add=True,
-        help_text="Date when staff member was hired"
+        auto_now_add=True, help_text="Date when staff member was hired"
     )
     is_active = models.BooleanField(
-        default=True,
-        help_text="Whether the staff member is currently active"
+        default=True, help_text="Whether the staff member is currently active"
     )
 
     history = HistoricalRecords()
 
     def clean(self):
         super().clean()
-        
+
         # Validate role-department compatibility
         role_department_map = {
-            'PHARMACIST': 'PHARMACY',
-            'LAB_TECH': 'LABORATORY',
-            'RADIOLOGIST': 'RADIOLOGY',
-            'SURGEON': 'SURGERY',
-            'ANESTHESIOLOGIST': 'SURGERY',
+            "PHARMACIST": "PHARMACY",
+            "LAB_TECH": "LABORATORY",
+            "RADIOLOGIST": "RADIOLOGY",
+            "SURGEON": "SURGERY",
+            "ANESTHESIOLOGIST": "SURGERY",
         }
-        
+
         if self.role in role_department_map and self.department:
             if self.department != role_department_map[self.role]:
-                raise ValidationError({
-                    'department': f'{self.get_role_display()} should be in {role_department_map[self.role]} department.'
-                })
-    
+                raise ValidationError(
+                    {
+                        "department": f"{self.get_role_display()} should be in {role_department_map[self.role]} department."
+                    }
+                )
+
     def save(self, *args, **kwargs):
         """Normalize data and run full validation before saving."""
         # Allow using human-readable role labels like "Doctor" in addition to codes like "DOCTOR"
@@ -163,42 +147,47 @@ class Staff(models.Model):
             self.role = role_map.get(self.role, self.role)
 
         super().save(*args, **kwargs)
-    
+
     @property
     def full_name(self):
         """Return staff member's full name."""
         return f"{self.first_name} {self.last_name}"
-    
+
     @property
     def is_medical_staff(self):
         """Check if staff member is medical personnel."""
-        medical_roles = ['DOCTOR', 'NURSE', 'SURGEON', 'ANESTHESIOLOGIST', 'RADIOLOGIST']
+        medical_roles = [
+            "DOCTOR",
+            "NURSE",
+            "SURGEON",
+            "ANESTHESIOLOGIST",
+            "RADIOLOGIST",
+        ]
         return self.role in medical_roles
-    
+
     def __str__(self):
         return f"{self.staff_id} - {self.first_name} {self.last_name} ({self.role})"
 
 
 class Shift(models.Model):
     DAYS_OF_WEEK = [
-        (0, 'Monday'),
-        (1, 'Tuesday'),
-        (2, 'Wednesday'),
-        (3, 'Thursday'),
-        (4, 'Friday'),
-        (5, 'Saturday'),
-        (6, 'Sunday'),
+        (0, "Monday"),
+        (1, "Tuesday"),
+        (2, "Wednesday"),
+        (3, "Thursday"),
+        (4, "Friday"),
+        (5, "Saturday"),
+        (6, "Sunday"),
     ]
 
-    staff = models.ForeignKey(Staff, on_delete=models.CASCADE, related_name='shifts')
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE, related_name="shifts")
     day_of_week = models.IntegerField(choices=DAYS_OF_WEEK)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    
+
     class Meta:
-        ordering = ['day_of_week', 'start_time']
-        unique_together = ['staff', 'day_of_week', 'start_time']
+        ordering = ["day_of_week", "start_time"]
+        unique_together = ["staff", "day_of_week", "start_time"]
 
     def __str__(self):
         return f"{self.staff} - {self.get_day_of_week_display()} ({self.start_time} - {self.end_time})"
-

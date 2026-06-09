@@ -1,4 +1,5 @@
 """Tests for billing app."""
+
 import pytest
 from decimal import Decimal
 from datetime import date, timedelta

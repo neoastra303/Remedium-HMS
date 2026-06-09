@@ -4,43 +4,49 @@ Modernize remaining old-style templates:
 2. Replace table-striped with table-hover + shadow-sm card wrapper
 3. Replace confirm_delete pages with modern card style
 """
+
 import pathlib, re
 
 # Fix pagination in all list templates
-list_templates = list(pathlib.Path('.').rglob('*_list.html'))
-list_templates = [f for f in list_templates if 'venv' not in str(f)]
+list_templates = list(pathlib.Path(".").rglob("*_list.html"))
+list_templates = [f for f in list_templates if "venv" not in str(f)]
 
 pagination_pattern = re.compile(
-    r'\{%\s*if is_paginated\s*%\}.*?\{%\s*endif\s*%\}',
-    re.DOTALL
+    r"\{%\s*if is_paginated\s*%\}.*?\{%\s*endif\s*%\}", re.DOTALL
 )
 pagination_replacement = "{% include 'partials/pagination.html' %}"
 
 for f in list_templates:
-    txt = f.read_text(encoding='utf-8')
+    txt = f.read_text(encoding="utf-8")
     new = pagination_pattern.sub(pagination_replacement, txt)
     # Also upgrade table styling
-    new = new.replace('class="table table-striped table-hover"', 'class="table table-hover align-middle mb-0"')
-    new = new.replace('class="table table-bordered table-striped"', 'class="table table-hover align-middle mb-0"')
+    new = new.replace(
+        'class="table table-striped table-hover"',
+        'class="table table-hover align-middle mb-0"',
+    )
+    new = new.replace(
+        'class="table table-bordered table-striped"',
+        'class="table table-hover align-middle mb-0"',
+    )
     if new != txt:
-        f.write_text(new, encoding='utf-8')
-        print(f'Fixed: {f}')
+        f.write_text(new, encoding="utf-8")
+        print(f"Fixed: {f}")
 
 # Fix confirm_delete templates - replace alert+button pattern with card
-confirm_templates = list(pathlib.Path('.').rglob('*_confirm_delete.html'))
-confirm_templates = [f for f in confirm_templates if 'venv' not in str(f)]
+confirm_templates = list(pathlib.Path(".").rglob("*_confirm_delete.html"))
+confirm_templates = [f for f in confirm_templates if "venv" not in str(f)]
 
 for f in confirm_templates:
-    txt = f.read_text(encoding='utf-8')
+    txt = f.read_text(encoding="utf-8")
     # Only fix if it's the old alert-warning style (not already modernized)
-    if 'alert-warning' in txt or ('<h1' in txt and 'fw-bold' not in txt):
+    if "alert-warning" in txt or ("<h1" in txt and "fw-bold" not in txt):
         # Extract the cancel URL
         cancel_match = re.search(r"url '([^']+)'", txt)
-        cancel_url = cancel_match.group(1) if cancel_match else '#'
+        cancel_url = cancel_match.group(1) if cancel_match else "#"
         # Extract object description
-        obj_match = re.search(r'<strong>([^<]+)</strong>', txt)
-        obj_desc = obj_match.group(1) if obj_match else 'this item'
-        
+        obj_match = re.search(r"<strong>([^<]+)</strong>", txt)
+        obj_desc = obj_match.group(1) if obj_match else "this item"
+
         new_content = f"""{{% extends 'base.html' %}}
 {{% block content %}}
 <div class="row justify-content-center"><div class="col-md-6">
@@ -58,5 +64,5 @@ for f in confirm_templates:
 </div></div>
 {{% endblock %}}
 """
-        f.write_text(new_content, encoding='utf-8')
-        print(f'Fixed confirm_delete: {f}')
+        f.write_text(new_content, encoding="utf-8")
+        print(f"Fixed confirm_delete: {f}")

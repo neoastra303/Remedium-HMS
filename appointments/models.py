@@ -8,15 +8,18 @@ from simple_history.models import HistoricalRecords
 
 class Appointment(models.Model):
     class Meta:
-        app_label = 'appointments'
+        app_label = "appointments"
         permissions = [
-            ('appointments_view_appointment', 'Can view appointment'),
-            ('appointments_add_appointment', 'Can add appointment'),
-            ('appointments_change_appointment', 'Can change appointment'),
-            ('appointments_delete_appointment', 'Can delete appointment'),
+            ("appointments_view_appointment", "Can view appointment"),
+            ("appointments_add_appointment", "Can add appointment"),
+            ("appointments_change_appointment", "Can change appointment"),
+            ("appointments_delete_appointment", "Can delete appointment"),
         ]
         constraints = [
-            models.UniqueConstraint(fields=['patient', 'doctor', 'appointment_date'], name='unique_appointment')
+            models.UniqueConstraint(
+                fields=["patient", "doctor", "appointment_date"],
+                name="unique_appointment",
+            )
         ]
 
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
@@ -32,19 +35,20 @@ class Appointment(models.Model):
     ]
 
     status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default="Scheduled",
-        db_index=True
+        max_length=20, choices=STATUS_CHOICES, default="Scheduled", db_index=True
     )
-    arrived_at = models.DateTimeField(blank=True, null=True, help_text="Time when patient arrived at clinic")
+    arrived_at = models.DateTimeField(
+        blank=True, null=True, help_text="Time when patient arrived at clinic"
+    )
 
     history = HistoricalRecords()
 
     def clean(self):
         super().clean()
         if self.appointment_date and self.appointment_date < timezone.now():
-            raise ValidationError({'appointment_date': "Appointment date cannot be in the past."})
+            raise ValidationError(
+                {"appointment_date": "Appointment date cannot be in the past."}
+            )
 
         # Check for conflicts with existing appointments using proper range overlap
         # Two ranges overlap when: start_a < end_b AND start_b < end_a
@@ -57,12 +61,17 @@ class Appointment(models.Model):
         overlapping = Appointment.objects.filter(
             doctor=self.doctor,
             appointment_date__lt=new_end,  # existing start < new end
-            appointment_date__gte=new_start - duration,  # existing start >= (new start - duration)
-            status="Scheduled"
+            appointment_date__gte=new_start
+            - duration,  # existing start >= (new start - duration)
+            status="Scheduled",
         ).exclude(id=self.id)
 
         if overlapping.exists():
-            raise ValidationError({'appointment_date': "This time slot is already booked for this doctor."})
+            raise ValidationError(
+                {
+                    "appointment_date": "This time slot is already booked for this doctor."
+                }
+            )
 
         # Check against Doctor's Shift
         # Note: This is a strict check. In real world, might need overrides.
@@ -72,13 +81,15 @@ class Appointment(models.Model):
         has_shift = self.doctor.shifts.filter(
             day_of_week=day_of_week,
             start_time__lte=time,
-            end_time__gte=time  # Simplified: logic usually needs to check if slot fits strictly within
+            end_time__gte=time,  # Simplified: logic usually needs to check if slot fits strictly within
         ).exists()
 
         # If the doctor has NO shifts defined, we might assume they are available or unavailable.
         # Here we assume if they have shifts, we must respect them.
         if self.doctor.shifts.exists() and not has_shift:
-             raise ValidationError({'appointment_date': "Doctor does not have a shift at this time."})
+            raise ValidationError(
+                {"appointment_date": "Doctor does not have a shift at this time."}
+            )
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

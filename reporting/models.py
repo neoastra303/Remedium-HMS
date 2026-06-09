@@ -4,10 +4,10 @@ from django.db import models
 class Report(models.Model):
     class Meta:
         permissions = [
-            ('reporting_view_report', 'Can view report'),
-            ('reporting_add_report', 'Can add report'),
-            ('reporting_change_report', 'Can change report'),
-            ('reporting_delete_report', 'Can delete report'),
+            ("reporting_view_report", "Can view report"),
+            ("reporting_add_report", "Can add report"),
+            ("reporting_change_report", "Can change report"),
+            ("reporting_delete_report", "Can delete report"),
         ]
 
     title = models.CharField(max_length=100)

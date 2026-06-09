@@ -1,6 +1,7 @@
 import pathlib
-f = pathlib.Path('static/css/custom.css')
-txt = f.read_text(encoding='utf-8')
+
+f = pathlib.Path("static/css/custom.css")
+txt = f.read_text(encoding="utf-8")
 old = """.card-header {
     background: rgba(255, 255, 255, 0.4);
     border-bottom: 1px solid var(--glass-border);
@@ -13,7 +14,7 @@ new = """.card-header {
     font-weight: 600;
 }"""
 if old in txt:
-    f.write_text(txt.replace(old, new), encoding='utf-8')
-    print('Done')
+    f.write_text(txt.replace(old, new), encoding="utf-8")
+    print("Done")
 else:
-    print('Not found')
+    print("Not found")

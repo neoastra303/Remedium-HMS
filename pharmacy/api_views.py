@@ -3,7 +3,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Prescription
-from .serializers import PrescriptionSerializer, DrugInfoSerializer, AdverseEventSerializer
+from .serializers import (
+    PrescriptionSerializer,
+    DrugInfoSerializer,
+    AdverseEventSerializer,
+)
 from .openfda_service import search_drug_label, search_adverse_events
 from core.permissions import IsPharmacyStaff
 
@@ -17,15 +21,16 @@ class PrescriptionViewSet(viewsets.ModelViewSet):
     drug_info: Return FDA drug label information for a medication.
     adverse_events: Return FDA adverse event summary for a medication.
     """
-    queryset = Prescription.objects.select_related('patient', 'prescribed_by').all()
+
+    queryset = Prescription.objects.select_related("patient", "prescribed_by").all()
     serializer_class = PrescriptionSerializer
     permission_classes = [IsPharmacyStaff]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['patient__first_name', 'patient__last_name', 'drug_name']
-    ordering_fields = ['prescribed_date']
-    ordering = ['-prescribed_date']
+    search_fields = ["patient__first_name", "patient__last_name", "drug_name"]
+    ordering_fields = ["prescribed_date"]
+    ordering = ["-prescribed_date"]
 
-    @action(detail=False, methods=['get'], url_path='drug-info')
+    @action(detail=False, methods=["get"], url_path="drug-info")
     def drug_info(self, request):
         """
         Get FDA drug label information from OpenFDA.
@@ -35,21 +40,21 @@ class PrescriptionViewSet(viewsets.ModelViewSet):
         Returns generic name, brand names, manufacturer, warnings,
         adverse reactions, dosage info, and drug interactions.
         """
-        drug_name = request.query_params.get('q', '').strip()
+        drug_name = request.query_params.get("q", "").strip()
         if not drug_name:
             return Response(
-                {'error': 'Query parameter "q" (drug name) is required.'},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": 'Query parameter "q" (drug name) is required.'},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         result = search_drug_label(drug_name)
-        if 'error' in result:
+        if "error" in result:
             return Response(result, status=status.HTTP_404_NOT_FOUND)
 
         serializer = DrugInfoSerializer(result)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'], url_path='adverse-events')
+    @action(detail=False, methods=["get"], url_path="adverse-events")
     def adverse_events(self, request):
         """
         Get FDA adverse event report summary for a medication from OpenFDA.
@@ -58,15 +63,15 @@ class PrescriptionViewSet(viewsets.ModelViewSet):
 
         Returns the top 10 most reported adverse reactions and total report count.
         """
-        drug_name = request.query_params.get('q', '').strip()
+        drug_name = request.query_params.get("q", "").strip()
         if not drug_name:
             return Response(
-                {'error': 'Query parameter "q" (drug name) is required.'},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": 'Query parameter "q" (drug name) is required.'},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         result = search_adverse_events(drug_name)
-        if 'error' in result:
+        if "error" in result:
             return Response(result, status=status.HTTP_502_BAD_GATEWAY)
 
         serializer = AdverseEventSerializer(result)

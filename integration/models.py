@@ -7,9 +7,11 @@ from cryptography.fernet import Fernet
 
 def get_encryption_key():
     """Return the dedicated Fernet key used for database-stored secrets."""
-    key = getattr(settings, 'FIELD_ENCRYPTION_KEY', '')
+    key = getattr(settings, "FIELD_ENCRYPTION_KEY", "")
     if not key:
-        raise ImproperlyConfigured("FIELD_ENCRYPTION_KEY must be set before storing integration API keys.")
+        raise ImproperlyConfigured(
+            "FIELD_ENCRYPTION_KEY must be set before storing integration API keys."
+        )
     return key.encode()
 
 
@@ -31,20 +33,20 @@ def decrypt_value(value):
 
 class ExternalIntegration(models.Model):
     SYSTEM_TYPES = [
-        ('EMR', 'Electronic Medical Records'),
-        ('PHARMACY_HUB', 'External Pharmacy Hub'),
-        ('INSURANCE', 'Insurance Gateway'),
-        ('LAB_EQUIPMENT', 'Laboratory Equipment'),
+        ("EMR", "Electronic Medical Records"),
+        ("PHARMACY_HUB", "External Pharmacy Hub"),
+        ("INSURANCE", "Insurance Gateway"),
+        ("LAB_EQUIPMENT", "Laboratory Equipment"),
     ]
-    
+
     system_name = models.CharField(max_length=100)
-    system_type = models.CharField(max_length=20, choices=SYSTEM_TYPES, default='EMR')
+    system_type = models.CharField(max_length=20, choices=SYSTEM_TYPES, default="EMR")
     api_endpoint = models.URLField()
     api_key = models.CharField(
         max_length=512,
         blank=True,
         null=True,
-        help_text="Encrypted API Key (use set_api_key/get_api_key methods)"
+        help_text="Encrypted API Key (use set_api_key/get_api_key methods)",
     )
 
     def set_api_key(self, raw_key):
@@ -56,8 +58,9 @@ class ExternalIntegration(models.Model):
         if not self.api_key:
             return None
         return decrypt_value(self.api_key)
+
     last_sync = models.DateTimeField(blank=True, null=True)
-    status = models.CharField(max_length=50, default='Inactive')
+    status = models.CharField(max_length=50, default="Inactive")
     last_sync_result = models.JSONField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
 

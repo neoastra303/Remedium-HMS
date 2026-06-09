@@ -1,4 +1,5 @@
 """Tests for staff app."""
+
 import pytest
 from django.core.exceptions import ValidationError
 from staff.models import Staff

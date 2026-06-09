@@ -6,19 +6,22 @@ from simple_history.models import HistoricalRecords
 
 class Surgery(models.Model):
     class Meta:
-        app_label = 'surgery'
+        app_label = "surgery"
         permissions = [
-            ('surgery_view_surgery', 'Can view surgery'),
-            ('surgery_add_surgery', 'Can add surgery'),
-            ('surgery_change_surgery', 'Can change surgery'),
-            ('surgery_delete_surgery', 'Can delete surgery'),
+            ("surgery_view_surgery", "Can view surgery"),
+            ("surgery_add_surgery", "Can add surgery"),
+            ("surgery_change_surgery", "Can change surgery"),
+            ("surgery_delete_surgery", "Can delete surgery"),
         ]
         constraints = [
-            models.UniqueConstraint(fields=['operating_room', 'scheduled_date'], name='unique_operating_room_schedule')
+            models.UniqueConstraint(
+                fields=["operating_room", "scheduled_date"],
+                name="unique_operating_room_schedule",
+            )
         ]
 
-    patient = models.ForeignKey('patients.Patient', on_delete=models.CASCADE)
-    surgeon = models.ForeignKey('staff.Staff', on_delete=models.CASCADE)
+    patient = models.ForeignKey("patients.Patient", on_delete=models.CASCADE)
+    surgeon = models.ForeignKey("staff.Staff", on_delete=models.CASCADE)
     scheduled_date = models.DateTimeField()
     operating_room = models.CharField(max_length=50)
     procedure = models.CharField(max_length=100)

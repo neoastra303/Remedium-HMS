@@ -3,10 +3,30 @@ from . import views
 
 
 urlpatterns = [
-    path('patientcares/', views.PatientCareListView.as_view(), name='patientcare_list'),
-    path('patientcares/<int:pk>/', views.PatientCareDetailView.as_view(), name='patientcare_detail'),
-    path('patientcares/create/', views.PatientCareCreateView.as_view(), name='patientcare_create'),
-    path('patientcares/<int:pk>/update/', views.PatientCareUpdateView.as_view(), name='patientcare_update'),
-    path('patientcares/<int:pk>/delete/', views.PatientCareDeleteView.as_view(), name='patientcare_delete'),
-    path('patient/<int:pk>/trends/', views.PatientVitalTrendsView.as_view(), name='patient_vital_trends'),
-    ]
+    path("patientcares/", views.PatientCareListView.as_view(), name="patientcare_list"),
+    path(
+        "patientcares/<int:pk>/",
+        views.PatientCareDetailView.as_view(),
+        name="patientcare_detail",
+    ),
+    path(
+        "patientcares/create/",
+        views.PatientCareCreateView.as_view(),
+        name="patientcare_create",
+    ),
+    path(
+        "patientcares/<int:pk>/update/",
+        views.PatientCareUpdateView.as_view(),
+        name="patientcare_update",
+    ),
+    path(
+        "patientcares/<int:pk>/delete/",
+        views.PatientCareDeleteView.as_view(),
+        name="patientcare_delete",
+    ),
+    path(
+        "patient/<int:pk>/trends/",
+        views.PatientVitalTrendsView.as_view(),
+        name="patient_vital_trends",
+    ),
+]

@@ -1,4 +1,5 @@
 """Tests for patients app."""
+
 import pytest
 from datetime import date, timedelta
 from django.core.exceptions import ValidationError
@@ -58,6 +59,7 @@ class TestPatientModel:
     def test_is_admitted_property(self):
         """Test is_admitted property."""
         from django.utils import timezone
+
         patient = Patient(
             unique_id="PAT005",
             first_name="Test",
@@ -72,6 +74,7 @@ class TestPatientModel:
     def test_is_admitted_discharged(self):
         """Test is_admitted returns False after discharge."""
         from django.utils import timezone
+
         patient = Patient(
             unique_id="PAT006",
             first_name="Test",
@@ -86,6 +89,7 @@ class TestPatientModel:
     def test_phone_invalid_format_rejected(self):
         """Phone numbers with dashes are invalid and must be rejected."""
         from django.core.exceptions import ValidationError
+
         patient = Patient(
             unique_id="PAT007",
             first_name="Test",
@@ -137,6 +141,7 @@ class TestPatientModel:
     def test_discharge_before_admission_raises_error(self):
         """Test discharge before admission raises constraint error."""
         from django.utils import timezone
+
         patient = Patient(
             unique_id="PAT011",
             first_name="Test",

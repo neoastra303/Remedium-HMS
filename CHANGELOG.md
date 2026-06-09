@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased] - 2026-06-10
 
 ### Added
+- implement receptionist toolkit (Check-in, Queue, Bed Map) ([`3e5d8ff`])
 - full-stack UI upgrades for flexible data relations ([`d14427e`])
 - professional dashboard redesign â€” consistent stat cards, component CSS, appointment rows, fix card-header color ([`9cca972`])
 - UI/UX overhaul â€” grouped patient form, login redesign, empty states, card hover fix, form spinners, delete toasts ([`79b2786`])

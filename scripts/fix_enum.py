@@ -1,6 +1,7 @@
 import pathlib
-f = pathlib.Path('remedium_hms/settings.py')
-txt = f.read_text(encoding='utf-8')
+
+f = pathlib.Path("remedium_hms/settings.py")
+txt = f.read_text(encoding="utf-8")
 old = "    'ENUM_NAME_OVERRIDES': {\n        'PatientGenderEnum': 'patients.models.Patient.GENDER_CHOICES',\n    },"
 new = """    'ENUM_NAME_OVERRIDES': {
         'PatientGenderEnum': 'patients.models.Patient.GENDER_CHOICES',
@@ -10,8 +11,8 @@ new = """    'ENUM_NAME_OVERRIDES': {
         'NotificationStatusEnum': 'notifications.models.Notification.STATUSES',
     },"""
 if old in txt:
-    f.write_text(txt.replace(old, new), encoding='utf-8')
-    print('Done')
+    f.write_text(txt.replace(old, new), encoding="utf-8")
+    print("Done")
 else:
-    print('Pattern not found')
-    print(repr(txt[txt.find("ENUM_NAME"):txt.find("ENUM_NAME")+200]))
+    print("Pattern not found")
+    print(repr(txt[txt.find("ENUM_NAME") : txt.find("ENUM_NAME") + 200]))

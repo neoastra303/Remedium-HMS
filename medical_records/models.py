@@ -16,29 +16,40 @@ class Encounter(models.Model):
     Represents a single clinical interaction or 'visit' for a patient.
     Serves as a hub for all activities during that visit.
     """
+
     ENCOUNTER_TYPES = [
-        ('AMBULATORY', 'Outpatient/Ambulatory'),
-        ('EMERGENCY', 'Emergency'),
-        ('INPATIENT', 'Inpatient/Admission'),
-        ('TELEHEALTH', 'Telehealth'),
-        ('VIRTUAL', 'Virtual Visit'),
+        ("AMBULATORY", "Outpatient/Ambulatory"),
+        ("EMERGENCY", "Emergency"),
+        ("INPATIENT", "Inpatient/Admission"),
+        ("TELEHEALTH", "Telehealth"),
+        ("VIRTUAL", "Virtual Visit"),
     ]
 
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='encounters')
-    doctor = models.ForeignKey('staff.Staff', on_delete=models.SET_NULL, null=True, blank=True)
+    patient = models.ForeignKey(
+        Patient, on_delete=models.CASCADE, related_name="encounters"
+    )
+    doctor = models.ForeignKey(
+        "staff.Staff", on_delete=models.SET_NULL, null=True, blank=True
+    )
     encounter_type = models.CharField(max_length=20, choices=ENCOUNTER_TYPES)
     start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField(blank=True, null=True)
     reason_for_visit = models.TextField()
     clinical_notes = models.TextField(blank=True)
-    
+
     # Allows linking a specific appointment to this encounter
-    appointment = models.OneToOneField('appointments.Appointment', on_delete=models.SET_NULL, null=True, blank=True, related_name='encounter')
+    appointment = models.OneToOneField(
+        "appointments.Appointment",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="encounter",
+    )
 
     history = HistoricalRecords()
 
     class Meta:
-        ordering = ['-start_time']
+        ordering = ["-start_time"]
 
     def __str__(self):
         return f"{self.get_encounter_type_display()} on {self.start_time.date()} for {self.patient}"
@@ -46,48 +57,56 @@ class Encounter(models.Model):
 
 class PatientDocument(models.Model):
     DOCUMENT_TYPES = [
-        ('LAB_REPORT', 'Lab Report'),
-        ('XRAY', 'X-Ray'),
-        ('MRI', 'MRI Scan'),
-        ('PRESCRIPTION', 'Prescription'),
-        ('INSURANCE', 'Insurance Document'),
-        ('OTHER', 'Other'),
+        ("LAB_REPORT", "Lab Report"),
+        ("XRAY", "X-Ray"),
+        ("MRI", "MRI Scan"),
+        ("PRESCRIPTION", "Prescription"),
+        ("INSURANCE", "Insurance Document"),
+        ("OTHER", "Other"),
     ]
 
     class Meta:
-        app_label = 'medical_records'
+        app_label = "medical_records"
         permissions = [
-            ('medical_records_view_document', 'Can view document'),
-            ('medical_records_add_document', 'Can add document'),
-            ('medical_records_change_document', 'Can change document'),
-            ('medical_records_delete_document', 'Can delete document'),
+            ("medical_records_view_document", "Can view document"),
+            ("medical_records_add_document", "Can add document"),
+            ("medical_records_change_document", "Can change document"),
+            ("medical_records_delete_document", "Can delete document"),
         ]
 
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='documents')
+    patient = models.ForeignKey(
+        Patient, on_delete=models.CASCADE, related_name="documents"
+    )
     document_type = models.CharField(max_length=20, choices=DOCUMENT_TYPES)
     title = models.CharField(max_length=100)
     file = models.FileField(
-        upload_to='patient_documents/%Y/%m/%d/',
+        upload_to="patient_documents/%Y/%m/%d/",
         # Removed .doc/.docx - potential macro security risk
-        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png'])]
+        validators=[
+            FileExtensionValidator(allowed_extensions=["pdf", "jpg", "jpeg", "png"])
+        ],
     )
     uploaded_at = models.DateTimeField(auto_now_add=True)
     notes = models.TextField(blank=True)
 
     # Generic foreign key to link to related entities (LabTest, Prescription, etc.)
-    content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True, blank=True)
+    content_type = models.ForeignKey(
+        ContentType, on_delete=models.SET_NULL, null=True, blank=True
+    )
     object_id = models.PositiveIntegerField(null=True, blank=True)
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey("content_type", "object_id")
 
     history = HistoricalRecords()
 
     def clean(self):
         super().clean()
         # Validate file size (10 MB limit)
-        if self.file and hasattr(self.file, 'size') and self.file.size > MAX_FILE_SIZE:
-            raise ValidationError({
-                'file': f'File size must be under {MAX_FILE_SIZE / (1024 * 1024)} MB. Current size: {self.file.size / (1024 * 1024):.1f} MB'
-            })
+        if self.file and hasattr(self.file, "size") and self.file.size > MAX_FILE_SIZE:
+            raise ValidationError(
+                {
+                    "file": f"File size must be under {MAX_FILE_SIZE / (1024 * 1024)} MB. Current size: {self.file.size / (1024 * 1024):.1f} MB"
+                }
+            )
 
     def __str__(self):
         return f"{self.title} - {self.patient.full_name}"

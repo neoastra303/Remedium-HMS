@@ -8,4 +8,5 @@ class CoreConfig(AppConfig):
     def ready(self):
         from django.contrib.auth.models import User
         from simple_history import register
-        register(User, app='core')
+
+        register(User, app="core")

@@ -1,4 +1,5 @@
 """Tests for pharmacy app."""
+
 import pytest
 from unittest.mock import patch, MagicMock
 from django.utils import timezone
@@ -18,19 +19,19 @@ class TestPrescriptionModel:
 
     def _create_patient(self):
         return Patient.objects.create(
-            unique_id='PAT_PHARM',
-            first_name='Test',
-            last_name='Patient',
+            unique_id="PAT_PHARM",
+            first_name="Test",
+            last_name="Patient",
             date_of_birth=timezone.now().date() - timedelta(days=365 * 30),
-            gender='M',
+            gender="M",
         )
 
     def _create_doctor(self):
         return Staff.objects.create(
-            staff_id='DOC_PHARM',
-            first_name='Dr. Test',
-            last_name='Doctor',
-            role='DOCTOR',
+            staff_id="DOC_PHARM",
+            first_name="Dr. Test",
+            last_name="Doctor",
+            role="DOCTOR",
         )
 
     def test_create_prescription(self):
@@ -38,22 +39,22 @@ class TestPrescriptionModel:
         doctor = self._create_doctor()
         rx = Prescription.objects.create(
             patient=patient,
-            drug_name='Amoxicillin',
-            dosage='500mg',
-            frequency='3 times daily',
+            drug_name="Amoxicillin",
+            dosage="500mg",
+            frequency="3 times daily",
             prescribed_by=doctor,
         )
         assert rx.pk is not None
-        assert str(rx) == 'Amoxicillin for PAT_PHARM - Test Patient'
+        assert str(rx) == "Amoxicillin for PAT_PHARM - Test Patient"
 
     def test_prescription_auto_date(self):
         """Test prescribed_date is auto-set."""
         patient = self._create_patient()
         rx = Prescription(
             patient=patient,
-            drug_name='Test Drug',
-            dosage='100mg',
-            frequency='Daily',
+            drug_name="Test Drug",
+            dosage="100mg",
+            frequency="Daily",
         )
         rx.save()
         assert rx.prescribed_date is not None
@@ -63,26 +64,28 @@ class TestPrescriptionModel:
 class TestOpenFDAService:
     """Test OpenFDA API service functions."""
 
-    @patch('pharmacy.openfda_service.requests.get')
+    @patch("pharmacy.openfda_service.requests.get")
     def test_search_drug_label_success(self, mock_get):
         """Test successful drug label search."""
         mock_response = MagicMock()
         mock_response.json.return_value = {
-            "results": [{
-                "openfda": {
-                    "generic_name": ["AMOXICILLIN"],
-                    "brand_name": ["AMOXIL"],
-                    "manufacturer_name": ["Test Pharma"],
-                    "route": ["ORAL"],
-                    "substance_name": ["AMOXICILLIN"],
-                    "product_type": ["HUMAN PRESCRIPTION DRUG"],
-                },
-                "warnings_and_cautions": ["Use with caution."],
-                "adverse_reactions": ["Nausea, diarrhea."],
-                "dosage_and_administration": ["Take as directed."],
-                "drug_interactions": ["None known."],
-                "indications_and_usage": ["Bacterial infections."],
-            }]
+            "results": [
+                {
+                    "openfda": {
+                        "generic_name": ["AMOXICILLIN"],
+                        "brand_name": ["AMOXIL"],
+                        "manufacturer_name": ["Test Pharma"],
+                        "route": ["ORAL"],
+                        "substance_name": ["AMOXICILLIN"],
+                        "product_type": ["HUMAN PRESCRIPTION DRUG"],
+                    },
+                    "warnings_and_cautions": ["Use with caution."],
+                    "adverse_reactions": ["Nausea, diarrhea."],
+                    "dosage_and_administration": ["Take as directed."],
+                    "drug_interactions": ["None known."],
+                    "indications_and_usage": ["Bacterial infections."],
+                }
+            ]
         }
         mock_response.raise_for_status = MagicMock()
         mock_get.return_value = mock_response
@@ -93,7 +96,7 @@ class TestOpenFDAService:
         assert result["manufacturer"] == "Test Pharma"
         assert "ORAL" in result["route"]
 
-    @patch('pharmacy.openfda_service.requests.get')
+    @patch("pharmacy.openfda_service.requests.get")
     def test_search_drug_label_not_found(self, mock_get):
         """Test drug not found returns error."""
         mock_response = MagicMock()
@@ -104,18 +107,19 @@ class TestOpenFDAService:
         result = search_drug_label("NonExistentDrug")
         assert "error" in result
 
-    @patch('pharmacy.openfda_service.requests.get')
+    @patch("pharmacy.openfda_service.requests.get")
     def test_search_drug_label_api_error(self, mock_get):
         """Test API failure returns error."""
         import requests as req
         from django.core.cache import cache
+
         cache.clear()  # Clear cache to avoid stale results
         mock_get.side_effect = req.RequestException("API down")
 
         result = search_drug_label("FailingDrug123")
         assert "error" in result
 
-    @patch('pharmacy.openfda_service.requests.get')
+    @patch("pharmacy.openfda_service.requests.get")
     def test_search_adverse_events(self, mock_get):
         """Test adverse event search."""
         mock_response = MagicMock()
@@ -139,65 +143,71 @@ class TestPrescriptionAPIWithOpenFDA:
     """Test Prescription API with OpenFDA endpoints."""
 
     def _create_user(self):
-        return User.objects.create_user('pharm@test.com', 'pharm@test.com', 'pharmpass', is_staff=True)
+        return User.objects.create_user(
+            "pharm@test.com", "pharm@test.com", "pharmpass", is_staff=True
+        )
 
     def _create_patient(self):
         return Patient.objects.create(
-            unique_id='PAT_API_PHARM',
-            first_name='Test',
-            last_name='Patient',
+            unique_id="PAT_API_PHARM",
+            first_name="Test",
+            last_name="Patient",
             date_of_birth=timezone.now().date() - timedelta(days=365 * 30),
-            gender='M',
+            gender="M",
         )
 
     def _create_doctor(self):
         return Staff.objects.create(
-            staff_id='DOC_PHARM_API',
-            first_name='Dr.',
-            last_name='Test',
-            role='DOCTOR',
+            staff_id="DOC_PHARM_API",
+            first_name="Dr.",
+            last_name="Test",
+            role="DOCTOR",
         )
 
-    @patch('pharmacy.openfda_service.requests.get')
+    @patch("pharmacy.openfda_service.requests.get")
     def test_drug_info_endpoint(self, mock_get, api_client):
         """Test /api/v1/prescriptions/drug-info/ returns drug data."""
         mock_response = MagicMock()
         mock_response.json.return_value = {
-            "results": [{
-                "openfda": {
-                    "generic_name": ["IBUPROFEN"],
-                    "brand_name": ["ADVIL"],
-                    "manufacturer_name": ["Pfizer"],
-                    "route": ["ORAL"],
-                    "substance_name": ["IBUPROFEN"],
-                    "product_type": ["HUMAN PRESCRIPTION DRUG"],
-                },
-                "warnings_and_cautions": ["Take with food."],
-                "adverse_reactions": ["Stomach upset."],
-                "dosage_and_administration": ["200mg every 6 hours."],
-                "drug_interactions": ["Blood thinners."],
-                "indications_and_usage": ["Pain relief."],
-            }]
+            "results": [
+                {
+                    "openfda": {
+                        "generic_name": ["IBUPROFEN"],
+                        "brand_name": ["ADVIL"],
+                        "manufacturer_name": ["Pfizer"],
+                        "route": ["ORAL"],
+                        "substance_name": ["IBUPROFEN"],
+                        "product_type": ["HUMAN PRESCRIPTION DRUG"],
+                    },
+                    "warnings_and_cautions": ["Take with food."],
+                    "adverse_reactions": ["Stomach upset."],
+                    "dosage_and_administration": ["200mg every 6 hours."],
+                    "drug_interactions": ["Blood thinners."],
+                    "indications_and_usage": ["Pain relief."],
+                }
+            ]
         }
         mock_response.raise_for_status = MagicMock()
         mock_get.return_value = mock_response
 
         user = self._create_user()
         api_client.force_authenticate(user=user)
-        response = api_client.get('/api/v1/prescriptions/drug-info/', {'q': 'Ibuprofen'})
+        response = api_client.get(
+            "/api/v1/prescriptions/drug-info/", {"q": "Ibuprofen"}
+        )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['generic_name'] == 'IBUPROFEN'
-        assert response.data['brand_name'] == 'ADVIL'
+        assert response.data["generic_name"] == "IBUPROFEN"
+        assert response.data["brand_name"] == "ADVIL"
 
     def test_drug_info_missing_query(self, api_client):
         """Test drug-info returns 400 without query parameter."""
         user = self._create_user()
         api_client.force_authenticate(user=user)
-        response = api_client.get('/api/v1/prescriptions/drug-info/')
+        response = api_client.get("/api/v1/prescriptions/drug-info/")
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    @patch('pharmacy.openfda_service.requests.get')
+    @patch("pharmacy.openfda_service.requests.get")
     def test_adverse_events_endpoint(self, mock_get, api_client):
         """Test /api/v1/prescriptions/adverse-events/ returns data."""
         mock_response = MagicMock()
@@ -211,7 +221,9 @@ class TestPrescriptionAPIWithOpenFDA:
 
         user = self._create_user()
         api_client.force_authenticate(user=user)
-        response = api_client.get('/api/v1/prescriptions/adverse-events/', {'q': 'Aspirin'})
+        response = api_client.get(
+            "/api/v1/prescriptions/adverse-events/", {"q": "Aspirin"}
+        )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['total_reports'] == 50
+        assert response.data["total_reports"] == 50

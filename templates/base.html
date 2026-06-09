@@ -59,6 +59,8 @@
                             {% if is_hms_admin or is_hms_lab_tech %}
                             <li><a class="dropdown-item {% if request.resolver_match.app_name == 'laboratory' %}active{% endif %}" href="{% url 'labtest_list' %}"><i class="bi bi-microscope me-2"></i> Laboratory</a></li>
                             {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'hospital:service_list' %}"><i class="bi bi-card-checklist me-2"></i> Services</a></li>
                         </ul>
                     </li>
                     {% endif %}

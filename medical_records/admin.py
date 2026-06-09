@@ -1,5 +1,12 @@
 from django.contrib import admin
-from .models import PatientDocument
+from .models import PatientDocument, Encounter
+
+@admin.register(Encounter)
+class EncounterAdmin(admin.ModelAdmin):
+    list_display = ('patient', 'encounter_type', 'doctor', 'start_time', 'end_time')
+    list_filter = ('encounter_type', 'start_time', 'doctor')
+    search_fields = ('patient__first_name', 'patient__last_name', 'reason_for_visit')
+
 
 @admin.register(PatientDocument)
 class PatientDocumentAdmin(admin.ModelAdmin):

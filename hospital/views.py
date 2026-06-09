@@ -1,9 +1,24 @@
 from django.shortcuts import render
 from django.views import generic
-from .models import Ward, Room
+from .models import Ward, Room, HospitalService
 from .forms import WardForm, RoomForm
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+
+
+class HospitalServiceListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+    model = HospitalService
+    template_name = 'hospital/service_list.html'
+    context_object_name = 'services'
+    paginate_by = 15
+    permission_required = 'hospital.view_hospitalservice'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        category = self.request.GET.get('category')
+        if category:
+            queryset = queryset.filter(category=category)
+        return queryset
 
 
 class WardListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):

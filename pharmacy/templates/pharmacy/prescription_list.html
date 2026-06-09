@@ -21,8 +21,18 @@
                 {% for prescription in prescriptions %}
                 <tr>
                     <td class="ps-4 fw-medium">{{ prescription.patient }}</td>
-                    <td>{{ prescription.drug_name }}</td>
+                    <td>
+                        {% if prescription.service %}{{ prescription.service.name }}{% else %}{{ prescription.drug_name }}{% endif %}
+                        {% if prescription.service and prescription.drug_name %}
+                            <div class="text-muted extra-small">({{ prescription.drug_name }})</div>
+                        {% endif %}
+                    </td>
                     <td class="d-mobile-none text-muted small">{{ prescription.dosage }}</td>
+                    <td>
+                        {% if prescription.status == 'Active' %}<span class="badge bg-success rounded-pill">Active</span>
+                        {% elif prescription.status == 'Completed' %}<span class="badge bg-info rounded-pill">Completed</span>
+                        {% else %}<span class="badge bg-secondary rounded-pill">{{ prescription.get_status_display }}</span>{% endif %}
+                    </td>
                     <td class="d-mobile-none text-muted small">{{ prescription.prescribed_date|date:"M d, Y" }}</td>
                     <td class="pe-4 text-end">
                         <a href="{% url 'prescription_detail' prescription.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>

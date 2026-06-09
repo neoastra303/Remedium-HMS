@@ -15,7 +15,7 @@ class PrescriptionListView(LoginRequiredMixin, PermissionRequiredMixin, generic.
     raise_exception = True
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().select_related('patient', 'service', 'prescribed_by')
         order_by = self.request.GET.get('order_by', 'prescribed_date') # Default sort by prescribed_date
         return queryset.order_by(order_by)
 

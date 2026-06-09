@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from patients.models import Patient
 from django.core.validators import FileExtensionValidator
 from django.core.exceptions import ValidationError
@@ -8,6 +9,39 @@ from django.contrib.contenttypes.models import ContentType
 
 # 10 MB file size limit
 MAX_FILE_SIZE = 10 * 1024 * 1024
+
+
+class Encounter(models.Model):
+    """
+    Represents a single clinical interaction or 'visit' for a patient.
+    Serves as a hub for all activities during that visit.
+    """
+    ENCOUNTER_TYPES = [
+        ('AMBULATORY', 'Outpatient/Ambulatory'),
+        ('EMERGENCY', 'Emergency'),
+        ('INPATIENT', 'Inpatient/Admission'),
+        ('TELEHEALTH', 'Telehealth'),
+        ('VIRTUAL', 'Virtual Visit'),
+    ]
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='encounters')
+    doctor = models.ForeignKey('staff.Staff', on_delete=models.SET_NULL, null=True, blank=True)
+    encounter_type = models.CharField(max_length=20, choices=ENCOUNTER_TYPES)
+    start_time = models.DateTimeField(default=timezone.now)
+    end_time = models.DateTimeField(blank=True, null=True)
+    reason_for_visit = models.TextField()
+    clinical_notes = models.TextField(blank=True)
+    
+    # Allows linking a specific appointment to this encounter
+    appointment = models.OneToOneField('appointments.Appointment', on_delete=models.SET_NULL, null=True, blank=True, related_name='encounter')
+
+    history = HistoricalRecords()
+
+    class Meta:
+        ordering = ['-start_time']
+
+    def __str__(self):
+        return f"{self.get_encounter_type_display()} on {self.start_time.date()} for {self.patient}"
 
 
 class PatientDocument(models.Model):

@@ -52,7 +52,8 @@ class PatientDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
         care_records = list(p.patientcare_set.order_by('monitoring_date')[:20])
         context['care_records'] = care_records
         context['prescriptions'] = p.prescription_set.select_related('prescribed_by').order_by('-prescribed_date')[:10]
-        context['lab_tests'] = p.labtest_set.order_by('-test_date')[:10]
+        context['lab_tests'] = p.labtest_set.order_by('-requested_date')[:10]
+        context['encounters'] = p.encounters.select_related('doctor').order_by('-start_time')[:10]
         context['documents'] = p.documents.all()[:10]
         context['chart_data'] = json.dumps({
             'dates': [r.monitoring_date.strftime('%b %d %H:%M') for r in care_records],

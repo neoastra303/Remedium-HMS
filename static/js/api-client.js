@@ -47,15 +47,36 @@ class APIClient {
                 credentials: 'same-origin'
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            const responseData = await response.json();
+
+            // Handle professional enveloped responses
+            if (responseData.status === 'success') {
+                return { 
+                    success: true, 
+                    data: responseData.data,
+                    code: responseData.code 
+                };
+            } else if (responseData.status === 'error') {
+                return { 
+                    success: false, 
+                    message: responseData.message,
+                    errors: responseData.errors,
+                    code: responseData.code 
+                };
             }
 
-            const data = await response.json();
-            return { success: true, data };
+            // Fallback for non-enveloped or legacy responses
+            if (!response.ok) {
+                throw new Error(responseData.detail || `HTTP error! status: ${response.status}`);
+            }
+
+            return { success: true, data: responseData };
         } catch (error) {
             console.error('API Error:', error);
-            return { success: false, error: error.message };
+            return { 
+                success: false, 
+                message: error.message || 'An unexpected error occurred.' 
+            };
         }
     }
 

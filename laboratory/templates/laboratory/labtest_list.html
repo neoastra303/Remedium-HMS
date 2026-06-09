@@ -21,9 +21,18 @@
                 {% for test in lab_tests %}
                 <tr>
                     <td class="ps-4 fw-medium">{{ test.patient }}</td>
-                    <td>{{ test.test_name }}</td>
+                    <td>
+                        {% if test.service %}{{ test.service.name }}{% else %}{{ test.test_name }}{% endif %}
+                        {% if test.service and test.test_name %}
+                            <div class="text-muted extra-small">({{ test.test_name }})</div>
+                        {% endif %}
+                    </td>
                     <td class="d-mobile-none text-muted small">{{ test.requested_date|date:"M d, Y" }}</td>
-                    <td><span class="badge bg-secondary rounded-pill">{{ test.get_status_display }}</span></td>
+                    <td>
+                        {% if test.status == 'Requested' %}<span class="badge bg-warning text-dark rounded-pill">Requested</span>
+                        {% elif test.status == 'Completed' %}<span class="badge bg-success rounded-pill">Completed</span>
+                        {% else %}<span class="badge bg-secondary rounded-pill">{{ test.get_status_display }}</span>{% endif %}
+                    </td>
                     <td class="pe-4 text-end">
                         <a href="{% url 'labtest_detail' test.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
                         <a href="{% url 'labtest_update' test.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>

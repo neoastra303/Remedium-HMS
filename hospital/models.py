@@ -56,3 +56,33 @@ class Room(models.Model):
 
     def __str__(self):
         return f'{self.ward.name} - Room {self.room_number}'
+
+
+class HospitalService(models.Model):
+    """
+    Centralized catalog of all billable services, tests, and procedures.
+    Allows for flexible pricing and categorization.
+    """
+    SERVICE_CATEGORIES = [
+        ('CONSULTATION', 'Consultation'),
+        ('LABORATORY', 'Laboratory Test'),
+        ('RADIOLOGY', 'Radiology/Imaging'),
+        ('SURGERY', 'Surgical Procedure'),
+        ('ACCOMMODATION', 'Ward/Room Charge'),
+        ('PHARMACY', 'Medication/Pharmacy'),
+        ('OTHER', 'Other Services'),
+    ]
+
+    name = models.CharField(max_length=100, unique=True)
+    category = models.CharField(max_length=20, choices=SERVICE_CATEGORIES)
+    description = models.TextField(blank=True, null=True)
+    base_price = models.DecimalField(max_digits=10, decimal_places=2)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Hospital Service"
+        verbose_name_plural = "Hospital Services"
+        ordering = ['category', 'name']
+
+    def __str__(self):
+        return f"{self.name} ({self.get_category_display()})"

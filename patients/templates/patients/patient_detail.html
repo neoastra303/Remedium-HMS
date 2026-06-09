@@ -154,22 +154,66 @@
         </div>
     </div>
 
+    {# ── Encounters Tab ── #}
+    <div class="tab-pane fade" id="encounters">
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{% url 'medical_records:encounter_create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>Start Visit/Encounter
+            </a>
+        </div>
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light"><tr><th class="ps-4">Date</th><th>Type</th><th>Doctor</th><th>Reason</th><th class="pe-4">Duration</th></tr></thead>
+                    <tbody>
+                        {% for e in encounters %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-medium">{{ e.start_time|date:"M d, Y" }}</div>
+                                <div class="text-muted small">{{ e.start_time|time:"H:i" }}</div>
+                            </td>
+                            <td><span class="badge bg-info-subtle text-info border border-info-subtle">{{ e.get_encounter_type_display }}</span></td>
+                            <td>{{ e.doctor|default:"—" }}</td>
+                            <td class="text-muted small">{{ e.reason_for_visit|truncatechars:100 }}</td>
+                            <td class="pe-4 text-muted">
+                                {% if e.end_time %}
+                                    {{ e.start_time|timesince:e.end_time }}
+                                {% else %}
+                                    <span class="badge bg-success-subtle text-success">Active</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}<tr><td colspan="5" class="text-center py-4 text-muted">No clinical encounters recorded.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     {# ── Prescriptions Tab ── #}
     <div class="tab-pane fade" id="prescriptions">
         <div class="card border-0 shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th class="ps-4">Drug</th><th>Dosage</th><th>Frequency</th><th>Prescribed By</th><th class="pe-4">Date</th></tr></thead>
+                    <thead class="table-light"><tr><th class="ps-4">Medication</th><th>Dosage</th><th>Frequency</th><th>Status</th><th class="pe-4">Date</th></tr></thead>
                     <tbody>
                         {% for rx in prescriptions %}
                         <tr>
-                            <td class="ps-4 fw-medium">{{ rx.drug_name }}</td>
+                            <td class="ps-4 fw-medium">
+                                <div>{{ rx.drug_name|default:rx.service.name }}</div>
+                                {% if rx.service %}<div class="text-muted small">ID: {{ rx.service.name }}</div>{% endif %}
+                            </td>
                             <td>{{ rx.dosage }}</td>
                             <td class="text-muted small">{{ rx.frequency }}</td>
-                            <td>{{ rx.prescribed_by|default:"—" }}</td>
+                            <td>
+                                {% if rx.status == 'Active' %}<span class="badge bg-success rounded-pill">Active</span>
+                                {% elif rx.status == 'Completed' %}<span class="badge bg-secondary rounded-pill">Completed</span>
+                                {% else %}<span class="badge bg-danger rounded-pill">Discontinued</span>{% endif %}
+                            </td>
                             <td class="pe-4 small text-muted">{{ rx.prescribed_date|date:"M d, Y" }}</td>
                         </tr>
-                        {% empty %}<tr><td colspan="5" class="text-center py-4 text-muted">No prescriptions.</td></tr>
+                        {% empty %}<tr><td colspan="5" class="text-center py-4 text-muted">No prescriptions recorded.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -182,16 +226,23 @@
         <div class="card border-0 shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th class="ps-4">Test</th><th>Result</th><th>Status</th><th class="pe-4">Date</th></tr></thead>
+                    <thead class="table-light"><tr><th class="ps-4">Test Name</th><th>Category</th><th>Result</th><th>Status</th><th class="pe-4">Requested</th></tr></thead>
                     <tbody>
                         {% for lt in lab_tests %}
                         <tr>
-                            <td class="ps-4 fw-medium">{{ lt.test_name }}</td>
+                            <td class="ps-4 fw-medium">
+                                {{ lt.test_name|default:lt.service.name }}
+                            </td>
+                            <td class="small text-muted">{{ lt.service.get_category_display|default:"General" }}</td>
                             <td class="text-muted small">{{ lt.result|default:"Pending" }}</td>
-                            <td><span class="badge bg-secondary rounded-pill">{{ lt.get_status_display }}</span></td>
-                            <td class="pe-4 small text-muted">{{ lt.test_date|date:"M d, Y" }}</td>
+                            <td>
+                                {% if lt.status == 'Completed' %}<span class="badge bg-success rounded-pill">Done</span>
+                                {% elif lt.status == 'Cancelled' %}<span class="badge bg-danger rounded-pill">Cancelled</span>
+                                {% else %}<span class="badge bg-info rounded-pill">Requested</span>{% endif %}
+                            </td>
+                            <td class="pe-4 small text-muted">{{ lt.requested_date|date:"M d, Y H:i" }}</td>
                         </tr>
-                        {% empty %}<tr><td colspan="4" class="text-center py-4 text-muted">No lab tests.</td></tr>
+                        {% empty %}<tr><td colspan="5" class="text-center py-4 text-muted">No lab tests requested.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

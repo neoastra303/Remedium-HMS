@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-card-checklist me-2 text-primary"></i>Service Catalog</h4>
+    <div class="dropdown">
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            Filter Category
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-menu" href="?">All Categories</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="?category=CONSULTATION">Consultations</a></li>
+            <li><a class="dropdown-item" href="?category=LABORATORY">Lab Tests</a></li>
+            <li><a class="dropdown-item" href="?category=RADIOLOGY">Radiology</a></li>
+            <li><a class="dropdown-item" href="?category=SURGERY">Surgeries</a></li>
+            <li><a class="dropdown-item" href="?category=ACCOMMODATION">Room Charges</a></li>
+            <li><a class="dropdown-item" href="?category=PHARMACY">Pharmacy</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">Service Name</th>
+                    <th>Category</th>
+                    <th class="text-end pe-4">Base Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in services %}
+                <tr>
+                    <td class="ps-4">
+                        <div class="fw-medium">{{ s.name }}</div>
+                        {% if s.description %}<div class="text-muted small">{{ s.description|truncatechars:60 }}</div>{% endif %}
+                    </td>
+                    <td><span class="badge bg-light text-dark border">{{ s.get_category_display }}</span></td>
+                    <td class="text-end pe-4 fw-bold text-primary">${{ s.base_price }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="text-center py-4 text-muted">No services found in this category.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% include 'partials/pagination.html' %}
+{% endblock %}

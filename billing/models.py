@@ -48,7 +48,7 @@ class Invoice(models.Model):
     invoice_number = models.CharField(max_length=20, unique=True, editable=False, blank=True)
     issue_date = models.DateField(default=timezone.now)
     due_date = models.DateField(default=timezone.now)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     paid = models.BooleanField(default=False, db_index=True)
     insurance_claimed = models.BooleanField(default=False, db_index=True)
     details = models.TextField(blank=True, null=True)
@@ -63,6 +63,12 @@ class Invoice(models.Model):
             self.invoice_number = f'INV-{year}-{seq:05d}'
         return super().save(*args, **kwargs)
 
+    def update_total(self):
+        """Recalculate total amount from items."""
+        total = self.items.aggregate(total=Sum('total_price'))['total'] or 0
+        self.total_amount = total
+        self.save(update_fields=['total_amount'])
+
     def clean(self):
         super().clean()
         if self.total_amount and self.total_amount < 0:
@@ -71,7 +77,28 @@ class Invoice(models.Model):
             raise ValidationError({'due_date': "Due date cannot be before the issue date."})
 
     def __str__(self):
-        return f"Invoice #{self.id} for {self.patient}"
+        return f"Invoice #{self.invoice_number} for {self.patient}"
+
+
+class InvoiceItem(models.Model):
+    """Individual line items on an invoice."""
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='items')
+    service = models.ForeignKey('hospital.HospitalService', on_delete=models.SET_NULL, null=True, blank=True)
+    description = models.CharField(max_length=255, help_text="Specific description for this item")
+    quantity = models.PositiveIntegerField(default=1)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
+
+    def save(self, *args, **kwargs):
+        if not self.description and self.service:
+            self.description = self.service.name
+        self.total_price = self.unit_price * self.quantity
+        super().save(*args, **kwargs)
+        # Update parent invoice total
+        self.invoice.update_total()
+
+    def __str__(self):
+        return f"{self.description} (x{self.quantity}) on {self.invoice.invoice_number}"
 
 
 class Payment(models.Model):
@@ -100,7 +127,7 @@ class Payment(models.Model):
     history = HistoricalRecords()
     
     def __str__(self):
-        return f"{self.amount} for Invoice #{self.invoice.id}"
+        return f"{self.amount} for Invoice #{self.invoice.invoice_number}"
 
 
 @receiver(post_save, sender=Payment)

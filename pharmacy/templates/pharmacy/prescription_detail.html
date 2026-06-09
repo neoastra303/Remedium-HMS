@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold mb-0"><i class="bi bi-capsule me-2 text-primary"></i>{{ prescription.drug_name }}</h4>
+    <h4 class="fw-bold mb-0"><i class="bi bi-capsule me-2 text-primary"></i>
+        {% if prescription.service %}{{ prescription.service.name }}{% else %}{{ prescription.drug_name }}{% endif %}
+    </h4>
     <div class="d-flex gap-2">
         <a href="{% url 'prescription_update' prescription.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
         <a href="{% url 'prescription_delete' prescription.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Delete</a>
@@ -11,7 +13,19 @@
     <div class="card-body px-4">
         <dl class="row mb-0">
             <dt class="col-4 text-muted small">Patient</dt><dd class="col-8"><a href="{% url 'patient_detail' prescription.patient.pk %}">{{ prescription.patient.full_name }}</a></dd>
-            <dt class="col-4 text-muted small">Drug</dt><dd class="col-8 fw-medium">{{ prescription.drug_name }}</dd>
+            <dt class="col-4 text-muted small">Drug</dt>
+            <dd class="col-8 fw-medium">
+                {% if prescription.service %}{{ prescription.service.name }}{% else %}{{ prescription.drug_name }}{% endif %}
+                {% if prescription.service and prescription.drug_name %}
+                    <span class="text-muted small ms-1">({{ prescription.drug_name }})</span>
+                {% endif %}
+            </dd>
+            <dt class="col-4 text-muted small">Status</dt>
+            <dd class="col-8">
+                {% if prescription.status == 'Active' %}<span class="badge bg-success rounded-pill">Active</span>
+                {% elif prescription.status == 'Completed' %}<span class="badge bg-info rounded-pill">Completed</span>
+                {% else %}<span class="badge bg-secondary rounded-pill">{{ prescription.get_status_display }}</span>{% endif %}
+            </dd>
             <dt class="col-4 text-muted small">Dosage</dt><dd class="col-8">{{ prescription.dosage }}</dd>
             <dt class="col-4 text-muted small">Frequency</dt><dd class="col-8">{{ prescription.frequency }}</dd>
             <dt class="col-4 text-muted small">Prescribed By</dt><dd class="col-8">{{ prescription.prescribed_by|default:"—" }}</dd>

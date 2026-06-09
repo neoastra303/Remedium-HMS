@@ -25,6 +25,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- professionalize DB and API layers ([`3da4b8e`])
 - untrack .coverage and .env (now gitignored) ([`cbff4e3`])
 - stage all unstaged working-tree changes from 13-commit backlog ([`14d7246`])
 - add full-stack production showcase document ([`5fe06b9`])

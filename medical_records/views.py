@@ -2,8 +2,35 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from .models import PatientDocument
+from .models import PatientDocument, Encounter
 from patients.models import Patient
+
+
+class EncounterCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+    model = Encounter
+    fields = ['patient', 'doctor', 'encounter_type', 'reason_for_visit', 'clinical_notes', 'appointment']
+    template_name = 'medical_records/encounter_form.html'
+    permission_required = 'medical_records.medical_records_add_encounter'
+    raise_exception = True
+
+    def get_initial(self):
+        initial = super().get_initial()
+        patient_pk = self.request.GET.get('patient')
+        appointment_pk = self.request.GET.get('appointment')
+        if patient_pk:
+            initial['patient'] = get_object_or_404(Patient, pk=patient_pk)
+        if appointment_pk:
+            from appointments.models import Appointment
+            appointment = get_object_or_404(Appointment, pk=appointment_pk)
+            initial['appointment'] = appointment
+            if not patient_pk:
+                initial['patient'] = appointment.patient
+            initial['doctor'] = appointment.doctor
+            initial['reason_for_visit'] = appointment.reason
+        return initial
+
+    def get_success_url(self):
+        return reverse('patient_detail', kwargs={'pk': self.object.patient.pk})
 
 
 class PatientDocumentListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):

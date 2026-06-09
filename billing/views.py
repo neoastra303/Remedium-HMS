@@ -1,16 +1,17 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views import generic
 from .models import Invoice, Payment
-from .forms import InvoiceForm
+from .forms import InvoiceForm, InvoiceItemFormSet
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.db import transaction
 
 
 class InvoiceListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Invoice
     template_name = 'billing/invoice_list.html'
     context_object_name = 'invoices'
-    paginate_by = 10  # Add pagination
+    paginate_by = 10
     permission_required = 'billing.billing_view_invoice'
     raise_exception = True
 
@@ -32,6 +33,26 @@ class InvoiceCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cre
     permission_required = 'billing.billing_add_invoice'
     raise_exception = True
 
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['items'] = InvoiceItemFormSet(self.request.POST)
+        else:
+            data['items'] = InvoiceItemFormSet()
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        items = context['items']
+        with transaction.atomic():
+            self.object = form.save()
+            if items.is_valid():
+                items.instance = self.object
+                items.save()
+            else:
+                return self.form_invalid(form)
+        return super().form_valid(form)
+
 
 class InvoiceUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Invoice
@@ -40,6 +61,26 @@ class InvoiceUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upd
     success_url = reverse_lazy('invoice_list')
     permission_required = 'billing.billing_change_invoice'
     raise_exception = True
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['items'] = InvoiceItemFormSet(self.request.POST, instance=self.object)
+        else:
+            data['items'] = InvoiceItemFormSet(instance=self.object)
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        items = context['items']
+        with transaction.atomic():
+            self.object = form.save()
+            if items.is_valid():
+                items.instance = self.object
+                items.save()
+            else:
+                return self.form_invalid(form)
+        return super().form_valid(form)
 
 
 class InvoiceDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
@@ -58,11 +99,12 @@ class InvoiceDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
     raise_exception = True
 
     def get_queryset(self):
-        return Invoice.objects.select_related('patient').prefetch_related('payments').all()
+        return Invoice.objects.select_related('patient').prefetch_related('payments', 'items__service').all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['payments'] = self.object.payments.all()
+        context['items'] = self.object.items.all()
         return context
 
 
@@ -74,11 +116,12 @@ class InvoicePrintView(LoginRequiredMixin, PermissionRequiredMixin, generic.Deta
     raise_exception = True
 
     def get_queryset(self):
-        return Invoice.objects.select_related('patient').prefetch_related('payments').all()
+        return Invoice.objects.select_related('patient').prefetch_related('payments', 'items__service').all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['payments'] = self.object.payments.all()
+        context['items'] = self.object.items.all()
         return context
 
 
@@ -95,6 +138,3 @@ class PaymentCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cre
 
     def get_success_url(self):
         return reverse('invoice_detail', kwargs={'pk': self.kwargs['invoice_pk']})
-
-
-# Create your views here.

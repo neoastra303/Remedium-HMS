@@ -17,7 +17,7 @@ class LabTestListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListV
     ALLOWED_ORDER_BY = ['requested_date', 'status', '-requested_date', '-status']
 
     def get_queryset(self):
-        queryset = super().get_queryset().select_related('patient')
+        queryset = super().get_queryset().select_related('patient', 'service')
         order_by = self.request.GET.get('order_by', 'requested_date')
         if order_by not in self.ALLOWED_ORDER_BY:
             order_by = 'requested_date'

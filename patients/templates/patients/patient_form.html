@@ -2,23 +2,32 @@
 {% block content %}
 <div class="d-flex align-items-center mb-4">
     <a href="{% url 'patient_list' %}" class="btn btn-sm btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i></a>
-    <h4 class="fw-bold mb-0">{% if object %}Edit — {{ object.full_name }}{% else %}New Patient Admission{% endif %}</h4>
+    <div>
+        <h4 class="fw-bold mb-0">{% if object %}Edit — {{ object.full_name }}{% else %}New Patient Admission{% endif %}</h4>
+        <p class="text-muted small mb-0">{% if object %}Update patient information{% else %}Register a new patient in the system{% endif %}</p>
+    </div>
 </div>
 
-<form method="post" novalidate id="patientForm">
+<form method="post" novalidate id="patientForm" data-spinner="true">
     {% csrf_token %}
-    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <div>{{ form.non_field_errors }}</div>
+    </div>
+    {% endif %}
 
     <div class="row g-4">
 
         <div class="col-12">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-0 py-3 px-4 fw-bold small text-uppercase text-muted">
-                    <i class="bi bi-person-vcard me-2 text-primary"></i>Identity
+                <div class="card-header bg-white border-0 py-3 px-4">
+                    <span class="fw-bold small text-uppercase text-muted">
+                        <i class="bi bi-person-vcard me-2 text-primary"></i>Identity
+                    </span>
                 </div>
                 <div class="card-body px-4 pb-4">
                     <div class="row g-3">
-                        {% for fname in 'unique_id,first_name,last_name,date_of_birth,gender'|split:',' %}{% endfor %}
                         <div class="col-md-3">{% include 'partials/field.html' with field=form.unique_id label="Unique ID" %}</div>
                         <div class="col-md-3">{% include 'partials/field.html' with field=form.first_name label="First Name" %}</div>
                         <div class="col-md-3">{% include 'partials/field.html' with field=form.last_name label="Last Name" %}</div>
@@ -31,8 +40,10 @@
 
         <div class="col-12">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-0 py-3 px-4 fw-bold small text-uppercase text-muted">
-                    <i class="bi bi-telephone me-2 text-info"></i>Contact
+                <div class="card-header bg-white border-0 py-3 px-4">
+                    <span class="fw-bold small text-uppercase text-muted">
+                        <i class="bi bi-telephone me-2 text-info"></i>Contact
+                    </span>
                 </div>
                 <div class="card-body px-4 pb-4">
                     <div class="row g-3">
@@ -47,8 +58,10 @@
 
         <div class="col-md-6">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white border-0 py-3 px-4 fw-bold small text-uppercase text-muted">
-                    <i class="bi bi-hospital me-2 text-success"></i>Admission
+                <div class="card-header bg-white border-0 py-3 px-4">
+                    <span class="fw-bold small text-uppercase text-muted">
+                        <i class="bi bi-hospital me-2 text-success"></i>Admission
+                    </span>
                 </div>
                 <div class="card-body px-4 pb-4">
                     <div class="row g-3">
@@ -63,8 +76,10 @@
 
         <div class="col-md-6">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white border-0 py-3 px-4 fw-bold small text-uppercase text-muted">
-                    <i class="bi bi-person-exclamation me-2 text-warning"></i>Emergency Contact & History
+                <div class="card-header bg-white border-0 py-3 px-4">
+                    <span class="fw-bold small text-uppercase text-muted">
+                        <i class="bi bi-person-exclamation me-2 text-warning"></i>Emergency &amp; History
+                    </span>
                 </div>
                 <div class="card-body px-4 pb-4">
                     <div class="row g-3">
@@ -80,8 +95,8 @@
 
     <div class="mt-4 d-flex gap-2">
         <button type="submit" class="btn btn-primary" id="submitBtn">
-            <span id="submitText"><i class="bi bi-check-circle me-1"></i>Save Patient</span>
-            <span id="submitSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving…</span>
+            <span data-submit-text><i class="bi bi-check-circle me-1"></i>{% if object %}Update Patient{% else %}Save Patient{% endif %}</span>
+            <span data-submit-spinner class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving…</span>
         </button>
         <a href="{% url 'patient_list' %}" class="btn btn-outline-secondary">Cancel</a>
     </div>

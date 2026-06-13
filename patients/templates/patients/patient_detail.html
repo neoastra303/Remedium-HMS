@@ -1,20 +1,25 @@
 {% extends 'base.html' %}
 {% block content %}
 
+{# ── Breadcrumb ── #}
+{% include 'partials/breadcrumb.html' with breadcrumbs=breadcrumbs %}
+
 {# ── Header ── #}
-<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
     <div class="d-flex align-items-center gap-3">
         <div class="avatar-circle" style="width:56px;height:56px;font-size:1.2rem;">
             {{ patient.first_name|first }}{{ patient.last_name|first }}
         </div>
         <div>
             <h4 class="fw-bold mb-0">{{ patient.full_name }}</h4>
-            <span class="text-muted small">{{ patient.unique_id }}</span>
-            {% if patient.is_admitted %}
-                <span class="badge bg-primary rounded-pill ms-2">Admitted</span>
-            {% else %}
-                <span class="badge bg-light text-muted rounded-pill ms-2 border">Discharged</span>
-            {% endif %}
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="text-muted small">{{ patient.unique_id }}</span>
+                {% if patient.is_admitted %}
+                    <span class="badge bg-medical-blue rounded-pill"><i class="bi bi-check-circle me-1"></i>Admitted</span>
+                {% else %}
+                    <span class="badge bg-light text-muted rounded-pill border">Discharged</span>
+                {% endif %}
+            </div>
         </div>
     </div>
     <div class="d-flex gap-2 flex-wrap">
@@ -27,22 +32,25 @@
         <a href="{% url 'patient_history' patient.pk %}" class="btn btn-sm btn-outline-secondary">
             <i class="bi bi-clock-history me-1"></i>History
         </a>
-        <a href="{% url 'invoice_create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-outline-success">
+        <a href="{% url 'invoice_create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-outline-info">
             <i class="bi bi-currency-dollar me-1"></i>Quick Pay
         </a>
-        <a href="{% url 'patient_delete' patient.pk %}" class="btn btn-sm btn-outline-danger">
+        <button type="button" class="btn btn-sm btn-outline-danger"
+            data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+            data-action-url="{% url 'patient_delete' patient.pk %}"
+            data-item-name="{{ patient.full_name }}">
             <i class="bi bi-trash me-1"></i>Delete
-        </a>
+        </button>
     </div>
 </div>
 
 {# ── Tabs ── #}
 <ul class="nav nav-tabs mb-4" id="patientTabs" role="tablist">
     <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#info"><i class="bi bi-person me-1"></i>Info</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#appointments"><i class="bi bi-calendar-event me-1"></i>Appointments <span class="badge bg-secondary ms-1">{{ appointments|length }}</span></a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#vitals"><i class="bi bi-heart-pulse me-1"></i>Vitals <span class="badge bg-secondary ms-1">{{ care_records|length }}</span></a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#prescriptions"><i class="bi bi-capsule me-1"></i>Prescriptions <span class="badge bg-secondary ms-1">{{ prescriptions|length }}</span></a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#labs"><i class="bi bi-microscope me-1"></i>Lab Tests <span class="badge bg-secondary ms-1">{{ lab_tests|length }}</span></a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#appointments"><i class="bi bi-calendar-event me-1"></i>Appointments {% if appointments %}<span class="badge bg-secondary ms-1">{{ appointments|length }}</span>{% endif %}</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#vitals"><i class="bi bi-heart-pulse me-1"></i>Vitals {% if care_records %}<span class="badge bg-secondary ms-1">{{ care_records|length }}</span>{% endif %}</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#prescriptions"><i class="bi bi-capsule me-1"></i>Prescriptions {% if prescriptions %}<span class="badge bg-secondary ms-1">{{ prescriptions|length }}</span>{% endif %}</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#labs"><i class="bi bi-microscope me-1"></i>Lab Tests {% if lab_tests %}<span class="badge bg-secondary ms-1">{{ lab_tests|length }}</span>{% endif %}</a></li>
     <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#documents"><i class="bi bi-folder2-open me-1"></i>Documents</a></li>
 </ul>
 
@@ -53,30 +61,46 @@
         <div class="row g-4">
             <div class="col-md-6">
                 <div class="card border-0 shadow-sm h-100">
-                    <div class="card-header bg-white border-0 fw-bold py-3 px-4"><i class="bi bi-person-vcard me-2 text-primary"></i>Demographics</div>
+                    <div class="card-header bg-white border-0 fw-bold py-3 px-4">
+                        <i class="bi bi-person-vcard me-2 text-primary"></i>Demographics
+                    </div>
                     <div class="card-body px-4">
-                        <dl class="row mb-0">
-                            <dt class="col-5 text-muted small">Date of Birth</dt><dd class="col-7">{{ patient.date_of_birth|date:"M d, Y" }} <span class="text-muted small">(Age {{ patient.age }})</span></dd>
-                            <dt class="col-5 text-muted small">Gender</dt><dd class="col-7">{{ patient.get_gender_display }}</dd>
-                            <dt class="col-5 text-muted small">Phone</dt><dd class="col-7">{{ patient.phone|default:"—" }}</dd>
-                            <dt class="col-5 text-muted small">Email</dt><dd class="col-7">{{ patient.email|default:"—" }}</dd>
-                            <dt class="col-5 text-muted small">Address</dt><dd class="col-7">{{ patient.address|default:"—" }}</dd>
-                            <dt class="col-5 text-muted small">Insurance</dt><dd class="col-7">{{ patient.insurance_provider|default:"—" }}</dd>
+                        <dl class="row mb-0 g-2">
+                            <dt class="col-5 text-muted small fw-medium">Date of Birth</dt>
+                            <dd class="col-7">{{ patient.date_of_birth|date:"M d, Y" }} <span class="text-muted small">(Age {{ patient.age }})</span></dd>
+                            <dt class="col-5 text-muted small fw-medium">Gender</dt>
+                            <dd class="col-7"><span class="badge bg-light text-body border">{{ patient.get_gender_display }}</span></dd>
+                            <dt class="col-5 text-muted small fw-medium">Phone</dt>
+                            <dd class="col-7">{{ patient.phone|default:"—" }}</dd>
+                            <dt class="col-5 text-muted small fw-medium">Email</dt>
+                            <dd class="col-7">{{ patient.email|default:"—" }}</dd>
+                            <dt class="col-5 text-muted small fw-medium">Address</dt>
+                            <dd class="col-7">{{ patient.address|default:"—" }}</dd>
+                            <dt class="col-5 text-muted small fw-medium">Insurance</dt>
+                            <dd class="col-7">{{ patient.insurance_provider|default:"—" }}</dd>
                         </dl>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="card border-0 shadow-sm h-100">
-                    <div class="card-header bg-white border-0 fw-bold py-3 px-4"><i class="bi bi-hospital me-2 text-info"></i>Admission</div>
+                    <div class="card-header bg-white border-0 fw-bold py-3 px-4">
+                        <i class="bi bi-hospital me-2 text-info"></i>Admission
+                    </div>
                     <div class="card-body px-4">
-                        <dl class="row mb-0">
-                            <dt class="col-5 text-muted small">Admitted</dt><dd class="col-7">{{ patient.admission_date|date:"M d, Y H:i"|default:"—" }}</dd>
-                            <dt class="col-5 text-muted small">Discharged</dt><dd class="col-7">{{ patient.discharge_date|date:"M d, Y H:i"|default:"—" }}</dd>
-                            <dt class="col-5 text-muted small">Ward</dt><dd class="col-7">{{ patient.ward|default:"—" }}</dd>
-                            <dt class="col-5 text-muted small">Room</dt><dd class="col-7">{{ patient.room|default:"—" }}</dd>
-                            <dt class="col-5 text-muted small">Emergency Contact</dt><dd class="col-7">{{ patient.emergency_contact_name|default:"—" }}</dd>
-                            <dt class="col-5 text-muted small">Emergency Phone</dt><dd class="col-7">{{ patient.emergency_contact_phone|default:"—" }}</dd>
+                        <dl class="row mb-0 g-2">
+                            <dt class="col-5 text-muted small fw-medium">Admitted</dt>
+                            <dd class="col-7">{{ patient.admission_date|date:"M d, Y H:i"|default:"—" }}</dd>
+                            <dt class="col-5 text-muted small fw-medium">Discharged</dt>
+                            <dd class="col-7">{{ patient.discharge_date|date:"M d, Y H:i"|default:"—" }}</dd>
+                            <dt class="col-5 text-muted small fw-medium">Ward</dt>
+                            <dd class="col-7">{{ patient.ward|default:"—" }}</dd>
+                            <dt class="col-5 text-muted small fw-medium">Room</dt>
+                            <dd class="col-7">{{ patient.room|default:"—" }}</dd>
+                            <dt class="col-5 text-muted small fw-medium">Emergency Contact</dt>
+                            <dd class="col-7">{{ patient.emergency_contact_name|default:"—" }}</dd>
+                            <dt class="col-5 text-muted small fw-medium">Emergency Phone</dt>
+                            <dd class="col-7">{{ patient.emergency_contact_phone|default:"—" }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -84,8 +108,12 @@
             {% if patient.medical_history %}
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white border-0 fw-bold py-3 px-4"><i class="bi bi-journal-medical me-2 text-warning"></i>Medical History</div>
-                    <div class="card-body px-4">{{ patient.medical_history|linebreaksbr }}</div>
+                    <div class="card-header bg-white border-0 fw-bold py-3 px-4">
+                        <i class="bi bi-journal-medical me-2 text-warning"></i>Medical History
+                    </div>
+                    <div class="card-body px-4">
+                        <p class="mb-0 small lh-sm">{{ patient.medical_history|linebreaksbr }}</p>
+                    </div>
                 </div>
             </div>
             {% endif %}
@@ -94,23 +122,45 @@
 
     {# ── Appointments Tab ── #}
     <div class="tab-pane fade" id="appointments">
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{% url 'appointment_create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>New Appointment
+            </a>
+        </div>
         <div class="card border-0 shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th class="ps-4">Date</th><th>Doctor</th><th>Reason</th><th class="pe-4">Status</th></tr></thead>
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4 py-3">Date &amp; Time</th>
+                            <th class="py-3">Doctor</th>
+                            <th class="py-3">Reason</th>
+                            <th class="pe-4 py-3">Status</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         {% for a in appointments %}
                         <tr>
-                            <td class="ps-4">{{ a.appointment_date|date:"M d, Y H:i" }}</td>
-                            <td>{{ a.doctor }}</td>
+                            <td class="ps-4">
+                                <div class="fw-medium small">{{ a.appointment_date|date:"M d, Y" }}</div>
+                                <div class="text-muted" style="font-size:0.75rem;">{{ a.appointment_date|date:"H:i" }}</div>
+                            </td>
+                            <td class="small">{{ a.doctor }}</td>
                             <td class="text-muted small">{{ a.reason|default:"—"|truncatechars:60 }}</td>
                             <td class="pe-4">
-                                {% if a.status == 'Scheduled' %}<span class="badge bg-primary rounded-pill">{{ a.get_status_display }}</span>
-                                {% elif a.status == 'Completed' %}<span class="badge bg-success rounded-pill">{{ a.get_status_display }}</span>
-                                {% else %}<span class="badge bg-secondary rounded-pill">{{ a.get_status_display }}</span>{% endif %}
+                                {% if a.status == 'Scheduled' %}
+                                    <span class="badge bg-primary rounded-pill">{{ a.get_status_display }}</span>
+                                {% elif a.status == 'Completed' %}
+                                    <span class="badge bg-success rounded-pill">{{ a.get_status_display }}</span>
+                                {% elif a.status == 'Cancelled' %}
+                                    <span class="badge bg-danger rounded-pill">{{ a.get_status_display }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary rounded-pill">{{ a.get_status_display }}</span>
+                                {% endif %}
                             </td>
                         </tr>
-                        {% empty %}<tr><td colspan="4" class="text-center py-4 text-muted">No appointments.</td></tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center py-4 text-muted small">No appointments recorded.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -133,15 +183,29 @@
         <div class="card border-0 shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th class="ps-4">Date</th><th>Status</th><th>Temp °C</th><th>HR</th><th>BP</th><th>SpO₂</th><th class="pe-4">BMI</th></tr></thead>
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4 py-3">Date</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3">Temp °C</th>
+                            <th class="py-3">HR</th>
+                            <th class="py-3">BP</th>
+                            <th class="py-3">SpO₂</th>
+                            <th class="pe-4 py-3">BMI</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         {% for c in care_records %}
                         <tr>
                             <td class="ps-4 small">{{ c.monitoring_date|date:"M d, H:i" }}</td>
                             <td>
-                                {% if c.status == 'CRITICAL' %}<span class="badge bg-danger">{{ c.get_status_display }}</span>
-                                {% elif c.status == 'STABLE' %}<span class="badge bg-success">{{ c.get_status_display }}</span>
-                                {% else %}<span class="badge bg-secondary">{{ c.get_status_display }}</span>{% endif %}
+                                {% if c.status == 'CRITICAL' %}
+                                    <span class="badge bg-danger rounded-pill">{{ c.get_status_display }}</span>
+                                {% elif c.status == 'STABLE' %}
+                                    <span class="badge bg-success rounded-pill">{{ c.get_status_display }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary rounded-pill">{{ c.get_status_display }}</span>
+                                {% endif %}
                             </td>
                             <td>{{ c.temperature|default:"—" }}</td>
                             <td>{{ c.heart_rate|default:"—" }}</td>
@@ -149,7 +213,8 @@
                             <td>{{ c.oxygen_saturation|default:"—" }}</td>
                             <td class="pe-4">{{ c.bmi|default:"—" }}</td>
                         </tr>
-                        {% empty %}<tr><td colspan="7" class="text-center py-4 text-muted">No vitals recorded.</td></tr>
+                        {% empty %}
+                        <tr><td colspan="7" class="text-center py-4 text-muted small">No vitals recorded.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -167,18 +232,26 @@
         <div class="card border-0 shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th class="ps-4">Date</th><th>Type</th><th>Doctor</th><th>Reason</th><th class="pe-4">Duration</th></tr></thead>
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4 py-3">Date</th>
+                            <th class="py-3">Type</th>
+                            <th class="py-3">Doctor</th>
+                            <th class="py-3">Reason</th>
+                            <th class="pe-4 py-3">Duration</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         {% for e in encounters %}
                         <tr>
                             <td class="ps-4">
-                                <div class="fw-medium">{{ e.start_time|date:"M d, Y" }}</div>
-                                <div class="text-muted small">{{ e.start_time|time:"H:i" }}</div>
+                                <div class="fw-medium small">{{ e.start_time|date:"M d, Y" }}</div>
+                                <div class="text-muted" style="font-size:0.75rem;">{{ e.start_time|time:"H:i" }}</div>
                             </td>
                             <td><span class="badge bg-info-subtle text-info border border-info-subtle">{{ e.get_encounter_type_display }}</span></td>
-                            <td>{{ e.doctor|default:"—" }}</td>
+                            <td class="small">{{ e.doctor|default:"—" }}</td>
                             <td class="text-muted small">{{ e.reason_for_visit|truncatechars:100 }}</td>
-                            <td class="pe-4 text-muted">
+                            <td class="pe-4 text-muted small">
                                 {% if e.end_time %}
                                     {{ e.start_time|timesince:e.end_time }}
                                 {% else %}
@@ -186,7 +259,8 @@
                                 {% endif %}
                             </td>
                         </tr>
-                        {% empty %}<tr><td colspan="5" class="text-center py-4 text-muted">No clinical encounters recorded.</td></tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center py-4 text-muted small">No clinical encounters recorded.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -199,24 +273,37 @@
         <div class="card border-0 shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th class="ps-4">Medication</th><th>Dosage</th><th>Frequency</th><th>Status</th><th class="pe-4">Date</th></tr></thead>
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4 py-3">Medication</th>
+                            <th class="py-3">Dosage</th>
+                            <th class="py-3">Frequency</th>
+                            <th class="py-3">Status</th>
+                            <th class="pe-4 py-3">Date</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         {% for rx in prescriptions %}
                         <tr>
-                            <td class="ps-4 fw-medium">
+                            <td class="ps-4 fw-medium small">
                                 <div>{{ rx.drug_name|default:rx.service.name }}</div>
-                                {% if rx.service %}<div class="text-muted small">ID: {{ rx.service.name }}</div>{% endif %}
+                                {% if rx.service %}<div class="text-muted" style="font-size:0.7rem;">ID: {{ rx.service.name }}</div>{% endif %}
                             </td>
-                            <td>{{ rx.dosage }}</td>
+                            <td class="small">{{ rx.dosage }}</td>
                             <td class="text-muted small">{{ rx.frequency }}</td>
                             <td>
-                                {% if rx.status == 'Active' %}<span class="badge bg-success rounded-pill">Active</span>
-                                {% elif rx.status == 'Completed' %}<span class="badge bg-secondary rounded-pill">Completed</span>
-                                {% else %}<span class="badge bg-danger rounded-pill">Discontinued</span>{% endif %}
+                                {% if rx.status == 'Active' %}
+                                    <span class="badge bg-success rounded-pill">Active</span>
+                                {% elif rx.status == 'Completed' %}
+                                    <span class="badge bg-secondary rounded-pill">Completed</span>
+                                {% else %}
+                                    <span class="badge bg-danger rounded-pill">Discontinued</span>
+                                {% endif %}
                             </td>
                             <td class="pe-4 small text-muted">{{ rx.prescribed_date|date:"M d, Y" }}</td>
                         </tr>
-                        {% empty %}<tr><td colspan="5" class="text-center py-4 text-muted">No prescriptions recorded.</td></tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center py-4 text-muted small">No prescriptions recorded.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -229,23 +316,36 @@
         <div class="card border-0 shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th class="ps-4">Test Name</th><th>Category</th><th>Result</th><th>Status</th><th class="pe-4">Requested</th></tr></thead>
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4 py-3">Test Name</th>
+                            <th class="py-3">Category</th>
+                            <th class="py-3">Result</th>
+                            <th class="py-3">Status</th>
+                            <th class="pe-4 py-3">Requested</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         {% for lt in lab_tests %}
                         <tr>
-                            <td class="ps-4 fw-medium">
+                            <td class="ps-4 fw-medium small">
                                 {{ lt.test_name|default:lt.service.name }}
                             </td>
                             <td class="small text-muted">{{ lt.service.get_category_display|default:"General" }}</td>
                             <td class="text-muted small">{{ lt.result|default:"Pending" }}</td>
                             <td>
-                                {% if lt.status == 'Completed' %}<span class="badge bg-success rounded-pill">Done</span>
-                                {% elif lt.status == 'Cancelled' %}<span class="badge bg-danger rounded-pill">Cancelled</span>
-                                {% else %}<span class="badge bg-info rounded-pill">Requested</span>{% endif %}
+                                {% if lt.status == 'Completed' %}
+                                    <span class="badge bg-success rounded-pill">Done</span>
+                                {% elif lt.status == 'Cancelled' %}
+                                    <span class="badge bg-danger rounded-pill">Cancelled</span>
+                                {% else %}
+                                    <span class="badge bg-info rounded-pill">Requested</span>
+                                {% endif %}
                             </td>
                             <td class="pe-4 small text-muted">{{ lt.requested_date|date:"M d, Y H:i" }}</td>
                         </tr>
-                        {% empty %}<tr><td colspan="5" class="text-center py-4 text-muted">No lab tests requested.</td></tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center py-4 text-muted small">No lab tests requested.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -258,12 +358,23 @@
         <div class="card border-0 shadow-sm">
             <div class="card-body">
                 {% for doc in documents %}
-                <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
-                    <div><i class="bi bi-file-earmark me-2 text-primary"></i>{{ doc.title }}</div>
-                    <a href="{{ doc.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">Download</a>
+                <div class="d-flex align-items-center justify-content-between py-3 border-bottom">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-file-earmark-text text-primary fs-5"></i>
+                        <div>
+                            <div class="fw-medium small">{{ doc.title }}</div>
+                            <div class="text-muted" style="font-size:0.7rem;">{{ doc.uploaded_at|date:"M d, Y" }}</div>
+                        </div>
+                    </div>
+                    <a href="{{ doc.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                        <i class="bi bi-download me-1"></i>Download
+                    </a>
                 </div>
                 {% empty %}
-                <p class="text-muted text-center py-4">No documents uploaded.</p>
+                <div class="text-center py-5">
+                    <i class="bi bi-folder2-open d-block text-muted opacity-25" style="font-size:2.5rem;margin-bottom:0.75rem;"></i>
+                    <p class="text-muted small mb-0">No documents uploaded.</p>
+                </div>
                 {% endfor %}
                 <div class="mt-3">
                     <a href="{% url 'patient_document_list' patient.pk %}" class="btn btn-sm btn-outline-secondary">
@@ -276,7 +387,7 @@
 
 </div>
 
-<div class="mt-3">
+<div class="mt-4">
     <a href="{% url 'patient_list' %}" class="btn btn-sm btn-outline-secondary">
         <i class="bi bi-arrow-left me-1"></i>Back to Patients
     </a>
@@ -287,20 +398,30 @@
 <script>
 (function() {
     const data = {{ chart_data|safe }};
-    if (!data.dates.length) return;
+    if (!data.dates || !data.dates.length) return;
     new Chart(document.getElementById('vitalsChart'), {
         type: 'line',
         data: {
             labels: data.dates,
             datasets: [
-                { label: 'Heart Rate (bpm)', data: data.heart_rates, borderColor: '#dc3545', tension: 0.3, spanGaps: true },
-                { label: 'Temperature (°C)', data: data.temperatures, borderColor: '#fd7e14', tension: 0.3, spanGaps: true },
-                { label: 'Systolic BP', data: data.systolic, borderColor: '#0d6efd', tension: 0.3, spanGaps: true },
-                { label: 'Diastolic BP', data: data.diastolic, borderColor: '#6f42c1', tension: 0.3, spanGaps: true },
-                { label: 'SpO₂ (%)', data: data.oxygen, borderColor: '#20c997', tension: 0.3, spanGaps: true },
+                { label: 'Heart Rate (bpm)', data: data.heart_rates, borderColor: '#dc3545', backgroundColor: 'rgba(220,53,69,0.1)', tension: 0.3, spanGaps: true, fill: true },
+                { label: 'Temperature (°C)', data: data.temperatures, borderColor: '#fd7e14', backgroundColor: 'rgba(253,126,20,0.1)', tension: 0.3, spanGaps: true, fill: true },
+                { label: 'Systolic BP', data: data.systolic, borderColor: '#0d6efd', backgroundColor: 'rgba(13,110,253,0.1)', tension: 0.3, spanGaps: true, fill: true },
+                { label: 'Diastolic BP', data: data.diastolic, borderColor: '#6f42c1', backgroundColor: 'rgba(111,66,193,0.1)', tension: 0.3, spanGaps: true, fill: true },
+                { label: 'SpO₂ (%)', data: data.oxygen, borderColor: '#20c997', backgroundColor: 'rgba(32,201,151,0.1)', tension: 0.3, spanGaps: true, fill: true },
             ]
         },
-        options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: false } } }
+        options: {
+            responsive: true,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16, font: { size: 11 } } }
+            },
+            scales: {
+                y: { beginAtZero: false, grid: { color: 'rgba(0,0,0,0.04)' } },
+                x: { grid: { display: false } }
+            }
+        }
     });
 })();
 </script>

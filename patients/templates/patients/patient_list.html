@@ -1,61 +1,81 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 class="mb-4">Patients</h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h4 class="fw-bold mb-1"><i class="bi bi-people text-primary me-2"></i>Patients</h4>
+        <p class="text-muted small mb-0">Manage patient records and admissions</p>
+    </div>
+    <a href="{% url 'patient_create' %}" class="btn btn-primary shadow-sm">
+        <i class="bi bi-person-plus me-1"></i> New Admission
+    </a>
+</div>
 
-<div class="row mb-4">
+<div class="row g-3 mb-4">
     <div class="col-md-8">
-        <form method="get" class="d-flex">
-            <input class="form-control me-2 shadow-sm border-0" type="search" placeholder="Search Patient ID, Name..." aria-label="Search" name="q" value="{{ request.GET.q|default_if_none:'' }}">
+        <form method="get" class="d-flex gap-2">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input class="form-control border-start-0 ps-0" type="search" placeholder="Search by Patient ID, Name, or Phone..." aria-label="Search" name="q" value="{{ request.GET.q|default_if_none:'' }}">
+            </div>
             <button class="btn btn-primary" type="submit"><i class="bi bi-search me-1"></i> Search</button>
             {% if request.GET.q %}
-                <a href="{% url 'patient_list' %}" class="btn btn-outline-secondary ms-2">Clear</a>
+                <a href="{% url 'patient_list' %}" class="btn btn-outline-secondary">Clear</a>
             {% endif %}
         </form>
-    </div>
-    <div class="col-md-4 text-end">
-        <a href="{% url 'patient_create' %}" class="btn btn-primary shadow-sm"><i class="bi bi-person-plus me-1"></i> New Admission</a>
     </div>
 </div>
 
 {% if patients %}
-<div class="card glass-effect border-0 overflow-hidden shadow-sm">
+<div class="card border-0 shadow-sm">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
             <thead>
-                <tr class="bg-light">
-                    <th class="ps-4 py-3">Patient Profile</th>
+                <tr>
+                    <th class="ps-4 py-3">Patient</th>
                     <th class="py-3">Unique ID</th>
-                    <th class="py-3 d-mobile-none">Date of Birth</th>
+                    <th class="py-3 d-none d-md-table-cell">Date of Birth</th>
                     <th class="py-3">Status</th>
-                    <th class="pe-4 py-3 text-end">Operations</th>
+                    <th class="pe-4 py-3 text-end">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for patient in patients %}
                 <tr>
                     <td class="ps-4">
-                        <div class="d-flex align-items-center">
-                            <div class="avatar-circle me-3">{{ patient.first_name|first }}{{ patient.last_name|first }}</div>
-                            <div>
-                                <div class="fw-bold">{{ patient.full_name }}</div>
-                                <div class="small text-muted">{{ patient.email|default:"No email" }}</div>
+                        <a href="{% url 'patient_detail' patient.pk %}" class="text-decoration-none">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle me-3">{{ patient.first_name|first }}{{ patient.last_name|first }}</div>
+                                <div>
+                                    <div class="fw-semibold text-body">{{ patient.full_name }}</div>
+                                    <div class="small text-muted">{{ patient.email|default:"No email" }}</div>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                     </td>
-                    <td class="fw-medium text-primary">{{ patient.unique_id }}</td>
-                    <td class="d-mobile-none">{{ patient.date_of_birth|date:"M d, Y" }}</td>
+                    <td class="fw-medium"><span class="badge bg-light text-primary border border-primary-subtle">{{ patient.unique_id }}</span></td>
+                    <td class="d-none d-md-table-cell text-muted small">{{ patient.date_of_birth|date:"M d, Y" }}</td>
                     <td>
                         {% if patient.is_admitted %}
-                            <span class="badge bg-medical-blue rounded-pill">Admitted</span>
+                            <span class="badge bg-medical-blue rounded-pill"><i class="bi bi-check-circle me-1"></i>Admitted</span>
                         {% else %}
-                            <span class="badge bg-light text-muted rounded-pill">Discharged</span>
+                            <span class="badge bg-light text-muted rounded-pill border">Discharged</span>
                         {% endif %}
                     </td>
                     <td class="pe-4 text-end">
                         <div class="btn-group">
-                            <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
-                            <a href="{% url 'patient_update' patient.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-sm btn-outline-primary" title="View">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{% url 'patient_update' patient.pk %}" class="btn btn-sm btn-outline-warning" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-danger" title="Delete"
+                                data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                                data-action-url="{% url 'patient_delete' patient.pk %}"
+                                data-item-name="{{ patient.full_name }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -68,8 +88,17 @@
 {% include 'partials/pagination.html' %}
 
 {% else %}
-<div class="alert alert-info" role="alert">
-    No patients found.
+<div class="card border-0 shadow-sm">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-people d-block text-muted opacity-25" style="font-size:3rem;margin-bottom:0.75rem;"></i>
+        <h5 class="text-muted">No patients found</h5>
+        <p class="text-muted small mb-3">{% if request.GET.q %}No results match your search. Try different keywords.{% else %}Get started by registering your first patient.{% endif %}</p>
+        {% if not request.GET.q %}
+        <a href="{% url 'patient_create' %}" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i> New Admission</a>
+        {% else %}
+        <a href="{% url 'patient_list' %}" class="btn btn-outline-secondary"><i class="bi bi-x-circle me-1"></i> Clear Search</a>
+        {% endif %}
+    </div>
 </div>
 {% endif %}
 {% endblock %}

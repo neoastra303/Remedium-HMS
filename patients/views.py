@@ -59,6 +59,10 @@ class PatientDetailView(
 
         context = super().get_context_data(**kwargs)
         p = self.object
+        context["breadcrumbs"] = [
+            {"label": "Patients", "url": "/patients/"},
+            {"label": p.full_name},
+        ]
         context["appointments"] = p.appointment_set.select_related("doctor").order_by(
             "-appointment_date"
         )[:10]

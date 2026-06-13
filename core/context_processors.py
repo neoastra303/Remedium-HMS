@@ -12,20 +12,39 @@ def user_roles(request):
     is_pharmacist = request.user.groups.filter(name="Pharmacist").exists()
     is_lab_tech = request.user.groups.filter(name="Lab Technician").exists()
 
+    is_surgeon = request.user.groups.filter(name="Surgeon").exists()
+    is_anesthesiologist = request.user.groups.filter(name="Anesthesiologist").exists()
+    is_radiologist = request.user.groups.filter(name="Radiologist").exists()
+    is_technician = request.user.groups.filter(name="Technician").exists()
+    is_security = request.user.groups.filter(name="Security").exists()
+    is_maintenance = request.user.groups.filter(name="Maintenance").exists()
+
     staff_profile = getattr(request.user, "staff_profile", None)
     if staff_profile:
         if staff_profile.role == "DOCTOR":
             is_doctor = True
-        if staff_profile.role == "NURSE":
+        elif staff_profile.role == "NURSE":
             is_nurse = True
-        if staff_profile.role == "ADMIN":
+        elif staff_profile.role == "ADMIN":
             is_admin = True
-        if staff_profile.role == "RECEPTIONIST":
+        elif staff_profile.role == "RECEPTIONIST":
             is_receptionist = True
-        if staff_profile.role == "PHARMACIST":
+        elif staff_profile.role == "PHARMACIST":
             is_pharmacist = True
-        if staff_profile.role == "LAB_TECH":
+        elif staff_profile.role == "LAB_TECH":
             is_lab_tech = True
+        elif staff_profile.role == "SURGEON":
+            is_surgeon = True
+        elif staff_profile.role == "ANESTHESIOLOGIST":
+            is_anesthesiologist = True
+        elif staff_profile.role == "RADIOLOGIST":
+            is_radiologist = True
+        elif staff_profile.role == "TECH":
+            is_technician = True
+        elif staff_profile.role == "SECURITY":
+            is_security = True
+        elif staff_profile.role == "MAINTENANCE":
+            is_maintenance = True
 
     from notifications.models import Notification
 
@@ -38,5 +57,11 @@ def user_roles(request):
         "is_hms_receptionist": is_receptionist,
         "is_hms_pharmacist": is_pharmacist,
         "is_hms_lab_tech": is_lab_tech,
+        "is_hms_surgeon": is_surgeon,
+        "is_hms_anesthesiologist": is_anesthesiologist,
+        "is_hms_radiologist": is_radiologist,
+        "is_hms_technician": is_technician,
+        "is_hms_security": is_security,
+        "is_hms_maintenance": is_maintenance,
         "unread_notifications": unread_notifications,
     }

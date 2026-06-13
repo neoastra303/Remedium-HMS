@@ -28,6 +28,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- enhance list templates (appointments, staff, invoices) and partials (pagination, field, empty-state) ([`b0dbc30`])
 - enhance patient templates and views with breadcrumbs, modal deletes, improved UX ([`5c92e73`])
 - add scroll-to-top, loading overlay, breadcrumb support, polished login page ([`d3f0847`])
 - improve toast stacking, page transitions, loading overlay, form helpers ([`23e71bb`])

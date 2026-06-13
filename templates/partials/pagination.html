@@ -1,40 +1,40 @@
 {% if is_paginated and page_obj.paginator.num_pages > 1 %}
 <nav class="mt-4" aria-label="Pagination">
-    <ul class="pagination justify-content-center">
+    <ul class="pagination justify-content-center align-items-center gap-1">
         {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for k,v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v|urlencode }}{% endif %}{% endfor %}">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for k,v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v|urlencode }}{% endif %}{% endfor %}" aria-label="Previous">
                     <i class="bi bi-chevron-left"></i>
                 </a>
             </li>
         {% else %}
-            <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-left"></i></span></li>
+            <li class="page-item disabled"><span class="page-link" aria-label="Previous"><i class="bi bi-chevron-left"></i></span></li>
         {% endif %}
 
         {% for i in page_obj.paginator.page_range %}
             {% if i == 1 or i == page_obj.paginator.num_pages or i >= page_obj.number|add:"-2" and i <= page_obj.number|add:"2" %}
-                {% if forloop.counter > 1 %}
-                    {% with prev=page_obj.paginator.page_range|slice:forloop.counter0 %}
-                        {% if prev and prev.0 != i|add:"-1" %}
-                            <li class="page-item disabled"><span class="page-link">…</span></li>
-                        {% endif %}
-                    {% endwith %}
+                {% if page_obj.paginator.num_pages > 6 and i > 1 and i == page_obj.number|add:"-2" and i != 2 %}
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
                 {% endif %}
                 <li class="page-item {% if page_obj.number == i %}active{% endif %}">
                     <a class="page-link" href="?page={{ i }}{% for k,v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v|urlencode }}{% endif %}{% endfor %}">{{ i }}</a>
                 </li>
+                {% if page_obj.paginator.num_pages > 6 and i == page_obj.number|add:"2" and i != page_obj.paginator.num_pages|add:"-1" %}
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                {% endif %}
             {% endif %}
         {% endfor %}
 
         {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for k,v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v|urlencode }}{% endif %}{% endfor %}">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for k,v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v|urlencode }}{% endif %}{% endfor %}" aria-label="Next">
                     <i class="bi bi-chevron-right"></i>
                 </a>
             </li>
         {% else %}
-            <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-right"></i></span></li>
+            <li class="page-item disabled"><span class="page-link" aria-label="Next"><i class="bi bi-chevron-right"></i></span></li>
         {% endif %}
     </ul>
+    <p class="text-center text-muted small mt-2 mb-0">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} ({{ page_obj.paginator.count }} total)</p>
 </nav>
 {% endif %}

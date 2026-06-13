@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3 animate-fade-in">
+
+    {# ── Header ── #}
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <h5 class="fw-bold mb-0">Welcome, {{ user.first_name|default:user.username }}</h5>
+            <p class="text-muted small mb-0 d-flex align-items-center gap-2">
+                <span class="badge bg-medical-purple rounded-pill"><i class="bi bi-microscope me-1"></i>Laboratory</span>
+                <span class="text-muted">·</span>
+                <span>{{ now|date:"l, F j, Y" }}</span>
+            </p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="d-flex align-items-center gap-1 text-success small fw-medium bg-success bg-opacity-10 px-3 py-1 rounded-pill">
+                <span class="status-dot bg-success"></span>On Duty
+            </span>
+        </div>
+    </div>
+
+    {# ── Stat Cards ── #}
+    <div class="row g-3 mb-4 stagger-children">
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--blue">
+                <div class="stat-card__icon"><i class="bi bi-clock"></i></div>
+                <div class="stat-card__label">Pending Tests</div>
+                <div class="stat-card__value">{{ pending_tests }}</div>
+                <div class="stat-card__sub">Awaiting processing</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--teal">
+                <div class="stat-card__icon"><i class="bi bi-check-circle"></i></div>
+                <div class="stat-card__label">Completed Today</div>
+                <div class="stat-card__value">{{ completed_today }}</div>
+                <div class="stat-card__sub">Results published</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--green">
+                <div class="stat-card__icon"><i class="bi bi-hourglass"></i></div>
+                <div class="stat-card__label">In Progress</div>
+                <div class="stat-card__value">{{ in_progress_tests }}</div>
+                <div class="stat-card__sub">Being analyzed</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--amber">
+                <div class="stat-card__icon"><i class="bi bi-calendar-check"></i></div>
+                <div class="stat-card__label">Today's Requests</div>
+                <div class="stat-card__value">{{ requests_today }}</div>
+                <div class="stat-card__sub">New test orders</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {# ── Main Column ── #}
+        <div class="col-lg-8">
+
+            {# Quick Actions #}
+            <div class="mb-4">
+                <div class="section-label">Quick Actions</div>
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'labtest_list' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-microscope"></i>
+                            </div>
+                            <div class="quick-action__title">All Tests</div>
+                            <div class="quick-action__sub">View queue</div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'labtest_create' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-plus-circle"></i>
+                            </div>
+                            <div class="quick-action__title">New Test</div>
+                            <div class="quick-action__sub">Order</div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'patient_list' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="quick-action__title">Patients</div>
+                            <div class="quick-action__sub">Directory</div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'appointment_list' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-calendar-event"></i>
+                            </div>
+                            <div class="quick-action__title">Appointments</div>
+                            <div class="quick-action__sub">Schedule</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Pending Lab Tests #}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header-clean d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold d-flex align-items-center gap-2">
+                        <i class="bi bi-clock-history text-warning"></i>Pending Lab Tests
+                        <span class="badge bg-warning text-dark rounded-pill">{{ pending_tests }}</span>
+                    </span>
+                    <a href="{% url 'labtest_list' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4 py-2 small">Patient</th>
+                                <th class="py-2 small">Test</th>
+                                <th class="py-2 small d-none d-md-table-cell">Category</th>
+                                <th class="py-2 small">Doctor</th>
+                                <th class="pe-4 py-2 small">Requested</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for test in pending_lab_tests %}
+                            <tr>
+                                <td class="ps-4 small fw-medium">{{ test.patient.full_name }}</td>
+                                <td class="small">{{ test.test_name|default:test.service.name }}</td>
+                                <td class="d-none d-md-table-cell small text-muted">{{ test.service.get_category_display|default:"General" }}</td>
+                                <td class="small text-muted">—</td>
+                                <td class="pe-4 text-muted small">{{ test.requested_date|date:"M d, H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center py-3 text-muted small">No pending lab tests.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {# Recent Completed #}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header-clean d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success"></i>Recently Completed
+                    </span>
+                    <a href="{% url 'labtest_list' %}" class="btn btn-sm btn-outline-success rounded-pill px-3">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4 py-2 small">Patient</th>
+                                <th class="py-2 small">Test</th>
+                                <th class="py-2 small d-none d-md-table-cell">Result</th>
+                                <th class="pe-4 py-2 small">Completed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for test in recent_completed %}
+                            <tr>
+                                <td class="ps-4 small fw-medium">{{ test.patient.full_name }}</td>
+                                <td class="small">{{ test.test_name|default:test.service.name }}</td>
+                                <td class="d-none d-md-table-cell small text-muted">{{ test.result|truncatechars:40|default:"—" }}</td>
+                                <td class="pe-4 text-muted small">{{ test.requested_date|date:"M d, H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-3 text-muted small">No completed tests.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        {# ── Sidebar ── #}
+        <div class="col-lg-4">
+
+            {# Today's Summary #}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header-clean d-flex align-items-center gap-2">
+                    <i class="bi bi-bar-chart text-primary"></i>
+                    <span class="fw-semibold">Today's Summary</span>
+                </div>
+                <div class="card-body px-4">
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="small text-muted">Total Tests</span>
+                        <span class="fw-semibold small">{{ requests_today }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="small text-muted">Pending</span>
+                        <span class="fw-semibold small text-warning">{{ pending_tests }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="small text-muted">In Progress</span>
+                        <span class="fw-semibold small text-info">{{ in_progress_tests }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2">
+                        <span class="small text-muted">Completed</span>
+                        <span class="fw-semibold small text-success">{{ completed_today }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {# Quick Links #}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header-clean d-flex align-items-center gap-2">
+                    <i class="bi bi-link text-secondary"></i>
+                    <span class="fw-semibold">Links</span>
+                </div>
+                <div class="list-group list-group-flush rounded-bottom-3">
+                    <a href="{% url 'patient_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-3 border-0">
+                        <span class="small text-body"><i class="bi bi-people me-2 text-muted"></i>Patient Directory</span>
+                        <i class="bi bi-chevron-right small text-muted"></i>
+                    </a>
+                    <a href="{% url 'hospital:service_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-3 border-0">
+                        <span class="small text-body"><i class="bi bi-card-checklist me-2 text-muted"></i>Test Catalog</span>
+                        <i class="bi bi-chevron-right small text-muted"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3 animate-fade-in">
+
+    {# ── Header ── #}
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <h5 class="fw-bold mb-0">Welcome, {{ user.first_name|default:user.username }}</h5>
+            <p class="text-muted small mb-0 d-flex align-items-center gap-2">
+                <span class="badge bg-medical-teal rounded-pill"><i class="bi bi-heart-pulse me-1"></i>Nursing Staff</span>
+                <span class="text-muted">·</span>
+                <span>{{ now|date:"l, F j, Y" }}</span>
+            </p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="d-flex align-items-center gap-1 text-success small fw-medium bg-success bg-opacity-10 px-3 py-1 rounded-pill">
+                <span class="status-dot bg-success"></span>On Shift
+            </span>
+        </div>
+    </div>
+
+    {# ── Stat Cards ── #}
+    <div class="row g-3 mb-4 stagger-children">
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--blue">
+                <div class="stat-card__icon"><i class="bi bi-people"></i></div>
+                <div class="stat-card__label">Total Patients</div>
+                <div class="stat-card__value">{{ total_patients }}</div>
+                <div class="stat-card__sub">{{ admitted_patients }} currently admitted</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--teal">
+                <div class="stat-card__icon"><i class="bi bi-heart-pulse"></i></div>
+                <div class="stat-card__label">Under Care</div>
+                <div class="stat-card__value">{{ active_care_count }}</div>
+                <div class="stat-card__sub">
+                    <span class="text-danger">{{ critical_count }} critical</span>
+                    <span class="mx-1">·</span>
+                    <span>{{ stable_count }} stable</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--green">
+                <div class="stat-card__icon"><i class="bi bi-calendar-check"></i></div>
+                <div class="stat-card__label">Today's Appointments</div>
+                <div class="stat-card__value">{{ today_appointments }}</div>
+                <div class="stat-card__sub">Scheduled today</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--amber">
+                <div class="stat-card__icon"><i class="bi bi-person-plus"></i></div>
+                <div class="stat-card__label">New Admissions</div>
+                <div class="stat-card__value">{{ recent_admissions_count }}</div>
+                <div class="stat-card__sub">Last 7 days</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {# ── Main Column ── #}
+        <div class="col-lg-8">
+
+            {# Quick Actions #}
+            <div class="mb-4">
+                <div class="section-label">Quick Actions</div>
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'patient_list' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="quick-action__title">Patients</div>
+                            <div class="quick-action__sub">Directory</div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'care_monitoring:patientcare_list' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-heart-pulse"></i>
+                            </div>
+                            <div class="quick-action__title">Record Vitals</div>
+                            <div class="quick-action__sub">Care monitoring</div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'appointment_list' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-calendar-event"></i>
+                            </div>
+                            <div class="quick-action__title">Schedule</div>
+                            <div class="quick-action__sub">Appointments</div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'hospital:occupancy_map' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-grid-3x3-gap"></i>
+                            </div>
+                            <div class="quick-action__title">Bed Map</div>
+                            <div class="quick-action__sub">Occupancy</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Critical Patients #}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header-clean d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold d-flex align-items-center gap-2">
+                        <i class="bi bi-exclamation-triangle text-danger"></i>Patients Needing Attention
+                    </span>
+                    <a href="{% url 'care_monitoring:patientcare_list' %}" class="btn btn-sm btn-outline-danger rounded-pill px-3">View All</a>
+                </div>
+                {% for c in critical_care %}
+                <a href="{% url 'care_monitoring:patientcare_detail' c.pk %}" class="appt-row text-decoration-none">
+                    <div class="appt-row__avatar" style="background:linear-gradient(135deg,#dc3545,#b91c1c);">{{ c.patient.first_name|first }}{{ c.patient.last_name|first }}</div>
+                    <div class="appt-row__info">
+                        <div class="appt-row__name">{{ c.patient.full_name }}</div>
+                        <div class="appt-row__meta">
+                            <i class="bi bi-thermometer-half me-1"></i>{{ c.temperature|default:"—" }}°C
+                            · HR {{ c.heart_rate|default:"—" }}
+                            · BP {{ c.blood_pressure|default:"—" }}
+                        </div>
+                    </div>
+                    <span class="badge bg-danger rounded-pill">Critical</span>
+                </a>
+                {% empty %}
+                <div class="empty-state">
+                    <i class="bi bi-check-circle text-success"></i>
+                    <p>No critical patients at this time</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            {# Vitals Log #}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header-clean d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold d-flex align-items-center gap-2">
+                        <i class="bi bi-activity text-success"></i>Recent Vitals Recorded
+                    </span>
+                    <a href="{% url 'care_monitoring:patientcare_list' %}" class="btn btn-sm btn-outline-success rounded-pill px-3">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4 py-2 small">Patient</th>
+                                <th class="py-2 small">Status</th>
+                                <th class="py-2 small d-none d-md-table-cell">Temp</th>
+                                <th class="py-2 small d-none d-md-table-cell">HR</th>
+                                <th class="py-2 small d-none d-md-table-cell">BP</th>
+                                <th class="pe-4 py-2 small">Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in recent_vitals %}
+                            <tr>
+                                <td class="ps-4 small fw-medium">{{ c.patient.full_name }}</td>
+                                <td>
+                                    {% if c.status == 'CRITICAL' %}
+                                        <span class="badge bg-danger rounded-pill">Critical</span>
+                                    {% elif c.status == 'STABLE' %}
+                                        <span class="badge bg-success rounded-pill">Stable</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary rounded-pill">{{ c.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="d-none d-md-table-cell small">{{ c.temperature|default:"—" }}</td>
+                                <td class="d-none d-md-table-cell small">{{ c.heart_rate|default:"—" }}</td>
+                                <td class="d-none d-md-table-cell small">{{ c.blood_pressure|default:"—" }}</td>
+                                <td class="pe-4 text-muted small">{{ c.monitoring_date|date:"H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="6" class="text-center py-3 text-muted small">No vitals recorded yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        {# ── Sidebar ── #}
+        <div class="col-lg-4">
+
+            {# Recent Admissions #}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header-clean d-flex align-items-center gap-2">
+                    <i class="bi bi-person-plus-fill text-success"></i>
+                    <span class="fw-semibold">Recent Admissions</span>
+                </div>
+                <div class="card-body px-4 pb-3 pt-3">
+                    {% for patient in recent_patients %}
+                    <a href="{% url 'patient_detail' patient.pk %}" class="patient-row text-decoration-none">
+                        <div class="patient-row__avatar">{{ patient.first_name|first }}{{ patient.last_name|first }}</div>
+                        <div>
+                            <div class="patient-row__name">{{ patient.full_name }}</div>
+                            <div class="patient-row__meta"><i class="bi bi-clock me-1"></i>Admitted {{ patient.admission_date|date:"M d"|default:"—" }}</div>
+                        </div>
+                    </a>
+                    {% empty %}
+                    <p class="text-muted small mb-0 py-2">No recent admissions.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# Upcoming Appointments #}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header-clean d-flex align-items-center gap-2">
+                    <i class="bi bi-calendar-event text-primary"></i>
+                    <span class="fw-semibold">Today's Appointments</span>
+                </div>
+                <div class="card-body px-4 pb-3 pt-3">
+                    {% for appt in upcoming_appointments|slice:":5" %}
+                    <div class="d-flex align-items-center gap-2 py-2 border-bottom">
+                        <div class="patient-row__avatar">{{ appt.patient.first_name|first }}{{ appt.patient.last_name|first }}</div>
+                        <div class="flex-grow-1 min-width-0">
+                            <div class="small fw-medium text-truncate">{{ appt.patient.full_name }}</div>
+                            <div class="text-muted" style="font-size:0.7rem;">{{ appt.appointment_date|date:"H:i" }} · Dr. {{ appt.doctor.last_name }}</div>
+                        </div>
+                        <span class="appt-row__badge appt-row__badge--{{ appt.status|lower }}">{{ appt.get_status_display }}</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted small mb-0 py-2">No appointments today.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3 animate-fade-in">
+
+    {# ── Header ── #}
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <h5 class="fw-bold mb-0">Welcome, {{ user.first_name|default:user.username }}</h5>
+            <p class="text-muted small mb-0 d-flex align-items-center gap-2">
+                <span class="badge bg-medical-orange rounded-pill"><i class="bi bi-calendar-event me-1"></i>Reception</span>
+                <span class="text-muted">·</span>
+                <span>{{ now|date:"l, F j, Y" }}</span>
+            </p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="d-flex align-items-center gap-1 text-success small fw-medium bg-success bg-opacity-10 px-3 py-1 rounded-pill">
+                <span class="status-dot bg-success"></span>At Desk
+            </span>
+        </div>
+    </div>
+
+    {# ── Stat Cards ── #}
+    <div class="row g-3 mb-4 stagger-children">
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--blue">
+                <div class="stat-card__icon"><i class="bi bi-calendar-check"></i></div>
+                <div class="stat-card__label">Today's Appointments</div>
+                <div class="stat-card__value">{{ today_appointments }}</div>
+                <div class="stat-card__sub">{{ checked_in_count }} checked in</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--teal">
+                <div class="stat-card__icon"><i class="bi bi-people"></i></div>
+                <div class="stat-card__label">New Patients</div>
+                <div class="stat-card__value">{{ new_patients_7days }}</div>
+                <div class="stat-card__sub">Last 7 days</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--green">
+                <div class="stat-card__icon"><i class="bi bi-person-check"></i></div>
+                <div class="stat-card__label">Doctors Available</div>
+                <div class="stat-card__value">{{ available_doctors }}</div>
+                <div class="stat-card__sub">On duty today</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--amber">
+                <div class="stat-card__icon"><i class="bi bi-hospital"></i></div>
+                <div class="stat-card__label">Admitted</div>
+                <div class="stat-card__value">{{ admitted_patients }}</div>
+                <div class="stat-card__sub">Current in-patients</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {# ── Main Column ── #}
+        <div class="col-lg-8">
+
+            {# Quick Actions #}
+            <div class="mb-4">
+                <div class="section-label">Quick Actions</div>
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'patient_create' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-person-plus"></i>
+                            </div>
+                            <div class="quick-action__title">New Patient</div>
+                            <div class="quick-action__sub">Register</div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'appointment_create' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-calendar-plus"></i>
+                            </div>
+                            <div class="quick-action__title">Book Visit</div>
+                            <div class="quick-action__sub">Schedule</div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'doctor_availability' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-person-check"></i>
+                            </div>
+                            <div class="quick-action__title">Doctor Load</div>
+                            <div class="quick-action__sub">Availability</div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'queue_tracker' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-list-ol"></i>
+                            </div>
+                            <div class="quick-action__title">Queue</div>
+                            <div class="quick-action__sub">Track</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Today's Appointments #}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header-clean d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold d-flex align-items-center gap-2">
+                        <i class="bi bi-calendar2-week text-primary"></i>Today's Appointments
+                        <span class="badge bg-primary rounded-pill">{{ today_appointments }}</span>
+                    </span>
+                    <a href="{% url 'appointment_list' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">View All</a>
+                </div>
+                {% for appt in upcoming_appointments %}
+                <a href="{% url 'appointment_detail' appt.pk %}" class="appt-row text-decoration-none">
+                    <div class="appt-row__avatar">{{ appt.patient.first_name|first }}{{ appt.patient.last_name|first }}</div>
+                    <div class="appt-row__info">
+                        <div class="appt-row__name">{{ appt.patient.full_name }}</div>
+                        <div class="appt-row__meta">
+                            <i class="bi bi-clock me-1"></i>{{ appt.appointment_date|date:"H:i" }}
+                            · <i class="bi bi-person-badge me-1"></i>Dr. {{ appt.doctor.last_name }}
+                        </div>
+                    </div>
+                    <span class="appt-row__badge appt-row__badge--{{ appt.status|lower }}">{{ appt.get_status_display }}</span>
+                </a>
+                {% empty %}
+                <div class="empty-state">
+                    <i class="bi bi-calendar-x"></i>
+                    <p>No appointments scheduled today</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            {# Recent Patients Registered #}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header-clean d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold d-flex align-items-center gap-2">
+                        <i class="bi bi-person-plus-fill text-success"></i>Recently Registered
+                    </span>
+                    <a href="{% url 'patient_list' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4 py-2 small">Patient</th>
+                                <th class="py-2 small">ID</th>
+                                <th class="py-2 small">Phone</th>
+                                <th class="pe-4 py-2 small">Registered</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for patient in recent_patients %}
+                            <tr>
+                                <td class="ps-4 small fw-medium">{{ patient.full_name }}</td>
+                                <td class="small text-muted">{{ patient.unique_id }}</td>
+                                <td class="small text-muted">{{ patient.phone|default:"—" }}</td>
+                                <td class="pe-4 text-muted small">{{ patient.admission_date|date:"M d, H:i"|default:"—" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-3 text-muted small">No patients registered.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        {# ── Sidebar ── #}
+        <div class="col-lg-4">
+
+            {# Doctor Availability #}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header-clean d-flex align-items-center gap-2">
+                    <i class="bi bi-person-check text-success"></i>
+                    <span class="fw-semibold">Doctor Availability</span>
+                </div>
+                <div class="card-body px-4 pb-3 pt-3">
+                    <a href="{% url 'doctor_availability' %}" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="bi bi-eye me-1"></i>View All Doctors
+                    </a>
+                </div>
+            </div>
+
+            {# Billing Quick Actions #}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header-clean d-flex align-items-center gap-2">
+                    <i class="bi bi-cash-stack text-success"></i>
+                    <span class="fw-semibold">Billing</span>
+                </div>
+                <div class="list-group list-group-flush rounded-bottom-3">
+                    <a href="{% url 'invoice_create' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-3 border-0">
+                        <span class="small text-body"><i class="bi bi-plus-circle me-2 text-muted"></i>New Invoice</span>
+                        <i class="bi bi-chevron-right small text-muted"></i>
+                    </a>
+                    <a href="{% url 'invoice_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-3 border-0">
+                        <span class="small text-body"><i class="bi bi-receipt me-2 text-muted"></i>View Invoices</span>
+                        <i class="bi bi-chevron-right small text-muted"></i>
+                    </a>
+                </div>
+            </div>
+
+            {# Quick Links #}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header-clean d-flex align-items-center gap-2">
+                    <i class="bi bi-link text-secondary"></i>
+                    <span class="fw-semibold">Quick Links</span>
+                </div>
+                <div class="list-group list-group-flush rounded-bottom-3">
+                    <a href="{% url 'hospital:occupancy_map' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-3 border-0">
+                        <span class="small text-body"><i class="bi bi-grid-3x3-gap me-2 text-muted"></i>Bed Occupancy</span>
+                        <i class="bi bi-chevron-right small text-muted"></i>
+                    </a>
+                    <a href="{% url 'hospital:service_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-3 border-0">
+                        <span class="small text-body"><i class="bi bi-card-checklist me-2 text-muted"></i>Services</span>
+                        <i class="bi bi-chevron-right small text-muted"></i>
+                    </a>
+                    <a href="{% url 'patient_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-3 border-0">
+                        <span class="small text-body"><i class="bi bi-people me-2 text-muted"></i>Patient Directory</span>
+                        <i class="bi bi-chevron-right small text-muted"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

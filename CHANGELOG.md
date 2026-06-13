@@ -27,6 +27,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- add scroll-to-top, loading overlay, breadcrumb support, polished login page ([`d3f0847`])
 - improve toast stacking, page transitions, loading overlay, form helpers ([`23e71bb`])
 - overhaul design system with animations, skeletons, dark mode prep, responsive polish ([`e5ab6e3`])
 - update README with new architecture and receptionist toolkit features ([`e970d1d`])

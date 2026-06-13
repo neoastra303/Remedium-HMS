@@ -1,0 +1,12 @@
+<nav class="breadcrumb-custom" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}"><i class="bi bi-house-door"></i></a>
+    <span class="separator">/</span>
+    {% for crumb in breadcrumbs %}
+        {% if crumb.url %}
+            <a href="{{ crumb.url }}">{{ crumb.label }}</a>
+            {% if not forloop.last %}<span class="separator">/</span>{% endif %}
+        {% else %}
+            <span class="current">{{ crumb.label }}</span>
+        {% endif %}
+    {% endfor %}
+</nav>

@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3 animate-fade-in">
+
+    {# ── Header ── #}
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <h5 class="fw-bold mb-0">Welcome, {{ user.first_name|default:user.username }}</h5>
+            <p class="text-muted small mb-0 d-flex align-items-center gap-2">
+                <span class="badge bg-medical-teal rounded-pill"><i class="bi bi-capsule me-1"></i>Pharmacy</span>
+                <span class="text-muted">·</span>
+                <span>{{ now|date:"l, F j, Y" }}</span>
+            </p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="d-flex align-items-center gap-1 text-success small fw-medium bg-success bg-opacity-10 px-3 py-1 rounded-pill">
+                <span class="status-dot bg-success"></span>On Duty
+            </span>
+        </div>
+    </div>
+
+    {# ── Stat Cards ── #}
+    <div class="row g-3 mb-4 stagger-children">
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--blue">
+                <div class="stat-card__icon"><i class="bi bi-capsule"></i></div>
+                <div class="stat-card__label">Active Prescriptions</div>
+                <div class="stat-card__value">{{ active_prescriptions }}</div>
+                <div class="stat-card__sub">{{ new_prescriptions_today }} new today</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--teal">
+                <div class="stat-card__icon"><i class="bi bi-clock-history"></i></div>
+                <div class="stat-card__label">Pending Dispense</div>
+                <div class="stat-card__value">{{ pending_dispense }}</div>
+                <div class="stat-card__sub">Awaiting fulfillment</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--green">
+                <div class="stat-card__icon"><i class="bi bi-box-seam"></i></div>
+                <div class="stat-card__label">Low Stock Items</div>
+                <div class="stat-card__value">{{ low_stock_count }}</div>
+                <div class="stat-card__sub">Needs reorder</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card--amber">
+                <div class="stat-card__icon"><i class="bi bi-calendar-check"></i></div>
+                <div class="stat-card__label">Today Dispensed</div>
+                <div class="stat-card__value">{{ dispensed_today }}</div>
+                <div class="stat-card__sub">Prescriptions filled</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {# ── Main Column ── #}
+        <div class="col-lg-8">
+
+            {# Quick Actions #}
+            <div class="mb-4">
+                <div class="section-label">Quick Actions</div>
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'prescription_list' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-capsule"></i>
+                            </div>
+                            <div class="quick-action__title">Prescriptions</div>
+                            <div class="quick-action__sub">View all</div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'prescription_create' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-plus-circle"></i>
+                            </div>
+                            <div class="quick-action__title">New Rx</div>
+                            <div class="quick-action__sub">Prescribe</div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'inventoryitem_list' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                            <div class="quick-action__title">Inventory</div>
+                            <div class="quick-action__sub">Stock</div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'patient_list' %}" class="quick-action text-decoration-none">
+                            <div class="quick-action__icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="quick-action__title">Patients</div>
+                            <div class="quick-action__sub">Directory</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Pending Prescriptions #}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header-clean d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold d-flex align-items-center gap-2">
+                        <i class="bi bi-clock text-warning"></i>Pending Prescriptions
+                    </span>
+                    <a href="{% url 'prescription_list' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4 py-2 small">Patient</th>
+                                <th class="py-2 small">Medication</th>
+                                <th class="py-2 small d-none d-md-table-cell">Dosage</th>
+                                <th class="py-2 small">Doctor</th>
+                                <th class="pe-4 py-2 small">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rx in pending_prescriptions %}
+                            <tr>
+                                <td class="ps-4 small fw-medium">{{ rx.patient.full_name }}</td>
+                                <td class="small">{{ rx.drug_name|default:rx.service.name }}</td>
+                                <td class="d-none d-md-table-cell small text-muted">{{ rx.dosage|default:"—" }}</td>
+                                <td class="small text-muted">{{ rx.prescribed_by.last_name|default:"—" }}</td>
+<｜｜DSML｜｜parameter name="replaceAll" string="false">true
+                                <td class="pe-4 text-muted small">{{ rx.prescribed_date|date:"M d" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center py-3 text-muted small">No pending prescriptions.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {# Low Stock Items #}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header-clean d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold d-flex align-items-center gap-2">
+                        <i class="bi bi-exclamation-triangle text-danger"></i>Low Stock Items
+                    </span>
+                    <a href="{% url 'inventoryitem_list' %}" class="btn btn-sm btn-outline-danger rounded-pill px-3">Manage</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4 py-2 small">Item</th>
+                                <th class="py-2 small">Category</th>
+                                <th class="py-2 small">Qty</th>
+                                <th class="pe-4 py-2 small">Reorder</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in low_stock_items %}
+                            <tr>
+                                <td class="ps-4 small fw-medium">{{ item.name }}</td>
+                                <td class="small text-muted">{{ item.category|default:"—" }}</td>
+                                <td class="small"><span class="badge bg-danger rounded-pill">{{ item.quantity }}</span></td>
+                                <td class="pe-4 small">{{ item.reorder_level|default:"—" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-3 text-muted small">All items well-stocked.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        {# ── Sidebar ── #}
+        <div class="col-lg-4">
+
+            {# Today's Stats #}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header-clean d-flex align-items-center gap-2">
+                    <i class="bi bi-bar-chart text-primary"></i>
+                    <span class="fw-semibold">Today at a Glance</span>
+                </div>
+                <div class="card-body px-4">
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="small text-muted">Prescriptions Created</span>
+                        <span class="fw-semibold small">{{ new_prescriptions_today }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="small text-muted">Dispensed</span>
+                        <span class="fw-semibold small">{{ dispensed_today }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="small text-muted">Pending</span>
+                        <span class="fw-semibold small">{{ pending_dispense }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2">
+                        <span class="small text-muted">Total Active Rx</span>
+                        <span class="fw-semibold small">{{ active_prescriptions }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {# Inventory Links #}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header-clean d-flex align-items-center gap-2">
+                    <i class="bi bi-box-seam text-warning"></i>
+                    <span class="fw-semibold">Inventory</span>
+                </div>
+                <div class="list-group list-group-flush rounded-bottom-3">
+                    <a href="{% url 'inventoryitem_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-3 border-0">
+                        <span class="small text-body"><i class="bi bi-box me-2 text-muted"></i>All Items</span>
+                        <i class="bi bi-chevron-right small text-muted"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

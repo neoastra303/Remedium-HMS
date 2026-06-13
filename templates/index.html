@@ -2,16 +2,17 @@
 {% load static %}
 
 {% block content %}
-<div class="container-fluid px-4 py-3">
+<div class="container-fluid px-4 py-3 animate-fade-in">
 
     {# ── Header ── #}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             {% if user.is_authenticated %}
-                <h5 class="fw-bold mb-0">Welcome back, {{ user.first_name|default:user.username }} 👋</h5>
-                <p class="text-muted small mb-0">
+                <h5 class="fw-bold mb-0">Welcome back, {{ user.first_name|default:user.username }}</h5>
+                <p class="text-muted small mb-0 d-flex align-items-center gap-2">
                     {{ user.staff_profile.get_role_display|default:"System Administrator" }}
-                    <span class="mx-2">·</span>{{ now|date:"l, F j, Y" }}
+                    <span class="text-muted">·</span>
+                    <span>{{ now|date:"l, F j, Y" }}</span>
                 </p>
             {% else %}
                 <h5 class="fw-bold mb-0">Remedium HMS</h5>
@@ -20,7 +21,7 @@
         </div>
         {% if user.is_authenticated %}
         <div class="d-flex align-items-center gap-2">
-            <span class="d-flex align-items-center gap-1 text-success small fw-medium">
+            <span class="d-flex align-items-center gap-1 text-success small fw-medium bg-success bg-opacity-10 px-3 py-1 rounded-pill">
                 <span class="status-dot bg-success"></span>Online
             </span>
         </div>
@@ -33,8 +34,8 @@
 
     {% if user.is_authenticated %}
 
-    {# ── Stat Cards — all consistent style ── #}
-    <div class="row g-3 mb-4">
+    {# ── Stat Cards ── #}
+    <div class="row g-3 mb-4 stagger-children">
         <div class="col-6 col-md-3">
             <div class="stat-card stat-card--blue">
                 <div class="stat-card__icon"><i class="bi bi-people"></i></div>
@@ -134,8 +135,8 @@
             {# Appointments ── #}
             <div class="card border-0 shadow-sm">
                 <div class="card-header-clean d-flex justify-content-between align-items-center">
-                    <span class="fw-semibold">
-                        {% if is_hms_doctor %}Your Schedule{% else %}Upcoming Appointments{% endif %}
+                    <span class="fw-semibold d-flex align-items-center gap-2">
+                        {% if is_hms_doctor %}<i class="bi bi-calendar2-week text-primary"></i>Your Schedule{% else %}<i class="bi bi-calendar2-week text-primary"></i>Upcoming Appointments{% endif %}
                     </span>
                     <a href="{% url 'appointment_list' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">View All</a>
                 </div>
@@ -146,8 +147,8 @@
                     <div class="appt-row__info">
                         <div class="appt-row__name">{{ appt.patient.full_name }}</div>
                         <div class="appt-row__meta">
-                            {{ appt.appointment_date|date:"M d, H:i" }}
-                            {% if not is_hms_doctor %} · Dr. {{ appt.doctor.last_name }}{% endif %}
+                            <i class="bi bi-clock me-1"></i>{{ appt.appointment_date|date:"M d, H:i" }}
+                            {% if not is_hms_doctor %} · <i class="bi bi-person-badge me-1"></i>Dr. {{ appt.doctor.last_name }}{% endif %}
                         </div>
                     </div>
                     <span class="appt-row__badge appt-row__badge--{{ appt.status|lower }}">{{ appt.get_status_display }}</span>
@@ -168,7 +169,8 @@
 
             {# Dept Load / Recent Admissions #}
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header-clean">
+                <div class="card-header-clean d-flex align-items-center gap-2">
+                    {% if is_hms_admin %}<i class="bi bi-bar-chart-fill text-primary"></i>{% else %}<i class="bi bi-person-plus-fill text-success"></i>{% endif %}
                     <span class="fw-semibold">
                         {% if is_hms_admin %}Department Load{% else %}Recent Admissions{% endif %}
                     </span>
@@ -182,11 +184,11 @@
                                 <span class="text-muted">{{ dept.count }}</span>
                             </div>
                             <div class="progress rounded-pill" style="height:6px;">
-                                <div class="progress-bar" style="width:{{ dept.pct }}%;background:var(--primary-blue);"></div>
+                                <div class="progress-bar" style="width:{{ dept.pct }}%;background:linear-gradient(135deg,var(--primary-blue),var(--secondary-purple));"></div>
                             </div>
                         </div>
                         {% empty %}
-                        <p class="text-muted small mb-0">No department data.</p>
+                        <p class="text-muted small mb-0 py-2">No department data.</p>
                         {% endfor %}
                     {% else %}
                         {% for patient in recent_patients %}
@@ -194,11 +196,11 @@
                             <div class="patient-row__avatar">{{ patient.first_name|first }}{{ patient.last_name|first }}</div>
                             <div>
                                 <div class="patient-row__name">{{ patient.full_name }}</div>
-                                <div class="patient-row__meta">Admitted {{ patient.admission_date|date:"M d"|default:"—" }}</div>
+                                <div class="patient-row__meta"><i class="bi bi-clock me-1"></i>Admitted {{ patient.admission_date|date:"M d"|default:"—" }}</div>
                             </div>
                         </a>
                         {% empty %}
-                        <p class="text-muted small mb-0">No recent admissions.</p>
+                        <p class="text-muted small mb-0 py-2">No recent admissions.</p>
                         {% endfor %}
                     {% endif %}
                 </div>
@@ -207,17 +209,19 @@
             {# Admin Links #}
             {% if is_hms_admin %}
             <div class="card border-0 shadow-sm">
-                <div class="card-header-clean"><span class="fw-semibold">Admin</span></div>
+                <div class="card-header-clean d-flex align-items-center gap-2">
+                    <i class="bi bi-gear text-secondary"></i><span class="fw-semibold">Administration</span>
+                </div>
                 <div class="list-group list-group-flush rounded-bottom-3">
-                    <a href="{% url 'user_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-2 border-0">
+                    <a href="{% url 'user_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-3 border-0">
                         <span class="small text-body"><i class="bi bi-people me-2 text-muted"></i>User Accounts</span>
                         <i class="bi bi-chevron-right small text-muted"></i>
                     </a>
-                    <a href="{% url 'audit_log' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-2 border-0">
+                    <a href="{% url 'audit_log' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-3 border-0">
                         <span class="small text-body"><i class="bi bi-journal-text me-2 text-muted"></i>Audit Logs</span>
                         <i class="bi bi-chevron-right small text-muted"></i>
                     </a>
-                    <a href="{% url 'admin:index' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-2 border-0">
+                    <a href="{% url 'admin:index' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-4 py-3 border-0">
                         <span class="small text-body"><i class="bi bi-gear me-2 text-muted"></i>Django Admin</span>
                         <i class="bi bi-chevron-right small text-muted"></i>
                     </a>
@@ -232,13 +236,31 @@
     {# ── Public Landing ── #}
     <div class="row align-items-center justify-content-center" style="min-height:65vh;">
         <div class="col-md-6 text-center">
-            <div class="mb-4" style="font-size:4rem;opacity:0.15;">🏥</div>
+            <div class="mb-4 text-gradient" style="font-size:4rem;"><i class="bi bi-shield-plus"></i></div>
             <h3 class="fw-bold mb-2">Enterprise Healthcare Management</h3>
             <p class="text-muted mb-5">Streamline operations, enhance patient care, and secure medical data.</p>
-            <div class="row g-3 mb-5">
-                <div class="col-md-4"><div class="card border-0 shadow-sm p-4 h-100 text-center"><i class="bi bi-shield-check fs-3 text-success mb-2 d-block"></i><div class="fw-semibold small">Secure Records</div><div class="text-muted" style="font-size:0.78rem;">HIPAA-compliant</div></div></div>
-                <div class="col-md-4"><div class="card border-0 shadow-sm p-4 h-100 text-center"><i class="bi bi-graph-up fs-3 text-primary mb-2 d-block"></i><div class="fw-semibold small">Real-time Analytics</div><div class="text-muted" style="font-size:0.78rem;">Live dashboards</div></div></div>
-                <div class="col-md-4"><div class="card border-0 shadow-sm p-4 h-100 text-center"><i class="bi bi-people fs-3 text-info mb-2 d-block"></i><div class="fw-semibold small">Staff Management</div><div class="text-muted" style="font-size:0.78rem;">Roster scheduling</div></div></div>
+            <div class="row g-3 mb-5 stagger-children">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-4 h-100 text-center card-action">
+                        <i class="bi bi-shield-check fs-3 text-success mb-2 d-block"></i>
+                        <div class="fw-semibold small">Secure Records</div>
+                        <div class="text-muted" style="font-size:0.78rem;">HIPAA-compliant</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-4 h-100 text-center card-action">
+                        <i class="bi bi-graph-up fs-3 text-primary mb-2 d-block"></i>
+                        <div class="fw-semibold small">Real-time Analytics</div>
+                        <div class="text-muted" style="font-size:0.78rem;">Live dashboards</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-4 h-100 text-center card-action">
+                        <i class="bi bi-people fs-3 text-info mb-2 d-block"></i>
+                        <div class="fw-semibold small">Staff Management</div>
+                        <div class="text-muted" style="font-size:0.78rem;">Roster scheduling</div>
+                    </div>
+                </div>
             </div>
             <a href="{% url 'login' %}" class="btn btn-primary btn-lg rounded-pill px-5">
                 <i class="bi bi-box-arrow-in-right me-2"></i>Access Portal

@@ -5,7 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] - 2026-06-10
+## [Unreleased] - 2026-06-13
 
 ### Added
 - implement receptionist toolkit (Check-in, Queue, Bed Map) ([`3e5d8ff`])
@@ -27,6 +27,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- update README with new architecture and receptionist toolkit features ([`e970d1d`])
 - professionalize codebase with automated formatting and linting ([`366b1c9`])
 - professionalize DB and API layers ([`3da4b8e`])
 - untrack .coverage and .env (now gitignored) ([`cbff4e3`])

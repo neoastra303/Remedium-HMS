@@ -1,0 +1,70 @@
+from django.core.management.base import BaseCommand
+from django.contrib.auth.models import User
+from staff.models import Staff
+
+
+ROLES = [
+    ("admin", "ADMIN", "ADMINISTRATION", "Admin", "Admin"),
+    ("doctor", "DOCTOR", "CARDIOLOGY", "John", "Doe"),
+    ("nurse", "NURSE", "ICU", "Jane", "Smith"),
+    ("surgeon", "SURGEON", "SURGERY", "Robert", "Brown"),
+    ("anesthesiologist", "ANESTHESIOLOGIST", "SURGERY", "Emily", "Davis"),
+    ("radiologist", "RADIOLOGIST", "RADIOLOGY", "Michael", "Wilson"),
+    ("receptionist", "RECEPTIONIST", "EMERGENCY", "Sarah", "Taylor"),
+    ("pharmacist", "PHARMACIST", "PHARMACY", "David", "Anderson"),
+    ("labtech", "LAB_TECH", "LABORATORY", "Lisa", "Thomas"),
+    ("technician", "TECH", "OTHER", "James", "Jackson"),
+    ("security", "SECURITY", "SECURITY", "Chris", "Martin"),
+    ("maintenance", "MAINTENANCE", "MAINTENANCE", "Alex", "White"),
+    ("other", "OTHER", "OTHER", "Sam", "Moore"),
+]
+
+
+class Command(BaseCommand):
+    help = "Creates one user + staff profile per role with password 'password123'"
+
+    def handle(self, *args, **options):
+        password = "password123"
+        created_count = 0
+        exists_count = 0
+
+        for username, role_code, department, first_name, last_name in ROLES:
+            user, created = User.objects.get_or_create(
+                username=username,
+                defaults={
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "email": f"{username}@remedium.local",
+                },
+            )
+            if created:
+                user.set_password(password)
+                user.save()
+                created_count += 1
+                self.stdout.write(self.style.SUCCESS(f"Created user: {username}"))
+            else:
+                exists_count += 1
+
+            staff_id = f"{role_code[:4].upper()}-{user.id:03d}"
+            Staff.objects.get_or_create(
+                user=user,
+                defaults={
+                    "staff_id": staff_id,
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "role": role_code,
+                    "department": department,
+                    "phone": f"+1555{user.id:07d}",
+                    "email": f"{username}@remedium.local",
+                    "is_active": True,
+                },
+            )
+
+        self.stdout.write(self.style.SUCCESS(
+            f"\nDone. {created_count} users created, {exists_count} already existed."
+        ))
+        self.stdout.write(f"Password for all users: {password}")
+        self.stdout.write("")
+        self.stdout.write("Available accounts:")
+        for username, role_code, *_ in ROLES:
+            self.stdout.write(f"  {username:<20} ({role_code})")

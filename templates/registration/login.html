@@ -16,28 +16,6 @@
             justify-content: center;
             background: radial-gradient(circle at 20% 20%, #e0e7ff 0%, #f8fafc 50%, #f1f5f9 100%);
         }
-        body::before {
-            content: '';
-            position: fixed;
-            width: 500px; height: 500px;
-            background: var(--primary-blue);
-            filter: blur(180px);
-            border-radius: 50%;
-            top: -100px; left: -100px;
-            opacity: 0.08;
-            pointer-events: none;
-        }
-        body::after {
-            content: '';
-            position: fixed;
-            width: 400px; height: 400px;
-            background: var(--secondary-purple);
-            filter: blur(180px);
-            border-radius: 50%;
-            bottom: -80px; right: -80px;
-            opacity: 0.08;
-            pointer-events: none;
-        }
         .login-card {
             width: 100%;
             max-width: 420px;
@@ -54,10 +32,19 @@
             display: flex; align-items: center; justify-content: center;
             margin: 0 auto 1rem;
             box-shadow: 0 8px 20px rgba(0,98,255,0.3);
+            transition: transform 0.3s ease;
         }
+        .brand-logo:hover { transform: scale(1.05) rotate(-3deg); }
         .form-control:focus {
             border-color: var(--primary-blue);
             box-shadow: 0 0 0 3px rgba(0,98,255,0.12);
+        }
+        .input-group-text { transition: color 0.2s ease; }
+        .input-group:focus-within .input-group-text { color: var(--primary-blue); }
+        .login-card { animation: fadeInUp 0.5s ease forwards; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -67,36 +54,37 @@
             <div class="brand-logo">
                 <i class="bi bi-shield-plus text-white fs-4"></i>
             </div>
-            <h4 class="fw-bold mb-1" style="background:linear-gradient(135deg,#0062ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Remedium HMS</h4>
+            <h4 class="fw-bold mb-1 text-gradient">Remedium HMS</h4>
             <p class="text-muted small mb-0">Hospital Management System</p>
         </div>
 
         {% if form.errors %}
-        <div class="alert alert-danger py-2 small" role="alert">
-            <i class="bi bi-exclamation-triangle me-1"></i> Invalid username or password.
+        <div class="alert alert-danger py-2 small d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span>Invalid username or password. Please try again.</span>
         </div>
         {% endif %}
 
         <form method="post" action="{% url 'login' %}" novalidate id="loginForm">
             {% csrf_token %}
             <div class="mb-3">
-                <label for="id_username" class="form-label fw-medium small">Username</label>
+                <label for="id_username" class="form-label">Username</label>
                 <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
-                    <input type="text" name="username" id="id_username" class="form-control border-start-0 ps-0" placeholder="Enter username" autocomplete="username" required>
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-person"></i></span>
+                    <input type="text" name="username" id="id_username" class="form-control border-start-0 ps-0" placeholder="Enter your username" autocomplete="username" required autofocus>
                 </div>
             </div>
             <div class="mb-4">
-                <label for="id_password" class="form-label fw-medium small">Password</label>
+                <label for="id_password" class="form-label">Password</label>
                 <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
-                    <input type="password" name="password" id="id_password" class="form-control border-start-0 ps-0" placeholder="Enter password" autocomplete="current-password" required>
-                    <button type="button" class="input-group-text bg-light border-start-0" onclick="togglePwd()" tabindex="-1">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock"></i></span>
+                    <input type="password" name="password" id="id_password" class="form-control border-start-0 ps-0" placeholder="Enter your password" autocomplete="current-password" required>
+                    <button type="button" class="input-group-text bg-light border-start-0" onclick="togglePwd()" tabindex="-1" aria-label="Toggle password visibility">
                         <i class="bi bi-eye" id="pwdToggleIcon"></i>
                     </button>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100 py-2" id="loginBtn">
+            <button type="submit" class="btn btn-primary w-100 py-2.5" id="loginBtn" style="padding:0.75rem 1.5rem;">
                 <span id="loginText"><i class="bi bi-box-arrow-in-right me-2"></i>Sign In</span>
                 <span id="loginSpinner" class="d-none">
                     <span class="spinner-border spinner-border-sm me-2"></span>Signing in…
@@ -104,19 +92,28 @@
             </button>
         </form>
 
-        <div class="text-center mt-3">
-            <a href="{% url 'password_reset' %}" class="text-muted small text-decoration-none">
+        <div class="text-center mt-4">
+            <a href="{% url 'password_reset' %}" class="text-muted small text-decoration-none hover-text-primary">
                 <i class="bi bi-key me-1"></i>Forgot password?
             </a>
+        </div>
+
+        <div class="text-center mt-3">
+            <span class="text-muted" style="font-size:0.7rem;">&copy; {% now "Y" %} Remedium HMS</span>
         </div>
     </div>
 
     <script>
         function togglePwd() {
-            const inp = document.getElementById('id_password');
-            const icon = document.getElementById('pwdToggleIcon');
-            if (inp.type === 'password') { inp.type = 'text'; icon.className = 'bi bi-eye-slash'; }
-            else { inp.type = 'password'; icon.className = 'bi bi-eye'; }
+            var inp = document.getElementById('id_password');
+            var icon = document.getElementById('pwdToggleIcon');
+            if (inp.type === 'password') {
+                inp.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                inp.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
         }
         document.getElementById('loginForm').addEventListener('submit', function() {
             document.getElementById('loginText').classList.add('d-none');

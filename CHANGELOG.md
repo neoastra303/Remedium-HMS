@@ -29,6 +29,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- add encryption dependency and basic config ([`743e6b5`])
 - update README with role-based dashboards, test accounts table, UI/UX design section ([`8551a4b`])
 - add management command to create test users for all 13 roles ([`320ea92`])
 - enhance list templates (appointments, staff, invoices) and partials (pagination, field, empty-state) ([`b0dbc30`])

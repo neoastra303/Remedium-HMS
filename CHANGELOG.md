@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased] - 2026-06-15
 
 ### Added
+- **patients**: apply soft deletes and PHI encryption to Patient model ([`86848ae`])
 - implement project-wide soft delete and timestamp base model ([`ca773ba`])
 - implement role-based view routing and context processor with full role flags ([`065a963`])
 - create role-specific dashboards for admin, doctor, nurse, receptionist, pharmacist, labtech, surgeon, and default ([`29b438f`])

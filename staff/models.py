@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from core.models import RemediumBaseModel
 from simple_history.models import HistoricalRecords
 
 # Shared phone validator - same as Patient model
@@ -11,7 +12,7 @@ phone_regex = RegexValidator(
 )
 
 
-class Staff(models.Model):
+class Staff(RemediumBaseModel):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

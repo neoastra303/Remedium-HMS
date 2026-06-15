@@ -147,6 +147,20 @@ A complete review and fix of the Remedium Hospital Management System has been co
 
 ---
 
+## 💎 June 2026 - Database Refactoring (Security & Integrity)
+
+A major database enhancement phase was completed to elevate the system to professional healthcare standards (HIPAA/GDPR compliance ready).
+
+### **Key Enhancements**
+- **Field-Level Encryption (PHI):** Implemented `django-encrypted-model-fields` to encrypt sensitive patient data at rest (Phone, Email, Address, Medical History, Insurance).
+- **Soft Deletes:** Integrated a project-wide `RemediumBaseModel` and custom Managers. Deleted records are now hidden from the UI but preserved for legal and audit compliance.
+- **Unified Timestamps:** Centralized `created_at` and `updated_at` across all clinical and administrative models.
+- **Verification:** Added `core/tests_enhancements.py` to verify encryption-at-rest and soft-deletion logic.
+
+**Status:** ✅ **VERIFIED & SECURE**
+
+---
+
 ## 🔧 Technology Stack
 
 ### Backend

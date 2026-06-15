@@ -37,6 +37,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- update completion summary with June 2026 refactoring details ([`7d85225`])
 - add verification tests for database security and integrity ([`82788c2`])
 - add encryption dependency and basic config ([`743e6b5`])
 - update README with role-based dashboards, test accounts table, UI/UX design section ([`8551a4b`])

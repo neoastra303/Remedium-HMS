@@ -287,7 +287,7 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="noreply@remediumhms.c
 
 # Dedicated encryption key for application secrets stored in the database.
 # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-FIELD_ENCRYPTION_KEY = config("FIELD_ENCRYPTION_KEY", default="")
+FIELD_ENCRYPTION_KEY = config("FIELD_ENCRYPTION_KEY", default="KETwFe-Gtw80MYNku8lysC7POgv98lgTUUadt010MIA=")
 
 # Logging Configuration
 LOGGING = {

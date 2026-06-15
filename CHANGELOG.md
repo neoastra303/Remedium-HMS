@@ -5,7 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] - 2026-06-13
+## [Unreleased] - 2026-06-15
 
 ### Added
 - implement role-based view routing and context processor with full role flags ([`065a963`])
@@ -29,6 +29,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- update README with role-based dashboards, test accounts table, UI/UX design section ([`8551a4b`])
 - add management command to create test users for all 13 roles ([`320ea92`])
 - enhance list templates (appointments, staff, invoices) and partials (pagination, field, empty-state) ([`b0dbc30`])
 - enhance patient templates and views with breadcrumbs, modal deletes, improved UX ([`5c92e73`])

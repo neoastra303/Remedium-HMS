@@ -3,44 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Remedium HMS</title>
+    <title>Remedium HMS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../../static/css/custom.css">
+    <link rel="stylesheet" href="../static/css/custom.css">
     <style>
         body { background: var(--bg-clinical); }
-        .sidebar { height: 100vh; background: white; border-right: 1px solid var(--glass-border); padding: 20px; }
-        .nav-link { color: #64748b; border-radius: var(--radius-btn); margin-bottom: 5px; }
-        .nav-link.active { background: var(--primary-blue); color: white; }
+        .navbar { background: white; border-bottom: 1px solid var(--glass-border); padding: 10px 20px; }
+        .sidebar { height: calc(100vh - 70px); background: white; border-right: 1px solid var(--glass-border); padding: 20px; }
+        .nav-link { color: #64748b; border-radius: 12px; margin-bottom: 5px; }
+        .nav-link.active { background: #2563eb; color: white; }
         .main-content { padding: 30px; }
-        .glass-card { 
-            background: var(--glass-bg); 
-            backdrop-filter: blur(12px); 
-            border: 1px solid var(--glass-border); 
-            border-radius: var(--radius-card); 
-            padding: 20px;
-            box-shadow: var(--shadow-card);
-            height: 100%;
-        }
+        .glass-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .btn-action { border-radius: 50%; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
-<div class="d-flex">
-    <div class="sidebar">
-        <div class="remedium-logo mb-5">
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+        <div class="remedium-logo">
             <div class="logo-icon"><i class="bi bi-plus-lg"></i></div>
             Remedium
         </div>
+        <div class="d-flex w-50">
+            <input type="text" class="form-control rounded-pill" placeholder="Global search (Ctrl+K)...">
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-bell fs-5"></i>
+            <div class="rounded-circle bg-primary text-white p-2">UN</div>
+        </div>
+    </div>
+</nav>
+<div class="d-flex">
+    <div class="sidebar" style="width: 240px;">
         <div class="nav flex-column">
-            <a href="#" class="nav-link active"><i class="bi bi-grid me-2"></i> Dashboard</a>
-            <a href="#" class="nav-link"><i class="bi bi-people me-2"></i> Patients</a>
-            <a href="#" class="nav-link"><i class="bi bi-calendar-event me-2"></i> Appointments</a>
+            <a href="doctor.html" class="nav-link"><i class="bi bi-grid me-2"></i> Dashboard</a>
+            <a href="nurse.html" class="nav-link"><i class="bi bi-heart-pulse me-2"></i> Patients</a>
+            <a href="pharmacy.html" class="nav-link"><i class="bi bi-capsule me-2"></i> Pharmacy</a>
         </div>
     </div>
     <div class="main-content flex-grow-1">
-        <h3 class="fw-bold mb-4">{{dashboard_title}}</h3>
-        <div class="row g-4">
-            {{dashboard_content}}
+        <div class="d-flex justify-content-between mb-4">
+            <h3 class="fw-bold">{{title}}</h3>
+            <button class="btn btn-primary rounded-pill">+ Add New</button>
+        </div>
+        <div class="glass-card">
+            {{content}}
         </div>
     </div>
 </div>

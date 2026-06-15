@@ -9,29 +9,49 @@
     <link rel="stylesheet" href="../../static/css/custom.css">
     <style>
         body { background: var(--bg-clinical); }
-        .sidebar { height: 100vh; background: white; border-right: 1px solid var(--glass-border); padding: 20px; }
+        .navbar { background: white; border-bottom: 1px solid var(--glass-border); padding: 10px 20px; }
+        .sidebar { height: calc(100vh - 70px); background: white; border-right: 1px solid var(--glass-border); padding: 20px; }
         .nav-link { color: #64748b; border-radius: 12px; margin-bottom: 5px; }
         .nav-link.active { background: #2563eb; color: white; }
         .main-content { padding: 30px; }
-        .glass-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 16px; padding: 20px; height: 100%; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .glass-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .btn-action { border-radius: 50%; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
+<nav class="navbar navbar-expand-lg"><div class="container-fluid"><div class="remedium-logo"><div class="logo-icon"><i class="bi bi-plus-lg"></i></div>Remedium</div><div class="d-flex w-50"><input type="text" class="form-control rounded-pill" placeholder="Global search (Ctrl+K)..."></div><div class="d-flex align-items-center gap-3"><i class="bi bi-bell fs-5"></i><div class="rounded-circle bg-primary text-white p-2">UN</div></div></div></nav>
 <div class="d-flex">
-    <div class="sidebar">
-        <div class="remedium-logo mb-5">
-            <div class="logo-icon"><i class="bi bi-plus-lg"></i></div>
-            Remedium
-        </div>
+    <div class="sidebar" style="width: 240px;">
         <div class="nav flex-column">
-            <a href="#" class="nav-link active"><i class="bi bi-grid me-2"></i> Doctor Portal</a>
+            <a href="doctor.html" class="nav-link active"><i class="bi bi-grid me-2"></i> Doctor Portal</a>
         </div>
     </div>
     <div class="main-content flex-grow-1">
-        <h3 class="fw-bold mb-4">Doctor Dashboard</h3>
+        <div class="d-flex justify-content-between mb-4">
+            <h3 class="fw-bold">Doctor Dashboard</h3>
+            <button class="btn btn-primary rounded-pill">+ Schedule Appointment</button>
+        </div>
         <div class="row g-4">
-            <div class="col-md-6"><div class="glass-card"><h5>Today's Schedule</h5><p>• 09:00 - John Doe (Consult)</p><p>• 10:30 - Jane Smith (Follow-up)</p></div></div>
-            <div class="col-md-6"><div class="glass-card"><h5>Critical Vitals</h5><p class="text-danger">• Bed 101: BP 150/95</p><p class="text-warning">• Bed 105: SpO2 92%</p></div></div>
+            <div class="col-md-8">
+                <div class="glass-card">
+                    <h5 class="fw-bold mb-3">Today's Appointments</h5>
+                    <table class="table align-middle">
+                        <thead><tr><th>Patient</th><th>Time</th><th>Type</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            <tr><td>John Doe</td><td>09:00 AM</td><td>Consult</td><td>
+                                <button class="btn btn-outline-primary btn-action"><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-outline-danger btn-action"><i class="bi bi-trash"></i></button>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card h-100 border-danger border-opacity-50">
+                    <h5 class="fw-bold mb-3 text-danger">Critical Alerts</h5>
+                    <div class="alert alert-danger p-2 small">#PAT-102 BP High!</div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

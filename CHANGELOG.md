@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased] - 2026-06-16
 
 ### Added
+- implement HTML dashboard prototypes with glassmorphic design and branding ([`87f9f5d`])
 - implement global UX enhancements (Spotlight Search, page transitions, visual feedback) ([`2d122d0`])
 - **surgery**: apply soft deletes to Surgery model ([`f212471`])
 - **laboratory**: apply soft deletes to LabTest model ([`5863db6`])

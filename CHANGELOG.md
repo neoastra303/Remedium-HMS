@@ -37,6 +37,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- redesign README with professional enterprise showcase and architecture diagram ([`76c2687`])
 - add helper scripts for local admin and receptionist creation ([`526336c`])
 - update completion summary with June 2026 refactoring details ([`7d85225`])
 - add verification tests for database security and integrity ([`82788c2`])

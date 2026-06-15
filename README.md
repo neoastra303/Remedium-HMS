@@ -70,6 +70,45 @@ graph TD
     end
 ```
 
+### **🔄 Clinical Workflow**
+
+```mermaid
+sequenceDiagram
+    participant P as Patient
+    participant R as Receptionist
+    participant D as Doctor
+    participant L as Lab/Pharmacy
+    participant B as Billing
+
+    P->>R: Registration / Check-in
+    R->>D: Assign to Waiting Queue
+    D->>P: Consultation & Vitals
+    D->>L: Request Lab Test / Rx
+    L->>D: Results / Dispense
+    D->>B: Finalize Service
+    B->>P: Generate Invoice (Ledger)
+```
+
+---
+
+## 🎨 System Wireframes & Dashboards
+
+Remedium features a **Glassmorphic Design System** that adapts to the user's role.
+
+<div align="center">
+
+| **Clinical Dashboard** | **Administrative View** |
+|:---:|:---:|
+| ![Doctor Dashboard](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/doctor-view.png) | ![Admin Analytics](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/admin-view.png) |
+| *Focus: Patient Vitals & Today's Schedule* | *Focus: Revenue & Dept Occupancy* |
+
+| **Pharmacy Portal** | **Laboratory Console** |
+|:---:|:---:|
+| ![Pharmacist View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/pharmacy-view.png) | ![Lab View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/lab-view.png) |
+| *Focus: Stock Alerts & Rx Dispensing* | *Focus: Test Queue & Result Entry* |
+
+</div>
+
 ---
 
 ## 📊 Tech Stack
@@ -87,6 +126,8 @@ graph TD
 
 ## 👥 Intelligent Role Dashboards
 
+Each role is granted unique permissions and a specialized landing page.
+
 | Role | Interface | Key Features |
 |:---:|:---|---|
 | **Doctor** | `doctor_dashboard.html` | Schedule, active patients, vitals visualization, rapid Rx. |
@@ -94,6 +135,19 @@ graph TD
 | **Admin** | `admin_dashboard.html` | Revenue analytics, department load, staff management. |
 | **Pharmacist** | `pharmacist_dashboard.html` | Stock alerts, Rx queue, OpenFDA lookups. |
 | **Reception** | `reception_dashboard.html` | Check-in queue, billing flow, doctor availability. |
+
+### **🔐 Test Accounts (Demo Seeding)**
+
+Run `python manage.py create_role_users` to explore the system with any of these pre-configured roles:
+
+| Username | Role | Dashboard Access | Password |
+|:---|:---|:---|:---|
+| `admin` | Administrator | Full Analytics & Operations | `password123` |
+| `doctor` | Doctor | Clinical Consultation & vitals | `password123` |
+| `nurse` | Nurse | In-patient monitoring | `password123` |
+| `pharmacist` | Pharmacist | Inventory & OpenFDA Portal | `password123` |
+| `labtech` | Lab Technician | Result Entry & Queue | `password123` |
+| `receptionist` | Receptionist | Check-in & Ledger Billing | `password123` |
 
 ---
 

@@ -104,6 +104,12 @@
                 </ul>
                 <ul class="navbar-nav align-items-center gap-1">
                     {% if user.is_authenticated %}
+                    <li class="nav-item me-2 d-none d-md-block">
+                        <button class="btn btn-link nav-link px-2 d-flex align-items-center" id="globalSearchTrigger" title="Search (Ctrl+K)">
+                            <i class="bi bi-search"></i>
+                            <span class="ms-2 small text-muted opacity-50">Ctrl+K</span>
+                        </button>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="avatar-circle me-2" style="width:32px;height:32px;font-size:0.7rem;box-shadow:none;">
@@ -204,6 +210,34 @@
         </div>
     </div>
 
+    <!-- Global Search Modal (Spotlight Style) -->
+    <div class="modal fade" id="globalSearchModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0">
+                <div class="search-input-group d-flex align-items-center">
+                    <i class="bi bi-search fs-4 me-3 text-primary"></i>
+                    <input type="text" id="globalSearchInput" class="form-control form-control-lg border-0 shadow-none" placeholder="Search patients, staff, or invoices..." autocomplete="off">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div id="searchResults" class="search-results-list">
+                        <div class="p-4 text-center text-muted">
+                            <i class="bi bi-keyboard fs-1 d-block mb-2 opacity-25"></i>
+                            <p class="mb-0">Type to search Remedium...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-2 bg-light rounded-bottom-4">
+                    <div class="container-fluid d-flex justify-content-between small text-muted">
+                        <span><span class="badge bg-white text-dark border me-1">↑↓</span> to navigate</span>
+                        <span><span class="badge bg-white text-dark border me-1">Enter</span> to select</span>
+                        <span><span class="badge bg-white text-dark border me-1">Esc</span> to close</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
@@ -211,6 +245,7 @@
     <script src="{% static 'js/api-client.js' %}"></script>
     <script src="{% static 'js/ajax-helpers.js' %}"></script>
     <script src="{% static 'js/ui-feedback.js' %}"></script>
+    <script src="{% static 'js/ux-enhancements.js' %}"></script>
 
     <script>
     document.addEventListener('DOMContentLoaded', function () {

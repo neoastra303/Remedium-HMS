@@ -3,11 +3,12 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import date
-import re
+from encrypted_model_fields.fields import EncryptedCharField, EncryptedTextField, EncryptedEmailField
+from core.models import RemediumBaseModel
 from simple_history.models import HistoricalRecords
 
 
-class Patient(models.Model):
+class Patient(RemediumBaseModel):
     GENDER_CHOICES = [
         ("M", "Male"),
         ("F", "Female"),
@@ -54,32 +55,31 @@ class Patient(models.Model):
         db_index=True,
         help_text="Patient's gender",
     )
-    address = models.TextField(blank=True, null=True, help_text="Patient's address")
-    phone = models.CharField(
+    address = EncryptedTextField(blank=True, null=True, help_text="Patient's address")
+    phone = EncryptedCharField(
         validators=[phone_regex],
         max_length=20,
-        db_index=True,
         blank=True,
         null=True,
         help_text="Patient's phone number",
     )
-    email = models.EmailField(
-        db_index=True, blank=True, null=True, help_text="Patient's email address"
+    email = EncryptedEmailField(
+        blank=True, null=True, help_text="Patient's email address"
     )
-    insurance_provider = models.CharField(
+    insurance_provider = EncryptedCharField(
         max_length=100, blank=True, null=True, help_text="Insurance provider name"
     )
     emergency_contact_name = models.CharField(
         max_length=100, blank=True, null=True, help_text="Emergency contact name"
     )
-    emergency_contact_phone = models.CharField(
+    emergency_contact_phone = EncryptedCharField(
         validators=[phone_regex],
         max_length=20,
         blank=True,
         null=True,
         help_text="Emergency contact phone number",
     )
-    medical_history = models.TextField(
+    medical_history = EncryptedTextField(
         blank=True, null=True, help_text="Patient's medical history"
     )
     admission_date = models.DateTimeField(

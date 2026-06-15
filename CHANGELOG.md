@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased] - 2026-06-15
 
 ### Added
+- implement project-wide soft delete and timestamp base model ([`ca773ba`])
 - implement role-based view routing and context processor with full role flags ([`065a963`])
 - create role-specific dashboards for admin, doctor, nurse, receptionist, pharmacist, labtech, surgeon, and default ([`29b438f`])
 - implement receptionist toolkit (Check-in, Queue, Bed Map) ([`3e5d8ff`])

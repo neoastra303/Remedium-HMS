@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased] - 2026-06-15
 
 ### Added
+- **staff**: apply soft deletes to Staff model ([`4f7b9c1`])
 - **patients**: apply soft deletes and PHI encryption to Patient model ([`86848ae`])
 - implement project-wide soft delete and timestamp base model ([`ca773ba`])
 - implement role-based view routing and context processor with full role flags ([`065a963`])

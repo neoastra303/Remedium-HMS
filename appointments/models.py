@@ -3,10 +3,11 @@ from patients.models import Patient
 from staff.models import Staff
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from core.models import RemediumBaseModel
 from simple_history.models import HistoricalRecords
 
 
-class Appointment(models.Model):
+class Appointment(RemediumBaseModel):
     class Meta:
         app_label = "appointments"
         permissions = [

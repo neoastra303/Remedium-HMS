@@ -19,33 +19,56 @@
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg">
+<nav class="navbar navbar-expand-lg sticky-top">
     <div class="container-fluid">
         <div class="remedium-logo">
             <div class="logo-icon"><i class="bi bi-plus-lg"></i></div>
             Remedium
         </div>
         <div class="d-flex w-50">
-            <input type="text" class="form-control rounded-pill" placeholder="Global search (Ctrl+K)...">
+            <input type="text" class="form-control rounded-pill bg-light border-0" placeholder="Global search (Ctrl+K)...">
         </div>
         <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-bell fs-5"></i>
-            <div class="rounded-circle bg-primary text-white p-2">UN</div>
+            <!-- Notifications Dropdown -->
+            <div class="dropdown">
+                <i class="bi bi-bell fs-5 cursor-pointer" data-bs-toggle="dropdown"></i>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    <li><h6 class="dropdown-header">Notifications</h6></li>
+                    <li><a class="dropdown-item" href="#">Patient #101 stable</a></li>
+                </ul>
+            </div>
+            <!-- User Profile Dropdown -->
+            <div class="dropdown">
+                <div class="rounded-circle bg-primary text-white p-2 cursor-pointer" data-bs-toggle="dropdown">UN</div>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </nav>
 <div class="d-flex">
     <div class="sidebar" style="width: 240px;">
-        <div class="nav flex-column">
+        <nav class="nav flex-column">
             <a href="doctor.html" class="nav-link"><i class="bi bi-grid me-2"></i> Dashboard</a>
             <a href="nurse.html" class="nav-link"><i class="bi bi-heart-pulse me-2"></i> Patients</a>
             <a href="pharmacy.html" class="nav-link"><i class="bi bi-capsule me-2"></i> Pharmacy</a>
-        </div>
+        </nav>
     </div>
     <div class="main-content flex-grow-1">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">{{title}}</li>
+            </ol>
+        </nav>
         <div class="d-flex justify-content-between mb-4">
             <h3 class="fw-bold">{{title}}</h3>
-            <button class="btn btn-primary rounded-pill">+ Add New</button>
+            <div>
+                <button class="btn btn-outline-secondary rounded-pill me-2">Filter</button>
+                <button class="btn btn-primary rounded-pill">+ Add New</button>
+            </div>
         </div>
         <div class="glass-card">
             {{content}}

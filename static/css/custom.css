@@ -2,32 +2,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary-blue: #0062ff;
-  --primary-glow: rgba(0, 98, 255, 0.4);
-  --secondary-purple: #7b2ff7;
-  --accent-teal: #00d1b2;
-  --medical-green: #20bc77;
+  /* Modern Clinical-Glass Palette */
+  --primary-blue: #2563eb;
+  --bg-clinical: #f1f5f9;
   --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.3);
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --text-heading: #0f172a;
-  --bg-gradient: radial-gradient(circle at top right, #e0e7ff, #f8fafc),
-                radial-gradient(circle at bottom left, #f1f5f9, #ffffff);
-  --card-bg: #ffffff;
-  --card-border: rgba(0, 0, 0, 0.06);
-  --table-header-bg: rgba(255, 255, 255, 0.5);
-  --table-row-hover: #f8fafc;
-  --badge-font-size: 0.72rem;
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --shadow-elevated: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+  --font-inter: 'Inter', system-ui, sans-serif;
   --radius-card: 16px;
   --radius-btn: 12px;
   --radius-input: 10px;
-  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.05);
-  --shadow-card-hover: 0 8px 20px rgba(0, 0, 0, 0.09);
-  --shadow-elevated: 0 8px 32px rgba(31, 38, 135, 0.07);
   --transition-base: 0.2s ease;
-  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --text-main: #1e293b;
+  --text-muted: #64748b;
 }
+
+body { font-family: var(--font-inter); background: var(--bg-clinical); }
+
+/* Improved Dropdowns & UI */
+.navbar { background: rgba(255, 255, 255, 0.9) !important; backdrop-filter: blur(10px); }
+.dropdown-menu { border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+
+/* Logo Styling */
+.remedium-logo { display: flex; align-items: center; font-weight: 800; font-size: 1.4rem; color: var(--primary-blue); }
+.logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #2563eb, #3b82f6); border-radius: 8px; margin-right: 10px; display: flex; align-items: center; justify-content: center; color: white; }
 
 /* ── Reset & Base ──────────────────────────────────────────────────── */
 html { scroll-behavior: smooth; }

@@ -38,6 +38,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- modernize README with color-coded diagrams and security lifecycle flow ([`625441f`])
 - expand README with clinical workflow, dashboard wireframes, and test accounts ([`fe03468`])
 - redesign README with professional enterprise showcase and architecture diagram ([`76c2687`])
 - add helper scripts for local admin and receptionist creation ([`526336c`])

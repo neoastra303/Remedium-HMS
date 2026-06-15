@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased] - 2026-06-15
 
 ### Added
+- **billing**: apply soft deletes to Invoice and Payment models ([`e0f4a00`])
 - **appointments**: apply soft deletes to Appointment model ([`19cc0a8`])
 - **staff**: apply soft deletes to Staff model ([`4f7b9c1`])
 - **patients**: apply soft deletes and PHI encryption to Patient model ([`86848ae`])

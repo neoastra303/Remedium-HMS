@@ -1,9 +1,10 @@
 from django.db import models
 from patients.models import Patient
+from core.models import RemediumBaseModel
 from simple_history.models import HistoricalRecords
 
 
-class Prescription(models.Model):
+class Prescription(RemediumBaseModel):
     class Meta:
         app_label = "pharmacy"
         permissions = [

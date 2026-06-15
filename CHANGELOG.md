@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased] - 2026-06-15
 
 ### Added
+- **surgery**: apply soft deletes to Surgery model ([`f212471`])
 - **laboratory**: apply soft deletes to LabTest model ([`5863db6`])
 - **pharmacy**: apply soft deletes to Prescription model ([`82d8999`])
 - **billing**: apply soft deletes to Invoice and Payment models ([`e0f4a00`])

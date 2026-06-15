@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from core.models import RemediumBaseModel
 from simple_history.models import HistoricalRecords
 
 
@@ -26,7 +27,7 @@ class InvoiceCounter(models.Model):
             return counter.last_seq
 
 
-class Invoice(models.Model):
+class Invoice(RemediumBaseModel):
     class Meta:
         app_label = "billing"
         permissions = [
@@ -112,7 +113,7 @@ class InvoiceItem(models.Model):
         return f"{self.description} (x{self.quantity}) on {self.invoice.invoice_number}"
 
 
-class Payment(models.Model):
+class Payment(RemediumBaseModel):
     PAYMENT_METHODS = [
         ("CASH", "Cash"),
         ("CARD", "Credit/Debit Card"),

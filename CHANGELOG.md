@@ -5,7 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] - 2026-06-15
+## [Unreleased] - 2026-06-16
 
 ### Added
 - implement global UX enhancements (Spotlight Search, page transitions, visual feedback) ([`2d122d0`])
@@ -38,6 +38,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- add high-fidelity SVG wireframes for all specialized dashboards ([`c7939cf`])
 - modernize README with color-coded diagrams and security lifecycle flow ([`625441f`])
 - expand README with clinical workflow, dashboard wireframes, and test accounts ([`fe03468`])
 - redesign README with professional enterprise showcase and architecture diagram ([`76c2687`])

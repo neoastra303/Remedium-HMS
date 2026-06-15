@@ -134,17 +134,17 @@ The frontend utilizes a custom **Glassmorphic Design System** that prioritizes c
 
 | **The Clinical Cockpit (Doctor)** | **Administrative Analytics** |
 |:---:|:---:|
-| ![Doctor View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/doctor-view.svg) | ![Admin View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/admin-view.svg) |
+| ![Doctor View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/doctor-view.png) | ![Admin View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/admin-view.png) |
 | *High-density data visualization for rapid clinical decision-making.* | *Real-time hospital occupancy and revenue stream tracking.* |
 
 | **Ward Management (Nurse)** | **Pharmacy Control** |
 |:---:|:---:|
-| ![Nurse View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/nurse-view.svg) | ![Pharmacy View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/pharmacy-view.svg) |
+| ![Nurse View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/nurse-view.png) | ![Pharmacy View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/pharmacy-view.png) |
 | *Visual bed map and urgent medication countdown trackers.* | *OpenFDA integrated drug search and dispense queue management.* |
 
 | **Laboratory Information** | **Reception & Gateway** |
 |:---:|:---:|
-| ![Lab View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/lab-view.svg) | ![Reception View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/receptionist-view.svg) |
+| ![Lab View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/lab-view.png) | ![Reception View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/receptionist-view.png) |
 | *Automated test queue with critical range flagging and rapid entry.* | *Streamlined patient registration and ledger-based rapid billing.* |
 
 </div>

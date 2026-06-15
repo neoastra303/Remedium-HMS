@@ -40,72 +40,107 @@ Remedium-HMS is not just another CRUD app. It is a high-security, auditable, and
 
 ## 🏗️ Architectural Vision
 
-Remedium follows a **Modular Monolith** pattern, keeping the codebase manageable through 14 specialized Django apps while ensuring unified performance.
+Remedium follows a **Modular Monolith** pattern, ensuring strict boundaries between 14 specialized domains while maintaining a unified, high-performance core.
 
 ```mermaid
 graph TD
-    A[Core & Auth] --> B[Clinical]
-    A --> C[Operations]
-    A --> D[Support]
-    
-    subgraph Clinical
-    B1[Patients]
-    B2[Medical Records]
-    B3[Laboratory]
-    B4[Care Monitoring]
+    subgraph Core_Layer [Platform Foundation]
+        A[Core & RBAC]:::core
+        S[Staff & Auth]:::core
+    end
+
+    subgraph Clinical_Domain [Clinical Excellence]
+        B1[Patients]:::clinical
+        B2[Medical Records]:::clinical
+        B3[Laboratory]:::clinical
+        B4[Care Monitoring]:::clinical
     end
     
-    subgraph Operations
-    C1[Appointments]
-    C2[Billing & Ledger]
-    C3[Pharmacy]
-    C4[Surgery]
+    subgraph Operations_Domain [Operations & Finance]
+        C1[Appointments]:::ops
+        C2[Billing & Ledger]:::ops
+        C3[Pharmacy]:::ops
+        C4[Surgery]:::ops
     end
     
-    subgraph Support
-    D1[Inventory]
-    D2[Reporting]
-    D3[Integration]
-    D4[Hospital Units]
+    subgraph Support_Domain [Infrastructure]
+        D1[Inventory]:::infra
+        D2[Reporting]:::infra
+        D3[Integration]:::infra
+        D4[Hospital Units]:::infra
     end
+
+    A --> Clinical_Domain
+    A --> Operations_Domain
+    A --> Support_Domain
+
+    classDef core fill:#f9f,stroke:#333,stroke-width:2px,color:#000
+    classDef clinical fill:#bbf,stroke:#333,stroke-width:2px,color:#000
+    classDef ops fill:#dfd,stroke:#333,stroke-width:2px,color:#000
+    classDef infra fill:#ffd,stroke:#333,stroke-width:2px,color:#000
 ```
 
-### **🔄 Clinical Workflow**
+### **🔄 The Patient Journey (Full-Cycle Flow)**
 
 ```mermaid
 sequenceDiagram
-    participant P as Patient
-    participant R as Receptionist
-    participant D as Doctor
-    participant L as Lab/Pharmacy
-    participant B as Billing
+    autonumber
+    participant P as 👤 Patient
+    participant R as 🏢 Reception
+    participant D as 🩺 Doctor
+    participant L as 🔬 Lab/Pharmacy
+    participant B as 💰 Billing (Ledger)
 
-    P->>R: Registration / Check-in
-    R->>D: Assign to Waiting Queue
-    D->>P: Consultation & Vitals
-    D->>L: Request Lab Test / Rx
-    L->>D: Results / Dispense
-    D->>B: Finalize Service
-    B->>P: Generate Invoice (Ledger)
+    P->>R: Initial Registration & Triage
+    Note right of R: RBAC: Receptionist Role
+    R->>D: Digital Queue Assignment
+    D->>P: Physical Consultation
+    rect rgb(240, 240, 255)
+        Note over D,P: Vitals Capture & PHI Encryption
+    end
+    D->>L: Electronic Order (Lab/Rx)
+    L-->>D: Results Entry / Medication Dispense
+    D->>B: Finalize Encounter
+    B->>P: Immutable Ledger Invoice Generated
 ```
 
 ---
 
-## 🎨 System Wireframes & Dashboards
+## 🛡️ Security & Integrity Lifecycle
 
-Remedium features a **Glassmorphic Design System** that adapts to the user's role.
+Every record in Remedium follows a strictly protected lifecycle to ensure data privacy (HIPAA compliance ready) and legal auditability.
+
+```mermaid
+stateDiagram-v2
+    [*] --> PlainText: Input Data
+    PlainText --> DB: Field-Level Encryption (Fernet)
+    state DB {
+        [*] --> Active: "is_deleted = False"
+        Active --> SoftDeleted: User Clicks Delete
+        SoftDeleted --> Active: Admin Restore
+        SoftDeleted --> Archival: "is_deleted = True"
+    }
+    DB --> Output: Transparent Decryption (Python Layer)
+    Output --> [*]
+```
+
+---
+
+## 🎨 Professional Interface Showcase
+
+The frontend utilizes a custom **Glassmorphic Design System** that prioritizes clinical focus and visual comfort.
 
 <div align="center">
 
-| **Clinical Dashboard** | **Administrative View** |
+| **The Clinical Cockpit** | **Administrative Analytics** |
 |:---:|:---:|
-| ![Doctor Dashboard](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/doctor-view.png) | ![Admin Analytics](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/admin-view.png) |
-| *Focus: Patient Vitals & Today's Schedule* | *Focus: Revenue & Dept Occupancy* |
+| ![Doctor View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/doctor-view.png) | ![Admin View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/admin-view.png) |
+| *High-density data visualization for rapid clinical decision-making.* | *Real-time hospital occupancy and revenue stream tracking.* |
 
-| **Pharmacy Portal** | **Laboratory Console** |
+| **Pharmacy Management** | **Laboratory Console** |
 |:---:|:---:|
-| ![Pharmacist View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/pharmacy-view.png) | ![Lab View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/lab-view.png) |
-| *Focus: Stock Alerts & Rx Dispensing* | *Focus: Test Queue & Result Entry* |
+| ![Pharmacy View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/pharmacy-view.png) | ![Lab View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/lab-view.png) |
+| *OpenFDA integrated drug search and inventory reorder triggers.* | *Simplified result entry with automatic critical range flagging.* |
 
 </div>
 

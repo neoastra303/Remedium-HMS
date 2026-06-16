@@ -3,6 +3,9 @@
 import pytest
 from datetime import timedelta
 from django.utils import timezone
+from django.urls import reverse
+from django.contrib.auth.models import User, Permission
+from django.test import Client
 from notifications.models import Notification
 from patients.models import Patient
 
@@ -89,6 +92,78 @@ class TestNotificationModel:
             patient=patient,
         )
         assert patient.notifications.count() == 2
+
+    def _login_with_permission(self, username, codename):
+        client = Client()
+        user = User.objects.create_user(username=username, password="pass")
+        perm = Permission.objects.get(codename=codename)
+        user.user_permissions.add(perm)
+        client.login(username=username, password="pass")
+        return client
+
+    def test_notification_list_view_requires_permission(self):
+        """Test that notification list requires view_notification permission."""
+        user = User.objects.create_user(username="testuser", password="pass")
+        client = Client()
+        client.login(username="testuser", password="pass")
+        url = reverse("notification_list")
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_notification_list_view_with_permission(self):
+        """Test notification list loads with proper permission."""
+        client = self._login_with_permission("permuser", "view_notification")
+        url = reverse("notification_list")
+        response = client.get(url)
+        assert response.status_code == 200
+        assert "notifications" in response.context
+
+    def test_mark_read_requires_post(self):
+        """Test mark_read only accepts POST."""
+        client = self._login_with_permission("testuser2", "change_notification")
+        notif = Notification.objects.create(
+            recipient="test@test.com",
+            notification_type="EMAIL",
+            message="Test",
+        )
+        url = reverse("notification_mark_read", kwargs={"pk": notif.pk})
+        response = client.get(url)
+        assert response.status_code == 405
+
+    def test_mark_read_success(self):
+        """Test mark_read updates status to SENT."""
+        client = self._login_with_permission("testuser3", "change_notification")
+        notif = Notification.objects.create(
+            recipient="test@test.com",
+            notification_type="EMAIL",
+            message="Test",
+        )
+        url = reverse("notification_mark_read", kwargs={"pk": notif.pk})
+        response = client.post(url)
+        assert response.status_code == 302
+        notif.refresh_from_db()
+        assert notif.status == "SENT"
+
+    def test_mark_all_read_success(self):
+        """Test mark_all_read updates all pending notifications."""
+        client = self._login_with_permission("testuser4", "change_notification")
+        Notification.objects.create(
+            recipient="test@test.com",
+            notification_type="EMAIL",
+            message="Pending 1",
+            status="PENDING",
+        )
+        Notification.objects.create(
+            recipient="test@test.com",
+            notification_type="EMAIL",
+            message="Pending 2",
+            status="PENDING",
+        )
+        url = reverse("notification_mark_all_read")
+        response = client.post(url)
+        assert response.status_code == 302
+        assert Notification.objects.filter(status="PENDING").count() == 0
+        assert Notification.objects.filter(status="SENT").count() == 2
 
     def test_notification_ordering(self):
         """Test notifications are ordered by sent_at descending."""

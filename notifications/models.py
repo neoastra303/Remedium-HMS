@@ -2,9 +2,10 @@ from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from core.models import RemediumBaseModel
 
 
-class Notification(models.Model):
+class Notification(RemediumBaseModel):
     TYPES = [
         ("SMS", "SMS"),
         ("EMAIL", "Email"),

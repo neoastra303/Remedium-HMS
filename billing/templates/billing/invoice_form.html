@@ -12,7 +12,7 @@
                 </h5>
             </div>
             <div class="card-body p-4">
-                <form method="post" id="invoice-form" novalidate>
+                <form method="post" id="invoice-form" novalidate data-spinner="true">
                     {% csrf_token %}
                     
                     <div class="row mb-4">
@@ -67,7 +67,7 @@
 
                     <div class="d-flex justify-content-end gap-2 mt-2">
                         <a href="{% url 'invoice_list' %}" class="btn btn-light px-4">Cancel</a>
-                        <button type="submit" class="btn btn-primary px-4">Save Invoice</button>
+                        <button type="submit" class="btn btn-primary px-4"><span data-submit-text><i class="bi bi-check-circle me-1"></i>Save Invoice</span><span data-submit-spinner class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving…</span></button>
                     </div>
                 </form>
             </div>

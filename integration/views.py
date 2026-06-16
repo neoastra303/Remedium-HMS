@@ -1,5 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from core.views import DeleteSuccessMixin, SuccessQueryParamMixin
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.urls import reverse_lazy
@@ -48,7 +50,9 @@ class IntegrationDetailView(
 
 
 class IntegrationCreateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
 ):
     model = ExternalIntegration
     fields = ["system_name", "system_type", "api_endpoint", "notes"]
@@ -56,10 +60,13 @@ class IntegrationCreateView(
     success_url = reverse_lazy("integration_list")
     permission_required = "integration.add_externalintegration"
     raise_exception = True
+    success_message = "Integration created successfully."
 
 
 class IntegrationUpdateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.UpdateView
 ):
     model = ExternalIntegration
     fields = ["system_name", "system_type", "api_endpoint", "notes"]
@@ -67,16 +74,20 @@ class IntegrationUpdateView(
     success_url = reverse_lazy("integration_list")
     permission_required = "integration.change_externalintegration"
     raise_exception = True
+    success_query_param = "updated"
+    success_message = "Integration updated successfully."
 
 
 class IntegrationDeleteView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView
+    DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.DeleteView
 ):
     model = ExternalIntegration
     template_name = "integration/integration_confirm_delete.html"
     success_url = reverse_lazy("integration_list")
     permission_required = "integration.delete_externalintegration"
     raise_exception = True
+    success_message = "Integration deleted successfully."
 
 
 @login_required

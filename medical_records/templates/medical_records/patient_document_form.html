@@ -6,10 +6,10 @@
 
 <div class="card mb-4">
     <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" data-spinner="true">
             {% csrf_token %}
             {{ form|crispy }}
-            <button type="submit" class="btn btn-primary">Upload Document</button>
+            <button type="submit" class="btn btn-primary"><span data-submit-text><i class="bi bi-check-circle me-1"></i>Upload Document</span><span data-submit-spinner class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving…</span></button>
             <a href="{% url 'patient_document_list' patient.pk %}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>

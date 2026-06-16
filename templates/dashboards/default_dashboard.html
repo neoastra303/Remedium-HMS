@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static dashboard_tags %}
 
 {% block content %}
 <div class="container-fluid px-4 py-3 animate-fade-in">
@@ -31,22 +31,8 @@
                 <div class="stat-card__sub">{{ admitted_patients }} currently admitted</div>
             </div>
         </div>
-        <div class="col-6 col-md-4">
-            <div class="stat-card stat-card--teal">
-                <div class="stat-card__icon"><i class="bi bi-calendar-check"></i></div>
-                <div class="stat-card__label">Today's Appointments</div>
-                <div class="stat-card__value">{{ today_appointments }}</div>
-                <div class="stat-card__sub">Scheduled today</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4">
-            <div class="stat-card stat-card--green">
-                <div class="stat-card__icon"><i class="bi bi-building"></i></div>
-                <div class="stat-card__label">Active Staff</div>
-                <div class="stat-card__value">{{ active_staff|default:"—" }}</div>
-                <div class="stat-card__sub">On campus</div>
-            </div>
-        </div>
+        {% stat_card icon="bi-calendar-check" label="Today's Appointments" value=today_appointments sub_text="Scheduled today" color="teal" %}
+        {% stat_card icon="bi-building" label="Active Staff" value=active_staff|default:"—" sub_text="On campus" color="green" %}
     </div>
 
     <div class="row g-4">
@@ -57,42 +43,14 @@
             <div class="mb-4">
                 <div class="section-label">Quick Actions</div>
                 <div class="row g-3">
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'patient_list' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-primary bg-opacity-10 text-primary">
-                                <i class="bi bi-people"></i>
-                            </div>
-                            <div class="quick-action__title">Patients</div>
-                            <div class="quick-action__sub">Directory</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'appointment_list' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-info bg-opacity-10 text-info">
-                                <i class="bi bi-calendar-event"></i>
-                            </div>
-                            <div class="quick-action__title">Appointments</div>
-                            <div class="quick-action__sub">Schedule</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'hospital:occupancy_map' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-success bg-opacity-10 text-success">
-                                <i class="bi bi-grid-3x3-gap"></i>
-                            </div>
-                            <div class="quick-action__title">Bed Map</div>
-                            <div class="quick-action__sub">Occupancy</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'hospital:service_list' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-warning bg-opacity-10 text-warning">
-                                <i class="bi bi-card-checklist"></i>
-                            </div>
-                            <div class="quick-action__title">Services</div>
-                            <div class="quick-action__sub">Directory</div>
-                        </a>
-                    </div>
+                    {% url 'patient_list' as u1 %}
+                    {% url 'appointment_list' as u2 %}
+                    {% url 'hospital:occupancy_map' as u3 %}
+                    {% url 'hospital:service_list' as u4 %}
+                    {% quick_action url=u1 icon="bi-people" title="Patients" sub="Directory" %}
+                    {% quick_action url=u2 icon="bi-calendar-event" title="Appointments" sub="Schedule" bg_class="info" text_class="info" %}
+                    {% quick_action url=u3 icon="bi-grid-3x3-gap" title="Bed Map" sub="Occupancy" bg_class="success" text_class="success" %}
+                    {% quick_action url=u4 icon="bi-card-checklist" title="Services" sub="Directory" bg_class="warning" text_class="warning" %}
                 </div>
             </div>
 

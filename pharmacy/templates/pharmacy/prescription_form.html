@@ -11,9 +11,13 @@
                 </h5>
             </div>
             <div class="card-body p-4">
-                <form method="post" novalidate>
+                <form method="post" novalidate data-spinner="true">
                     {% csrf_token %}
-                    {% crispy form %}
+                    {{ form|crispy }}
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{% url 'prescription_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4"><span data-submit-text><i class="bi bi-check-circle me-1"></i>{% if object %}Update{% else %}Create{% endif %} Prescription</span><span data-submit-spinner class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving…</span></button>
+                    </div>
                 </form>
             </div>
         </div>

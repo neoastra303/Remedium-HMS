@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static dashboard_tags %}
 
 {% block content %}
 <div class="container-fluid px-4 py-3 animate-fade-in">
@@ -23,38 +23,10 @@
 
     {# ── Stat Cards ── #}
     <div class="row g-3 mb-4 stagger-children">
-        <div class="col-6 col-md-3">
-            <div class="stat-card stat-card--blue">
-                <div class="stat-card__icon"><i class="bi bi-calendar-check"></i></div>
-                <div class="stat-card__label">Today's Appointments</div>
-                <div class="stat-card__value">{{ today_appointments }}</div>
-                <div class="stat-card__sub">{{ checked_in_count }} checked in</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-card stat-card--teal">
-                <div class="stat-card__icon"><i class="bi bi-people"></i></div>
-                <div class="stat-card__label">New Patients</div>
-                <div class="stat-card__value">{{ new_patients_7days }}</div>
-                <div class="stat-card__sub">Last 7 days</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-card stat-card--green">
-                <div class="stat-card__icon"><i class="bi bi-person-check"></i></div>
-                <div class="stat-card__label">Doctors Available</div>
-                <div class="stat-card__value">{{ available_doctors }}</div>
-                <div class="stat-card__sub">On duty today</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-card stat-card--amber">
-                <div class="stat-card__icon"><i class="bi bi-hospital"></i></div>
-                <div class="stat-card__label">Admitted</div>
-                <div class="stat-card__value">{{ admitted_patients }}</div>
-                <div class="stat-card__sub">Current in-patients</div>
-            </div>
-        </div>
+        {% stat_card icon="bi-calendar-check" label="Today's Appointments" value=today_appointments sub_text=checked_in_count|stringformat:"s"|add:" checked in" color="blue" %}
+        {% stat_card icon="bi-people" label="New Patients" value=new_patients_7days sub_text="Last 7 days" color="teal" %}
+        {% stat_card icon="bi-person-check" label="Doctors Available" value=available_doctors sub_text="On duty today" color="green" %}
+        {% stat_card icon="bi-hospital" label="Admitted" value=admitted_patients sub_text="Current in-patients" color="amber" %}
     </div>
 
     <div class="row g-4">
@@ -65,42 +37,14 @@
             <div class="mb-4">
                 <div class="section-label">Quick Actions</div>
                 <div class="row g-3">
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'patient_create' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-primary bg-opacity-10 text-primary">
-                                <i class="bi bi-person-plus"></i>
-                            </div>
-                            <div class="quick-action__title">New Patient</div>
-                            <div class="quick-action__sub">Register</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'appointment_create' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-info bg-opacity-10 text-info">
-                                <i class="bi bi-calendar-plus"></i>
-                            </div>
-                            <div class="quick-action__title">Book Visit</div>
-                            <div class="quick-action__sub">Schedule</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'doctor_availability' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-success bg-opacity-10 text-success">
-                                <i class="bi bi-person-check"></i>
-                            </div>
-                            <div class="quick-action__title">Doctor Load</div>
-                            <div class="quick-action__sub">Availability</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'queue_tracker' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-warning bg-opacity-10 text-warning">
-                                <i class="bi bi-list-ol"></i>
-                            </div>
-                            <div class="quick-action__title">Queue</div>
-                            <div class="quick-action__sub">Track</div>
-                        </a>
-                    </div>
+                    {% url 'patient_create' as u1 %}
+                    {% url 'appointment_create' as u2 %}
+                    {% url 'doctor_availability' as u3 %}
+                    {% url 'queue_tracker' as u4 %}
+                    {% quick_action url=u1 icon="bi-person-plus" title="New Patient" sub="Register" %}
+                    {% quick_action url=u2 icon="bi-calendar-plus" title="Book Visit" sub="Schedule" bg_class="info" text_class="info" %}
+                    {% quick_action url=u3 icon="bi-person-check" title="Doctor Load" sub="Availability" bg_class="success" text_class="success" %}
+                    {% quick_action url=u4 icon="bi-list-ol" title="Queue" sub="Track" bg_class="warning" text_class="warning" %}
                 </div>
             </div>
 

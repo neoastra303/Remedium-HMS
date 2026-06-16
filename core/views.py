@@ -292,4 +292,16 @@ class DeleteSuccessMixin:
 
     def get_success_url(self):
         url = super().get_success_url()
-        return f"{url}?deleted=1"
+        separator = "&" if "?" in url else "?"
+        return f"{url}{separator}deleted=1"
+
+
+class SuccessQueryParamMixin:
+    """Appends ?created=1 or ?updated=1 to the success URL."""
+
+    success_query_param = "created"
+
+    def get_success_url(self):
+        url = super().get_success_url()
+        separator = "&" if "?" in url else "?"
+        return f"{url}{separator}{self.success_query_param}=1"

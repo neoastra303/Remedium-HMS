@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from core.views import DeleteSuccessMixin, SuccessQueryParamMixin
 from django.views import generic
 from django.urls import reverse_lazy
 from .models import PatientCare
@@ -62,7 +64,9 @@ class PatientCareDetailView(
 
 
 class PatientCareCreateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
 ):
     model = PatientCare
     form_class = PatientCareForm
@@ -70,10 +74,13 @@ class PatientCareCreateView(
     success_url = reverse_lazy("care_monitoring:patientcare_list")
     permission_required = "care_monitoring.care_monitoring_add_patientcare"
     raise_exception = True
+    success_message = "Care record created successfully."
 
 
 class PatientCareUpdateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.UpdateView
 ):
     model = PatientCare
     form_class = PatientCareForm
@@ -81,16 +88,20 @@ class PatientCareUpdateView(
     success_url = reverse_lazy("care_monitoring:patientcare_list")
     permission_required = "care_monitoring.care_monitoring_change_patientcare"
     raise_exception = True
+    success_query_param = "updated"
+    success_message = "Care record updated successfully."
 
 
 class PatientCareDeleteView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView
+    DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.DeleteView
 ):
     model = PatientCare
     template_name = "care_monitoring/patientcare_confirm_delete.html"
     success_url = reverse_lazy("care_monitoring:patientcare_list")
     permission_required = "care_monitoring.care_monitoring_delete_patientcare"
     raise_exception = True
+    success_message = "Care record deleted successfully."
 
 
 class PatientVitalTrendsView(LoginRequiredMixin, PermissionRequiredMixin, generic.View):

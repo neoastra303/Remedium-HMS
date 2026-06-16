@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from core.views import DeleteSuccessMixin, SuccessQueryParamMixin
 from django.views import generic
 from patients.models import Patient
 from .forms import ReportForm
@@ -32,30 +34,45 @@ class ReportDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Deta
     raise_exception = True
 
 
-class ReportCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+class ReportCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
+):
     model = Report
     form_class = ReportForm
     template_name = "reporting/report_form.html"
     success_url = "/reports/"
     permission_required = "reporting.reporting_add_report"
     raise_exception = True
+    success_message = "Report created successfully."
 
 
-class ReportUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
+class ReportUpdateView(
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.UpdateView
+):
     model = Report
     form_class = ReportForm
     template_name = "reporting/report_form.html"
     success_url = "/reports/"
     permission_required = "reporting.reporting_change_report"
     raise_exception = True
+    success_query_param = "updated"
+    success_message = "Report updated successfully."
 
 
-class ReportDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
+class ReportDeleteView(
+    DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.DeleteView
+):
     model = Report
     template_name = "reporting/report_confirm_delete.html"
     success_url = "/reports/"
     permission_required = "reporting.reporting_delete_report"
     raise_exception = True
+    success_message = "Report deleted successfully."
 
 
 @login_required

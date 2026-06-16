@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from core.views import DeleteSuccessMixin, SuccessQueryParamMixin
 from django.contrib.auth.decorators import (
     login_required,
     permission_required as perm_decorator,
@@ -108,55 +110,80 @@ class StaffDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detai
         return context
 
 
-class StaffCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+class StaffCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
+):
     model = Staff
     form_class = StaffForm  # Use the custom form class
     template_name = "staff/staff_form.html"
     success_url = reverse_lazy("staff_list")  # Redirect to the list view after success
     permission_required = "staff.staff_add_staff"
     raise_exception = True
+    success_message = "Staff member created successfully."
 
 
-class StaffUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
+class StaffUpdateView(
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.UpdateView
+):
     model = Staff
     form_class = StaffForm  # Use the custom form class
     template_name = "staff/staff_form.html"
     success_url = reverse_lazy("staff_list")  # Redirect to the list view after success
     permission_required = "staff.staff_change_staff"
     raise_exception = True
+    success_query_param = "updated"
+    success_message = "Staff member updated successfully."
 
 
-class StaffDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
+class StaffDeleteView(
+    DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.DeleteView
+):
     model = Staff
     template_name = "staff/staff_confirm_delete.html"
     success_url = reverse_lazy("staff_list")  # Redirect to the list view after success
     permission_required = "staff.staff_delete_staff"
     raise_exception = True
+    success_message = "Staff member deleted successfully."
 
 
-class ShiftCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+class ShiftCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.CreateView
+):
     model = Shift
     fields = ["day_of_week", "start_time", "end_time"]
     template_name = "staff/shift_form.html"
     permission_required = "staff.staff_change_staff"
     raise_exception = True
+    success_message = "Shift created successfully."
 
     def form_valid(self, form):
         form.instance.staff = get_object_or_404(Staff, pk=self.kwargs["staff_pk"])
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse("staff_detail", kwargs={"pk": self.kwargs["staff_pk"]})
+        url = reverse("staff_detail", kwargs={"pk": self.kwargs["staff_pk"]})
+        return f"{url}?created=1"
 
 
-class ShiftDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
+class ShiftDeleteView(
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.DeleteView
+):
     model = Shift
     template_name = "staff/shift_confirm_delete.html"
     permission_required = "staff.staff_change_staff"
     raise_exception = True
+    success_message = "Shift deleted successfully."
 
     def get_success_url(self):
-        return reverse("staff_detail", kwargs={"pk": self.object.staff.pk})
+        url = reverse("staff_detail", kwargs={"pk": self.object.staff.pk})
+        return f"{url}?deleted=1"
 
 
 # User Management Views
@@ -178,12 +205,17 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView
         )
 
 
-class UserCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+class UserCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
+):
     form_class = StaffWithUserForm
     template_name = "staff/user_form.html"
     success_url = reverse_lazy("user_list")
     permission_required = "auth.add_user"
     raise_exception = True
+    success_message = "User account created successfully."
 
 
 @login_required

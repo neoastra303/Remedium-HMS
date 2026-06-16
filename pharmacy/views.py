@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from core.views import DeleteSuccessMixin, SuccessQueryParamMixin
 from django.views import generic
 from .forms import PrescriptionForm
 from .models import Prescription
@@ -37,7 +39,9 @@ class PrescriptionDetailView(
 
 
 class PrescriptionCreateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
 ):
     model = Prescription
     form_class = PrescriptionForm
@@ -45,10 +49,13 @@ class PrescriptionCreateView(
     success_url = reverse_lazy("prescription_list")
     permission_required = "pharmacy.pharmacy_add_prescription"
     raise_exception = True
+    success_message = "Prescription created successfully."
 
 
 class PrescriptionUpdateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.UpdateView
 ):
     model = Prescription
     form_class = PrescriptionForm
@@ -56,16 +63,20 @@ class PrescriptionUpdateView(
     success_url = reverse_lazy("prescription_list")
     permission_required = "pharmacy.pharmacy_change_prescription"
     raise_exception = True
+    success_query_param = "updated"
+    success_message = "Prescription updated successfully."
 
 
 class PrescriptionDeleteView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView
+    DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.DeleteView
 ):
     model = Prescription
     template_name = "pharmacy/prescription_confirm_delete.html"
     success_url = reverse_lazy("prescription_list")
     permission_required = "pharmacy.pharmacy_delete_prescription"
     raise_exception = True
+    success_message = "Prescription deleted successfully."
 
 
 # Create your views here.

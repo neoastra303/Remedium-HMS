@@ -4,8 +4,9 @@ from .models import Patient
 from .forms import PatientForm
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
-from core.views import DeleteSuccessMixin
+from core.views import DeleteSuccessMixin, SuccessQueryParamMixin
 
 
 class PatientListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
@@ -98,7 +99,9 @@ class PatientDetailView(
 
 
 class PatientCreateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
 ):
     model = Patient
     form_class = PatientForm
@@ -106,10 +109,13 @@ class PatientCreateView(
     success_url = reverse_lazy("patient_list")
     permission_required = "patients.patients_add_patient"
     raise_exception = True
+    success_message = "Patient created successfully."
 
 
 class PatientUpdateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.UpdateView
 ):
     model = Patient
     form_class = PatientForm
@@ -117,16 +123,20 @@ class PatientUpdateView(
     success_url = reverse_lazy("patient_list")
     permission_required = "patients.patients_change_patient"
     raise_exception = True
+    success_query_param = "updated"
+    success_message = "Patient updated successfully."
 
 
 class PatientDeleteView(
-    DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView
+    DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.DeleteView
 ):
     model = Patient
     template_name = "patients/patient_confirm_delete.html"
     success_url = reverse_lazy("patient_list")
     permission_required = "patients.patients_delete_patient"
     raise_exception = True
+    success_message = "Patient deleted successfully."
 
 
 class PatientHistoryView(

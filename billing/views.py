@@ -4,6 +4,8 @@ from .models import Invoice, Payment
 from .forms import InvoiceForm, InvoiceItemFormSet
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from core.views import DeleteSuccessMixin, SuccessQueryParamMixin
 from django.db import transaction
 
 
@@ -33,7 +35,9 @@ class InvoiceListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListV
 
 
 class InvoiceCreateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
 ):
     model = Invoice
     form_class = InvoiceForm
@@ -41,6 +45,7 @@ class InvoiceCreateView(
     success_url = reverse_lazy("invoice_list")
     permission_required = "billing.billing_add_invoice"
     raise_exception = True
+    success_message = "Invoice created successfully."
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -64,7 +69,9 @@ class InvoiceCreateView(
 
 
 class InvoiceUpdateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.UpdateView
 ):
     model = Invoice
     form_class = InvoiceForm
@@ -72,6 +79,8 @@ class InvoiceUpdateView(
     success_url = reverse_lazy("invoice_list")
     permission_required = "billing.billing_change_invoice"
     raise_exception = True
+    success_query_param = "updated"
+    success_message = "Invoice updated successfully."
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -95,13 +104,15 @@ class InvoiceUpdateView(
 
 
 class InvoiceDeleteView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView
+    DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.DeleteView
 ):
     model = Invoice
     template_name = "billing/invoice_confirm_delete.html"
     success_url = reverse_lazy("invoice_list")
     permission_required = "billing.billing_delete_invoice"
     raise_exception = True
+    success_message = "Invoice deleted successfully."
 
 
 class InvoiceDetailView(
@@ -149,17 +160,20 @@ class InvoicePrintView(LoginRequiredMixin, PermissionRequiredMixin, generic.Deta
 
 
 class PaymentCreateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.CreateView
 ):
     model = Payment
     fields = ["amount", "payment_method", "transaction_id"]
     template_name = "billing/payment_form.html"
     permission_required = "billing.billing_change_invoice"
     raise_exception = True
+    success_message = "Payment recorded successfully."
 
     def form_valid(self, form):
         form.instance.invoice = get_object_or_404(Invoice, pk=self.kwargs["invoice_pk"])
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse("invoice_detail", kwargs={"pk": self.kwargs["invoice_pk"]})
+        url = reverse("invoice_detail", kwargs={"pk": self.kwargs["invoice_pk"]})
+        return f"{url}?created=1"

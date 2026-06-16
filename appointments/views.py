@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from core.views import DeleteSuccessMixin, SuccessQueryParamMixin
 from django.contrib.auth.decorators import (
     login_required,
     permission_required as perm_decorator,
@@ -32,7 +34,9 @@ class AppointmentListView(
 
 
 class AppointmentCreateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
 ):
     model = Appointment
     form_class = AppointmentForm
@@ -40,10 +44,13 @@ class AppointmentCreateView(
     success_url = reverse_lazy("appointment_list")
     permission_required = "appointments.appointments_add_appointment"
     raise_exception = True
+    success_message = "Appointment created successfully."
 
 
 class AppointmentUpdateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.UpdateView
 ):
     model = Appointment
     form_class = AppointmentForm
@@ -51,16 +58,20 @@ class AppointmentUpdateView(
     success_url = reverse_lazy("appointment_list")
     permission_required = "appointments.appointments_change_appointment"
     raise_exception = True
+    success_query_param = "updated"
+    success_message = "Appointment updated successfully."
 
 
 class AppointmentDeleteView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView
+    DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.DeleteView
 ):
     model = Appointment
     template_name = "appointments/appointment_confirm_delete.html"
     success_url = reverse_lazy("appointment_list")
     permission_required = "appointments.appointments_delete_appointment"
     raise_exception = True
+    success_message = "Appointment deleted successfully."
 
 
 class AppointmentDetailView(

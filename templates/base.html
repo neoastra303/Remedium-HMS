@@ -201,15 +201,18 @@
                     <h5 class="modal-title" id="confirmDeleteModalLabel"><i class="bi bi-exclamation-triangle text-danger me-2"></i>Confirm Deletion</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <p class="mb-0">Are you sure you want to delete <strong id="deleteItemName">this item</strong>? This action cannot be undone.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteButton">
-                        <i class="bi bi-trash me-1"></i>Delete
-                    </button>
-                </div>
+                <form method="post" id="deleteConfirmForm">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <p class="mb-0">Are you sure you want to delete <strong id="deleteItemName">this item</strong>? This action cannot be undone.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger" id="confirmDeleteButton">
+                            <i class="bi bi-trash me-1"></i>Delete
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -272,12 +275,8 @@
                 var itemName = button.getAttribute('data-item-name');
                 var nameEl = document.getElementById('deleteItemName');
                 if (nameEl) nameEl.textContent = itemName || 'this item';
-                var confirmButton = document.getElementById('confirmDeleteButton');
-                if (confirmButton) {
-                    confirmButton.onclick = function () {
-                        if (actionUrl) window.location.href = actionUrl;
-                    };
-                }
+                var form = document.getElementById('deleteConfirmForm');
+                if (form && actionUrl) form.action = actionUrl;
             });
         }
 

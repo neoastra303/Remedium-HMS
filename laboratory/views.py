@@ -4,6 +4,8 @@ from .forms import LabTestForm
 from .models import LabTest
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from core.views import DeleteSuccessMixin, SuccessQueryParamMixin
 
 
 class LabTestListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
@@ -35,7 +37,9 @@ class LabTestDetailView(
 
 
 class LabTestCreateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
 ):
     model = LabTest
     form_class = LabTestForm
@@ -43,10 +47,13 @@ class LabTestCreateView(
     success_url = reverse_lazy("labtest_list")
     permission_required = "laboratory.laboratory_add_labtest"
     raise_exception = True
+    success_message = "Lab test created successfully."
 
 
 class LabTestUpdateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.UpdateView
 ):
     model = LabTest
     form_class = LabTestForm
@@ -54,16 +61,20 @@ class LabTestUpdateView(
     success_url = reverse_lazy("labtest_list")
     permission_required = "laboratory.laboratory_change_labtest"
     raise_exception = True
+    success_query_param = "updated"
+    success_message = "Lab test updated successfully."
 
 
 class LabTestDeleteView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView
+    DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.DeleteView
 ):
     model = LabTest
     template_name = "laboratory/labtest_confirm_delete.html"
     success_url = reverse_lazy("labtest_list")
     permission_required = "laboratory.laboratory_delete_labtest"
     raise_exception = True
+    success_message = "Lab test deleted successfully."
 
 
 # Create your views here.

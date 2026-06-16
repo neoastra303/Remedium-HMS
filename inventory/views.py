@@ -4,6 +4,8 @@ from django.urls import reverse_lazy
 from .models import InventoryItem
 from .forms import InventoryItemForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from core.views import DeleteSuccessMixin, SuccessQueryParamMixin
 
 
 class InventoryItemListView(
@@ -31,7 +33,9 @@ class InventoryItemDetailView(
 
 
 class InventoryItemCreateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
 ):
     model = InventoryItem
     form_class = InventoryItemForm
@@ -39,10 +43,13 @@ class InventoryItemCreateView(
     success_url = reverse_lazy("inventoryitem_list")
     permission_required = "inventory.inventory_add_inventoryitem"
     raise_exception = True
+    success_message = "Inventory item created successfully."
 
 
 class InventoryItemUpdateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.UpdateView
 ):
     model = InventoryItem
     form_class = InventoryItemForm
@@ -50,13 +57,17 @@ class InventoryItemUpdateView(
     success_url = reverse_lazy("inventoryitem_list")
     permission_required = "inventory.inventory_change_inventoryitem"
     raise_exception = True
+    success_query_param = "updated"
+    success_message = "Inventory item updated successfully."
 
 
 class InventoryItemDeleteView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView
+    DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.DeleteView
 ):
     model = InventoryItem
     template_name = "inventory/inventoryitem_confirm_delete.html"
     success_url = reverse_lazy("inventoryitem_list")
     permission_required = "inventory.inventory_delete_inventoryitem"
     raise_exception = True
+    success_message = "Inventory item deleted successfully."

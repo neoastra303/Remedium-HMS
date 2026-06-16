@@ -3,7 +3,7 @@
 {% block content %}
 <h1 class="mb-4">Staff Form</h1>
 
-<form method="post" novalidate>
+<form method="post" novalidate data-spinner="true">
     {% csrf_token %}
 
     {% if form.non_field_errors %}
@@ -31,7 +31,7 @@
         </div>
     {% endfor %}
 
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-primary"><span data-submit-text><i class="bi bi-check-circle me-1"></i>Save</span><span data-submit-spinner class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving…</span></button>
     <a href="{% url 'staff_list' %}" class="btn btn-secondary">Cancel</a>
 </form>
 {% endblock %}

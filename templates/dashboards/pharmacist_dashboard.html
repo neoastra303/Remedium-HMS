@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static dashboard_tags %}
 
 {% block content %}
 <div class="container-fluid px-4 py-3 animate-fade-in">
@@ -23,38 +23,10 @@
 
     {# ── Stat Cards ── #}
     <div class="row g-3 mb-4 stagger-children">
-        <div class="col-6 col-md-3">
-            <div class="stat-card stat-card--blue">
-                <div class="stat-card__icon"><i class="bi bi-capsule"></i></div>
-                <div class="stat-card__label">Active Prescriptions</div>
-                <div class="stat-card__value">{{ active_prescriptions }}</div>
-                <div class="stat-card__sub">{{ new_prescriptions_today }} new today</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-card stat-card--teal">
-                <div class="stat-card__icon"><i class="bi bi-clock-history"></i></div>
-                <div class="stat-card__label">Pending Dispense</div>
-                <div class="stat-card__value">{{ pending_dispense }}</div>
-                <div class="stat-card__sub">Awaiting fulfillment</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-card stat-card--green">
-                <div class="stat-card__icon"><i class="bi bi-box-seam"></i></div>
-                <div class="stat-card__label">Low Stock Items</div>
-                <div class="stat-card__value">{{ low_stock_count }}</div>
-                <div class="stat-card__sub">Needs reorder</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-card stat-card--amber">
-                <div class="stat-card__icon"><i class="bi bi-calendar-check"></i></div>
-                <div class="stat-card__label">Today Dispensed</div>
-                <div class="stat-card__value">{{ dispensed_today }}</div>
-                <div class="stat-card__sub">Prescriptions filled</div>
-            </div>
-        </div>
+        {% stat_card icon="bi-capsule" label="Active Prescriptions" value=active_prescriptions sub_text=new_prescriptions_today|stringformat:"s"|add:" new today" color="blue" %}
+        {% stat_card icon="bi-clock-history" label="Pending Dispense" value=pending_dispense sub_text="Awaiting fulfillment" color="teal" %}
+        {% stat_card icon="bi-box-seam" label="Low Stock Items" value=low_stock_count sub_text="Needs reorder" color="green" %}
+        {% stat_card icon="bi-calendar-check" label="Today Dispensed" value=dispensed_today sub_text="Prescriptions filled" color="amber" %}
     </div>
 
     <div class="row g-4">
@@ -65,42 +37,14 @@
             <div class="mb-4">
                 <div class="section-label">Quick Actions</div>
                 <div class="row g-3">
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'prescription_list' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-primary bg-opacity-10 text-primary">
-                                <i class="bi bi-capsule"></i>
-                            </div>
-                            <div class="quick-action__title">Prescriptions</div>
-                            <div class="quick-action__sub">View all</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'prescription_create' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-info bg-opacity-10 text-info">
-                                <i class="bi bi-plus-circle"></i>
-                            </div>
-                            <div class="quick-action__title">New Rx</div>
-                            <div class="quick-action__sub">Prescribe</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'inventoryitem_list' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-warning bg-opacity-10 text-warning">
-                                <i class="bi bi-box-seam"></i>
-                            </div>
-                            <div class="quick-action__title">Inventory</div>
-                            <div class="quick-action__sub">Stock</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'patient_list' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-success bg-opacity-10 text-success">
-                                <i class="bi bi-people"></i>
-                            </div>
-                            <div class="quick-action__title">Patients</div>
-                            <div class="quick-action__sub">Directory</div>
-                        </a>
-                    </div>
+                    {% url 'prescription_list' as u1 %}
+                    {% url 'prescription_create' as u2 %}
+                    {% url 'inventoryitem_list' as u3 %}
+                    {% url 'patient_list' as u4 %}
+                    {% quick_action url=u1 icon="bi-capsule" title="Prescriptions" sub="View all" %}
+                    {% quick_action url=u2 icon="bi-plus-circle" title="New Rx" sub="Prescribe" bg_class="info" text_class="info" %}
+                    {% quick_action url=u3 icon="bi-box-seam" title="Inventory" sub="Stock" bg_class="warning" text_class="warning" %}
+                    {% quick_action url=u4 icon="bi-people" title="Patients" sub="Directory" bg_class="success" text_class="success" %}
                 </div>
             </div>
 

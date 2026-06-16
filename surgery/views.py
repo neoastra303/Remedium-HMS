@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from core.views import DeleteSuccessMixin, SuccessQueryParamMixin
 from django.views import generic
 from .forms import SurgeryForm
 from .models import Surgery
@@ -38,7 +40,9 @@ class SurgeryDetailView(
 
 
 class SurgeryCreateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
 ):
     model = Surgery
     form_class = SurgeryForm
@@ -46,10 +50,13 @@ class SurgeryCreateView(
     success_url = reverse_lazy("surgery_list")
     permission_required = "surgery.surgery_add_surgery"
     raise_exception = True
+    success_message = "Surgery scheduled successfully."
 
 
 class SurgeryUpdateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.UpdateView
 ):
     model = Surgery
     form_class = SurgeryForm
@@ -57,16 +64,20 @@ class SurgeryUpdateView(
     success_url = reverse_lazy("surgery_list")
     permission_required = "surgery.surgery_change_surgery"
     raise_exception = True
+    success_query_param = "updated"
+    success_message = "Surgery updated successfully."
 
 
 class SurgeryDeleteView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView
+    DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.DeleteView
 ):
     model = Surgery
     template_name = "surgery/surgery_confirm_delete.html"
     success_url = reverse_lazy("surgery_list")
     permission_required = "surgery.surgery_delete_surgery"
     raise_exception = True
+    success_message = "Surgery cancelled successfully."
 
 
 # Create your views here.

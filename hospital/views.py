@@ -4,6 +4,8 @@ from .models import Ward, Room, HospitalService
 from .forms import WardForm, RoomForm
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from core.views import DeleteSuccessMixin, SuccessQueryParamMixin
 
 
 class HospitalServiceListView(
@@ -59,27 +61,42 @@ class WardDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
     permission_required = "hospital.view_ward"
 
 
-class WardCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+class WardCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
+):
     model = Ward
     form_class = WardForm
     template_name = "hospital/ward_form.html"
     success_url = reverse_lazy("ward_list")
     permission_required = "hospital.add_ward"
+    success_message = "Ward created successfully."
 
 
-class WardUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
+class WardUpdateView(
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.UpdateView
+):
     model = Ward
     form_class = WardForm
     template_name = "hospital/ward_form.html"
     success_url = reverse_lazy("ward_list")
     permission_required = "hospital.change_ward"
+    success_query_param = "updated"
+    success_message = "Ward updated successfully."
 
 
-class WardDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
+class WardDeleteView(
+    DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.DeleteView
+):
     model = Ward
     template_name = "hospital/ward_confirm_delete.html"
     success_url = reverse_lazy("ward_list")
     permission_required = "hospital.delete_ward"
+    success_message = "Ward deleted successfully."
 
 
 class RoomListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
@@ -102,24 +119,39 @@ class RoomDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
     permission_required = "hospital.view_room"
 
 
-class RoomCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+class RoomCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
+):
     model = Room
     form_class = RoomForm
     template_name = "hospital/room_form.html"
     success_url = reverse_lazy("room_list")
     permission_required = "hospital.add_room"
+    success_message = "Room created successfully."
 
 
-class RoomUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
+class RoomUpdateView(
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.UpdateView
+):
     model = Room
     form_class = RoomForm
     template_name = "hospital/room_form.html"
     success_url = reverse_lazy("room_list")
     permission_required = "hospital.change_room"
+    success_query_param = "updated"
+    success_message = "Room updated successfully."
 
 
-class RoomDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
+class RoomDeleteView(
+    DeleteSuccessMixin, LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessMessageMixin, generic.DeleteView
+):
     model = Room
     template_name = "hospital/room_confirm_delete.html"
     success_url = reverse_lazy("room_list")
     permission_required = "hospital.delete_room"
+    success_message = "Room deleted successfully."

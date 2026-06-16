@@ -37,7 +37,10 @@
                     <td class="pe-4 text-end">
                         <a href="{% url 'prescription_detail' prescription.pk %}" class="btn btn-sm btn-outline-primary" title="View" aria-label="View"><i class="bi bi-eye"></i></a>
                         <a href="{% url 'prescription_update' prescription.pk %}" class="btn btn-sm btn-outline-warning" title="Edit" aria-label="Edit"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'prescription_delete' prescription.pk %}" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete"><i class="bi bi-trash"></i></a>
+                        <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete"
+                            data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                            data-action-url="{% url 'prescription_delete' prescription.pk %}"
+                            data-item-name="{{ prescription.patient }}"><i class="bi bi-trash"></i></button>
                     </td>
                 </tr>
                 {% empty %}

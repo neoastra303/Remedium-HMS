@@ -30,7 +30,10 @@
                     <td class="pe-4 text-end">
                         <a href="{% url 'integration_detail' integration.pk %}" class="btn btn-sm btn-outline-primary" title="View" aria-label="View"><i class="bi bi-eye"></i></a>
                         <a href="{% url 'integration_update' integration.pk %}" class="btn btn-sm btn-outline-warning" title="Edit" aria-label="Edit"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'integration_delete' integration.pk %}" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete"><i class="bi bi-trash"></i></a>
+                        <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete"
+                            data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                            data-action-url="{% url 'integration_delete' integration.pk %}"
+                            data-item-name="{{ integration.system_name }}"><i class="bi bi-trash"></i></button>
                     </td>
                 </tr>
                 {% empty %}

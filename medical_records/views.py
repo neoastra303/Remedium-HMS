@@ -2,12 +2,16 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from core.views import SuccessQueryParamMixin
 from .models import PatientDocument, Encounter
 from patients.models import Patient
 
 
 class EncounterCreateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
 ):
     model = Encounter
     fields = [
@@ -21,6 +25,7 @@ class EncounterCreateView(
     template_name = "medical_records/encounter_form.html"
     permission_required = "medical_records.medical_records_add_encounter"
     raise_exception = True
+    success_message = "Encounter created successfully."
 
     def get_initial(self):
         initial = super().get_initial()
@@ -40,7 +45,8 @@ class EncounterCreateView(
         return initial
 
     def get_success_url(self):
-        return reverse("patient_detail", kwargs={"pk": self.object.patient.pk})
+        url = reverse("patient_detail", kwargs={"pk": self.object.patient.pk})
+        return f"{url}?created=1"
 
 
 class PatientDocumentListView(
@@ -63,22 +69,26 @@ class PatientDocumentListView(
 
 
 class PatientDocumentCreateView(
-    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuccessQueryParamMixin, SuccessMessageMixin,
+    generic.CreateView
 ):
     model = PatientDocument
     fields = ["document_type", "title", "file", "notes"]
     template_name = "medical_records/patient_document_form.html"
     permission_required = "medical_records.medical_records_add_document"
     raise_exception = True
+    success_message = "Document uploaded successfully."
 
     def form_valid(self, form):
         form.instance.patient = get_object_or_404(Patient, pk=self.kwargs["patient_pk"])
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse(
+        url = reverse(
             "patient_document_list", kwargs={"patient_pk": self.kwargs["patient_pk"]}
         )
+        return f"{url}?created=1"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

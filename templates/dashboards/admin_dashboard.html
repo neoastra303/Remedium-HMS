@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static dashboard_tags %}
 
 {% block content %}
 <div class="container-fluid px-4 py-3 animate-fade-in">
@@ -59,14 +59,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-card stat-card--amber">
-                <div class="stat-card__icon"><i class="bi bi-person-badge"></i></div>
-                <div class="stat-card__label">Active Staff</div>
-                <div class="stat-card__value">{{ active_staff }}</div>
-                <div class="stat-card__sub">{{ dept_stats|length }} departments · {{ on_duty_today }} on duty</div>
-            </div>
-        </div>
+        {% stat_card icon="bi-person-badge" label="Active Staff" value=active_staff sub_text=dept_stats|length|stringformat:"s"|add:" departments · "|add:on_duty_today|stringformat:"s"|add:" on duty" color="amber" %}
     </div>
 
     <div class="row g-4">
@@ -77,42 +70,14 @@
             <div class="mb-4">
                 <div class="section-label">Quick Actions</div>
                 <div class="row g-3">
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'patient_create' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-primary bg-opacity-10 text-primary">
-                                <i class="bi bi-person-plus"></i>
-                            </div>
-                            <div class="quick-action__title">New Patient</div>
-                            <div class="quick-action__sub">Register</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'appointment_create' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-info bg-opacity-10 text-info">
-                                <i class="bi bi-calendar-plus"></i>
-                            </div>
-                            <div class="quick-action__title">Book Visit</div>
-                            <div class="quick-action__sub">Schedule</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'staff_create' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-warning bg-opacity-10 text-warning">
-                                <i class="bi bi-person-plus"></i>
-                            </div>
-                            <div class="quick-action__title">Add Staff</div>
-                            <div class="quick-action__sub">Onboard</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'hospital:occupancy_map' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-success bg-opacity-10 text-success">
-                                <i class="bi bi-grid-3x3-gap"></i>
-                            </div>
-                            <div class="quick-action__title">Bed Map</div>
-                            <div class="quick-action__sub">Occupancy</div>
-                        </a>
-                    </div>
+                    {% url 'patient_create' as u1 %}
+                    {% url 'appointment_create' as u2 %}
+                    {% url 'staff_create' as u3 %}
+                    {% url 'hospital:occupancy_map' as u4 %}
+                    {% quick_action url=u1 icon="bi-person-plus" title="New Patient" sub="Register" %}
+                    {% quick_action url=u2 icon="bi-calendar-plus" title="Book Visit" sub="Schedule" bg_class="info" text_class="info" %}
+                    {% quick_action url=u3 icon="bi-person-plus" title="Add Staff" sub="Onboard" bg_class="warning" text_class="warning" %}
+                    {% quick_action url=u4 icon="bi-grid-3x3-gap" title="Bed Map" sub="Occupancy" bg_class="success" text_class="success" %}
                 </div>
             </div>
 

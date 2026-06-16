@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static dashboard_tags %}
 
 {% block content %}
 <div class="container-fluid px-4 py-3 animate-fade-in">
@@ -23,38 +23,10 @@
 
     {# ── Stat Cards ── #}
     <div class="row g-3 mb-4 stagger-children">
-        <div class="col-6 col-md-3">
-            <div class="stat-card stat-card--blue">
-                <div class="stat-card__icon"><i class="bi bi-clock"></i></div>
-                <div class="stat-card__label">Pending Tests</div>
-                <div class="stat-card__value">{{ pending_tests }}</div>
-                <div class="stat-card__sub">Awaiting processing</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-card stat-card--teal">
-                <div class="stat-card__icon"><i class="bi bi-check-circle"></i></div>
-                <div class="stat-card__label">Completed Today</div>
-                <div class="stat-card__value">{{ completed_today }}</div>
-                <div class="stat-card__sub">Results published</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-card stat-card--green">
-                <div class="stat-card__icon"><i class="bi bi-hourglass"></i></div>
-                <div class="stat-card__label">In Progress</div>
-                <div class="stat-card__value">{{ in_progress_tests }}</div>
-                <div class="stat-card__sub">Being analyzed</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-card stat-card--amber">
-                <div class="stat-card__icon"><i class="bi bi-calendar-check"></i></div>
-                <div class="stat-card__label">Today's Requests</div>
-                <div class="stat-card__value">{{ requests_today }}</div>
-                <div class="stat-card__sub">New test orders</div>
-            </div>
-        </div>
+        {% stat_card icon="bi-clock" label="Pending Tests" value=pending_tests sub_text="Awaiting processing" color="blue" %}
+        {% stat_card icon="bi-check-circle" label="Completed Today" value=completed_today sub_text="Results published" color="teal" %}
+        {% stat_card icon="bi-hourglass" label="In Progress" value=in_progress_tests sub_text="Being analyzed" color="green" %}
+        {% stat_card icon="bi-calendar-check" label="Today's Requests" value=requests_today sub_text="New test orders" color="amber" %}
     </div>
 
     <div class="row g-4">
@@ -65,42 +37,14 @@
             <div class="mb-4">
                 <div class="section-label">Quick Actions</div>
                 <div class="row g-3">
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'labtest_list' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-primary bg-opacity-10 text-primary">
-                                <i class="bi bi-microscope"></i>
-                            </div>
-                            <div class="quick-action__title">All Tests</div>
-                            <div class="quick-action__sub">View queue</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'labtest_create' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-info bg-opacity-10 text-info">
-                                <i class="bi bi-plus-circle"></i>
-                            </div>
-                            <div class="quick-action__title">New Test</div>
-                            <div class="quick-action__sub">Order</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'patient_list' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-success bg-opacity-10 text-success">
-                                <i class="bi bi-people"></i>
-                            </div>
-                            <div class="quick-action__title">Patients</div>
-                            <div class="quick-action__sub">Directory</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'appointment_list' %}" class="quick-action text-decoration-none">
-                            <div class="quick-action__icon bg-warning bg-opacity-10 text-warning">
-                                <i class="bi bi-calendar-event"></i>
-                            </div>
-                            <div class="quick-action__title">Appointments</div>
-                            <div class="quick-action__sub">Schedule</div>
-                        </a>
-                    </div>
+                    {% url 'labtest_list' as u1 %}
+                    {% url 'labtest_create' as u2 %}
+                    {% url 'patient_list' as u3 %}
+                    {% url 'appointment_list' as u4 %}
+                    {% quick_action url=u1 icon="bi-microscope" title="All Tests" sub="View queue" %}
+                    {% quick_action url=u2 icon="bi-plus-circle" title="New Test" sub="Order" bg_class="info" text_class="info" %}
+                    {% quick_action url=u3 icon="bi-people" title="Patients" sub="Directory" bg_class="success" text_class="success" %}
+                    {% quick_action url=u4 icon="bi-calendar-event" title="Appointments" sub="Schedule" bg_class="warning" text_class="warning" %}
                 </div>
             </div>
 

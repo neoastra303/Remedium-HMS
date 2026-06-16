@@ -18,24 +18,24 @@
                 </tr>
             </thead>
             <tbody>
-                {% for record in history %}
+                {% for item in history %}
                 <tr>
-                    <td>{{ record.history_date }}</td>
-                    <td>{{ record.history_user|default:"System" }}</td>
+                    <td>{{ item.entry.history_date }}</td>
+                    <td>{{ item.entry.history_user|default:"System" }}</td>
                     <td>
-                        {% if record.history_type == '+' %}
+                        {% if item.entry.history_type == '+' %}
                             <span class="badge bg-success">Created</span>
-                        {% elif record.history_type == '~' %}
+                        {% elif item.entry.history_type == '~' %}
                             <span class="badge bg-warning">Updated</span>
                         {% else %}
                             <span class="badge bg-danger">Deleted</span>
                         {% endif %}
                     </td>
                     <td>
-                        {% if record.prev_record %}
+                        {% if item.changes %}
                             <ul class="mb-0 small">
-                                {% for field, value in record.diff_against(record.prev_record).changes %}
-                                    <li><strong>{{ field }}:</strong> {{ value.0 }} → {{ value.1 }}</li>
+                                {% for change in item.changes %}
+                                    <li><strong>{{ change.field }}:</strong> {{ change.old }} → {{ change.new }}</li>
                                 {% endfor %}
                             </ul>
                         {% else %}

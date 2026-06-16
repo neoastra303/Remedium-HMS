@@ -150,5 +150,16 @@ class PatientHistoryView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["history"] = self.object.history.all()
+        raw_history = self.object.history.all()
+        context["history"] = [
+            {
+                "entry": record,
+                "changes": (
+                    record.diff_against(record.prev_record).changes
+                    if record.prev_record
+                    else None
+                ),
+            }
+            for record in raw_history
+        ]
         return context

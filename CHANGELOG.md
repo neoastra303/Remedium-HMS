@@ -99,6 +99,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Initial commit of project files ([`fbeb48c`])
 
 ### Fixed
+- add hospital: namespace prefix to template URL tags ([`f912a39`])
 - add null=True to created_at/updated_at on remaining model files ([`d860921`])
 - improve accessibility, SEO, and error pages ([`8056a9a`])
 - update InventoryItemSerializer fields after model rename ([`b7a89f0`])

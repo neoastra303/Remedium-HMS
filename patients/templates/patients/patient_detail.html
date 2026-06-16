@@ -226,7 +226,7 @@
     {# ── Encounters Tab ── #}
     <div class="tab-pane fade" id="encounters">
         <div class="d-flex justify-content-end mb-3">
-            <a href="{% url 'medical_records:encounter_create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-primary">
+            <a href="{% url 'encounter_create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-primary">
                 <i class="bi bi-plus-circle me-1"></i>Start Visit/Encounter
             </a>
         </div>

@@ -3,8 +3,8 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="fw-bold mb-0"><i class="bi bi-building me-2 text-primary"></i>{{ ward.name }}</h4>
     <div class="d-flex gap-2">
-        <a href="{% url 'ward_update' ward.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
-        <a href="{% url 'ward_delete' ward.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Delete</a>
+        <a href="{% url 'hospital:ward_update' ward.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
+        <a href="{% url 'hospital:ward_delete' ward.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Delete</a>
     </div>
 </div>
 <div class="row g-4">
@@ -30,8 +30,8 @@
                             <td class="ps-4">{{ room.room_number }}</td>
                             <td>{{ room.capacity }}</td>
                             <td class="pe-4 text-end">
-                                <a href="{% url 'room_update' room.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'room_delete' room.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                                <a href="{% url 'hospital:room_update' room.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'hospital:room_delete' room.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
                             </td>
                         </tr>
                         {% empty %}<tr><td colspan="3" class="text-center py-3 text-muted">No rooms.</td></tr>
@@ -42,5 +42,5 @@
         </div>
     </div>
 </div>
-<div class="mt-3"><a href="{% url 'ward_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a></div>
+<div class="mt-3"><a href="{% url 'hospital:ward_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a></div>
 {% endblock %}

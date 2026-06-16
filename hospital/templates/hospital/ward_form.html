@@ -9,7 +9,7 @@
                 {% csrf_token %}
                 {{ form|crispy }}
                 <div class="d-flex justify-content-end gap-2 mt-4">
-                    <a href="{% url 'ward_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    <a href="{% url 'hospital:ward_list' %}" class="btn btn-outline-secondary">Cancel</a>
                     <button type="submit" class="btn btn-primary px-4"><span data-submit-text><i class="bi bi-check-circle me-1"></i>{% if object %}Update{% else %}Create{% endif %} Ward</span><span data-submit-spinner class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving…</span></button>
                 </div>
             </form>

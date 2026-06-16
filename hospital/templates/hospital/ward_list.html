@@ -2,7 +2,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="fw-bold mb-0"><i class="bi bi-building me-2 text-primary"></i>Wards</h4>
-    <a href="{% url 'ward_create' %}" class="btn btn-sm btn-primary"><i class="bi bi-plus-circle me-1"></i>New Ward</a>
+    <a href="{% url 'hospital:ward_create' %}" class="btn btn-sm btn-primary"><i class="bi bi-plus-circle me-1"></i>New Ward</a>
 </div>
 <div class="card border-0 shadow-sm">
     <div class="table-responsive">
@@ -14,11 +14,11 @@
                     <td class="ps-4 fw-medium">{{ ward.name }}</td>
                     <td>{{ ward.capacity }} beds</td>
                     <td class="pe-4 text-end">
-                        <a href="{% url 'ward_detail' ward.pk %}" class="btn btn-sm btn-outline-primary" title="View" aria-label="View"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'ward_update' ward.pk %}" class="btn btn-sm btn-outline-warning" title="Edit" aria-label="Edit"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'hospital:ward_detail' ward.pk %}" class="btn btn-sm btn-outline-primary" title="View" aria-label="View"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'hospital:ward_update' ward.pk %}" class="btn btn-sm btn-outline-warning" title="Edit" aria-label="Edit"><i class="bi bi-pencil"></i></a>
                         <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete"
                             data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
-                            data-action-url="{% url 'ward_delete' ward.pk %}"
+                            data-action-url="{% url 'hospital:ward_delete' ward.pk %}"
                             data-item-name="{{ ward.name }}"><i class="bi bi-trash"></i></button>
                     </td>
                 </tr>

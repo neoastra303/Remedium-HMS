@@ -395,10 +395,11 @@
 </div>
 
 {% if chart_data %}
+{{ chart_data|json_script:"vitals-chart-data" }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 (function() {
-    const data = {{ chart_data|safe }};
+    const data = JSON.parse(document.getElementById('vitals-chart-data').textContent);
     if (!data.dates || !data.dates.length) return;
     new Chart(document.getElementById('vitalsChart'), {
         type: 'line',

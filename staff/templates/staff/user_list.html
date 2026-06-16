@@ -49,7 +49,7 @@
                                     <a href="{% url 'staff_detail' staff.pk %}" class="btn btn-sm btn-outline-primary" title="View Profile" aria-label="View Profile">
                                         <i class="bi bi-person"></i>
                                     </a>
-                                    <a href="{% url 'user_password_reset' staff.pk %}" class="btn btn-sm btn-outline-warning" title="Reset Password" aria-label="Reset Password" onclick="return confirm('Are you sure you want to reset the password for {{ staff.user.username }}?')">
+                                    <a href="{% url 'user_password_reset' staff.pk %}" class="btn btn-sm btn-outline-warning" title="Reset Password" aria-label="Reset Password" onclick="return confirm('Are you sure you want to reset the password for {{ staff.user.username|escapejs }}?')">
                                         <i class="bi bi-key"></i>
                                     </a>
                                     <a href="{% url 'user_status_toggle' staff.pk %}" class="btn btn-sm {% if staff.user.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}" title="{% if staff.user.is_active %}Deactivate{% else %}Activate{% endif %}" aria-label="{% if staff.user.is_active %}Deactivate{% else %}Activate{% endif %}">

@@ -96,6 +96,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Initial commit of project files ([`fbeb48c`])
 
 ### Fixed
+- add null=True to created_at/updated_at on remaining model files ([`d860921`])
 - improve accessibility, SEO, and error pages ([`8056a9a`])
 - update InventoryItemSerializer fields after model rename ([`b7a89f0`])
 - remove duplicate STATUS_CHOICES inline definition in Surgery model ([`4f3c49c`])

@@ -1,8 +1,11 @@
+import logging
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from appointments.models import Appointment
 from .models import Notification
 from django.core.mail import send_mail
+
+logger = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender=Appointment)
@@ -34,5 +37,5 @@ def send_appointment_notification(sender, instance, created, **kwargs):
                     [instance.patient.email],
                     fail_silently=True,
                 )
-            except:
-                pass
+            except Exception as e:
+                logger.warning(f"Failed to send appointment notification email: {e}")

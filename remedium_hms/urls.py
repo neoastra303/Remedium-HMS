@@ -25,7 +25,7 @@ from hospital.api_views import WardViewSet, RoomViewSet
 from inventory.api_views import InventoryItemViewSet
 from surgery.api_views import SurgeryViewSet
 from care_monitoring.api_views import PatientCareViewSet
-from core.views import homepage
+from core.views import homepage, health_check
 
 api_router = DefaultRouter()
 api_router.register(r"patients", PatientViewSet, basename="patient")
@@ -43,6 +43,7 @@ api_router.register(r"care-monitoring", PatientCareViewSet, basename="care-monit
 
 urlpatterns = [
     path("", homepage, name="home"),
+    path("health/", health_check, name="health_check"),
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
     path("api-auth/", include("rest_framework.urls")),

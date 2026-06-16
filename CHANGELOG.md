@@ -41,6 +41,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- remove obsolete design scripts ([`77eb71e`])
 - switch dashboard wireframes to PNG format for improved compatibility ([`a8bc992`])
 - add high-fidelity SVG wireframes for all specialized dashboards ([`c7939cf`])
 - modernize README with color-coded diagrams and security lifecycle flow ([`625441f`])

@@ -76,7 +76,7 @@ def homepage(request):
     context["admitted_patients"] = Patient.objects.filter(
         admission_date__isnull=False, discharge_date__isnull=True
     ).count()
-    context["recent_patients"] = Patient.objects.order_by("-admission_date")[:5]
+    context["recent_patients"] = Patient.objects.select_related("ward", "room").order_by("-admission_date")[:5]
     context["now"] = timezone.now()
     context["role_display"] = get_role_display(role)
 

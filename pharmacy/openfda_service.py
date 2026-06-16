@@ -5,6 +5,17 @@ Provides drug information from the FDA's public API.
 Results are cached to avoid repeated API calls.
 """
 
+"""
+OpenFDA API integration service.
+
+Provides drug information from the FDA's public API.
+Results are cached to avoid repeated API calls.
+
+NOTE: These calls are synchronous and block the request thread. For production
+deployments at scale, consider migrating to an async task queue (Celery/django-q)
+to prevent worker threads from being blocked during OpenFDA API calls.
+"""
+
 import logging
 from datetime import timedelta
 from django.core.cache import cache
@@ -14,9 +25,10 @@ logger = logging.getLogger(__name__)
 
 OPENFDA_BASE_URL = "https://api.fda.gov"
 CACHE_TIMEOUT = 60 * 60 * 24  # 24 hours
+REQUEST_TIMEOUT = 5  # seconds — reduced from 10s to minimize request thread blocking
 
 
-def search_drug_label(drug_name: str) -> dict:
+def search_drug_label(drug_name: str, skip_cache: bool = False) -> dict:
     """
     Search OpenFDA drug label database for a medication.
 
@@ -31,15 +43,17 @@ def search_drug_label(drug_name: str) -> dict:
 
     Args:
         drug_name: Name of the drug to search for
+        skip_cache: If True, bypass cache and fetch fresh data
 
     Returns:
-        dict with drug information or empty dict if not found
+        dict with drug information or error dict if not found
     """
     cache_key = f"openfda_drug_label_{drug_name.lower().strip()}"
-    cached_result = cache.get(cache_key)
 
-    if cached_result:
-        return cached_result
+    if not skip_cache:
+        cached_result = cache.get(cache_key)
+        if cached_result:
+            return cached_result
 
     try:
         response = requests.get(
@@ -48,7 +62,7 @@ def search_drug_label(drug_name: str) -> dict:
                 "search": f'openfda.generic_name:"{drug_name}"',
                 "limit": 1,
             },
-            timeout=10,
+            timeout=REQUEST_TIMEOUT,
         )
         response.raise_for_status()
         data = response.json()
@@ -61,7 +75,7 @@ def search_drug_label(drug_name: str) -> dict:
                     "search": f'openfda.brand_name:"{drug_name}"',
                     "limit": 1,
                 },
-                timeout=10,
+                timeout=REQUEST_TIMEOUT,
             )
             response.raise_for_status()
             data = response.json()
@@ -81,7 +95,7 @@ def search_drug_label(drug_name: str) -> dict:
         return {"error": "An unexpected error occurred."}
 
 
-def search_adverse_events(drug_name: str) -> dict:
+def search_adverse_events(drug_name: str, skip_cache: bool = False) -> dict:
     """
     Search OpenFDA adverse event reports for a medication.
 
@@ -89,15 +103,17 @@ def search_adverse_events(drug_name: str) -> dict:
 
     Args:
         drug_name: Name of the drug to search for
+        skip_cache: If True, bypass cache and fetch fresh data
 
     Returns:
         dict with adverse event summary
     """
     cache_key = f"openfda_adverse_{drug_name.lower().strip()}"
-    cached_result = cache.get(cache_key)
 
-    if cached_result:
-        return cached_result
+    if not skip_cache:
+        cached_result = cache.get(cache_key)
+        if cached_result:
+            return cached_result
 
     try:
         response = requests.get(
@@ -107,7 +123,7 @@ def search_adverse_events(drug_name: str) -> dict:
                 "count": "patient.reaction.reactionmeddrapt.exact",
                 "limit": 10,
             },
-            timeout=10,
+            timeout=REQUEST_TIMEOUT,
         )
         response.raise_for_status()
         data = response.json()

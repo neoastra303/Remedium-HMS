@@ -42,6 +42,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- add postman/ to .gitignore ([`716193c`])
 - comprehensive UI/UX improvements across the board ([`9388afd`])
 - remove obsolete design scripts ([`77eb71e`])
 - switch dashboard wireframes to PNG format for improved compatibility ([`a8bc992`])

@@ -34,11 +34,7 @@ class Surgery(RemediumBaseModel):
 
     status = models.CharField(
         max_length=20,
-        choices=[
-            ("Scheduled", "Scheduled"),
-            ("Completed", "Completed"),
-            ("Cancelled", "Cancelled"),
-        ],
+        choices=STATUS_CHOICES,
         default="Scheduled",
     )
     notes = models.TextField(blank=True, null=True)

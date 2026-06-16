@@ -1,13 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from core.views import DeleteSuccessMixin, SuccessQueryParamMixin
 from django.views import generic
+from django.urls import reverse_lazy
 from patients.models import Patient
 from .forms import ReportForm
-from .models import Report  # Assuming a Report model exists
+from .models import Report
 
 
 class ReportListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
@@ -42,7 +43,7 @@ class ReportCreateView(
     model = Report
     form_class = ReportForm
     template_name = "reporting/report_form.html"
-    success_url = "/reports/"
+    success_url = reverse_lazy("report_list")
     permission_required = "reporting.reporting_add_report"
     raise_exception = True
     success_message = "Report created successfully."
@@ -56,7 +57,7 @@ class ReportUpdateView(
     model = Report
     form_class = ReportForm
     template_name = "reporting/report_form.html"
-    success_url = "/reports/"
+    success_url = reverse_lazy("report_list")
     permission_required = "reporting.reporting_change_report"
     raise_exception = True
     success_query_param = "updated"
@@ -69,7 +70,7 @@ class ReportDeleteView(
 ):
     model = Report
     template_name = "reporting/report_confirm_delete.html"
-    success_url = "/reports/"
+    success_url = reverse_lazy("report_list")
     permission_required = "reporting.reporting_delete_report"
     raise_exception = True
     success_message = "Report deleted successfully."
@@ -86,7 +87,7 @@ def patient_report(request):
 @login_required
 @permission_required("reporting.view_report")
 def download_report(request, pk):
-    report = Report.objects.get(pk=pk)
+    report = get_object_or_404(Report, pk=pk)
     response = HttpResponse(report.data, content_type="application/octet-stream")
     response["Content-Disposition"] = f'attachment; filename="{report.title}.txt"'
     return response

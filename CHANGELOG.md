@@ -93,6 +93,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Initial commit of project files ([`fbeb48c`])
 
 ### Fixed
+- correct permission name in check_in_appointment view ([`27428c9`])
 - enforce permission checks and require POST on notification views ([`722a1c4`])
 - prevent XSS via json_script filter and escapejs ([`b264af5`])
 - make RemediumBaseModel timestamps nullable for backward compatibility ([`1605516`])

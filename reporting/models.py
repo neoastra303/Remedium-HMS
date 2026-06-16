@@ -1,7 +1,8 @@
 from django.db import models
+from core.models import RemediumBaseModel
 
 
-class Report(models.Model):
+class Report(RemediumBaseModel):
     class Meta:
         permissions = [
             ("reporting_view_report", "Can view report"),
@@ -11,9 +12,8 @@ class Report(models.Model):
         ]
 
     title = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
     report_type = models.CharField(max_length=50)
-    data = models.TextField()
+    data = models.JSONField(default=dict)
 
     def __str__(self):
         return f"{self.title} ({self.report_type})"

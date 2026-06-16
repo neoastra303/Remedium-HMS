@@ -170,7 +170,7 @@ class Staff(RemediumBaseModel):
         return f"{self.staff_id} - {self.first_name} {self.last_name} ({self.role})"
 
 
-class Shift(models.Model):
+class Shift(RemediumBaseModel):
     DAYS_OF_WEEK = [
         (0, "Monday"),
         (1, "Tuesday"),

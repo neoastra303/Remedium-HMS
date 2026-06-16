@@ -1,8 +1,9 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from core.models import RemediumBaseModel
 
 
-class Ward(models.Model):
+class Ward(RemediumBaseModel):
     class Meta:
         app_label = "hospital"
         permissions = [
@@ -28,7 +29,7 @@ class Ward(models.Model):
         return self.name
 
 
-class Room(models.Model):
+class Room(RemediumBaseModel):
     class Meta:
         app_label = "hospital"
         permissions = [
@@ -62,7 +63,7 @@ class Room(models.Model):
         return f"{self.ward.name} - Room {self.room_number}"
 
 
-class HospitalService(models.Model):
+class HospitalService(RemediumBaseModel):
     """
     Centralized catalog of all billable services, tests, and procedures.
     Allows for flexible pricing and categorization.

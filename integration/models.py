@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from cryptography.fernet import Fernet
+from core.models import RemediumBaseModel
 
 
 def get_encryption_key():
@@ -31,7 +32,7 @@ def decrypt_value(value):
     return f.decrypt(value.encode()).decode()
 
 
-class ExternalIntegration(models.Model):
+class ExternalIntegration(RemediumBaseModel):
     SYSTEM_TYPES = [
         ("EMR", "Electronic Medical Records"),
         ("PHARMACY_HUB", "External Pharmacy Hub"),

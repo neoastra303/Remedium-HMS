@@ -4,9 +4,10 @@ from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from simple_history.models import HistoricalRecords
+from core.models import RemediumBaseModel
 
 
-class PatientCare(models.Model):
+class PatientCare(RemediumBaseModel):
     STATUS_CHOICES = [
         ("STABLE", "Stable"),
         ("CRITICAL", "Critical"),

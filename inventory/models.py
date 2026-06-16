@@ -2,9 +2,10 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from core.models import RemediumBaseModel
 
 
-class InventoryItem(models.Model):
+class InventoryItem(RemediumBaseModel):
     CATEGORY_CHOICES = [
         ("MEDICAL_SUPPLIES", "Medical Supplies"),
         ("PHARMACEUTICALS", "Pharmaceuticals"),
@@ -85,12 +86,7 @@ class InventoryItem(models.Model):
     expiry_date = models.DateField(
         blank=True, null=True, help_text="Expiry date for perishable items"
     )
-    last_updated = models.DateTimeField(
-        auto_now=True, help_text="Last updated timestamp"
-    )
-    created_date = models.DateTimeField(
-        auto_now_add=True, help_text="Date when item was added to inventory"
-    )
+
 
     def clean(self):
         super().clean()

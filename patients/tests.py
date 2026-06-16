@@ -3,6 +3,10 @@
 import pytest
 from datetime import date, timedelta
 from django.core.exceptions import ValidationError
+from django.urls import reverse
+from django.utils import timezone
+from django.contrib.auth.models import User, Permission
+from django.test import Client
 from patients.models import Patient
 
 
@@ -183,3 +187,78 @@ class TestPatientModel:
                 date_of_birth=date(1990, 1, 1),
                 gender="M",
             )
+
+
+@pytest.mark.django_db
+class TestPatientViews:
+    """Template rendering tests for Patient views."""
+
+    def _create_patient(self):
+        return Patient.objects.create(
+            unique_id="PAT_VW",
+            first_name="Test",
+            last_name="Patient",
+            date_of_birth=date(1990, 1, 1),
+            gender="M",
+        )
+
+    def _login_with_permission(self, username, codename):
+        client = Client()
+        user = User.objects.create_user(username=username, password="pass")
+        perm = Permission.objects.get(codename=codename)
+        user.user_permissions.add(perm)
+        client.login(username=username, password="pass")
+        return client
+
+    def test_list_requires_permission(self):
+        user = User.objects.create_user(username="testuser", password="pass")
+        client = Client()
+        client.login(username="testuser", password="pass")
+        url = reverse("patient_list")
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_list_with_permission(self):
+        client = self._login_with_permission("permuser", "patients_view_patient")
+        url = reverse("patient_list")
+        response = client.get(url)
+        assert response.status_code == 200
+        assert "patients" in response.context
+
+    def test_detail_requires_permission(self):
+        patient = self._create_patient()
+        user = User.objects.create_user(username="testuser", password="pass")
+        client = Client()
+        client.login(username="testuser", password="pass")
+        url = reverse("patient_detail", kwargs={"pk": patient.pk})
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_detail_with_permission(self):
+        patient = self._create_patient()
+        client = self._login_with_permission("permuser", "patients_view_patient")
+        url = reverse("patient_detail", kwargs={"pk": patient.pk})
+        response = client.get(url)
+        assert response.status_code == 200
+        assert response.context["patient"].pk == patient.pk
+
+    def test_create_requires_permission(self):
+        user = User.objects.create_user(username="testuser", password="pass")
+        client = Client()
+        client.login(username="testuser", password="pass")
+        url = reverse("patient_create")
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_create_with_permission(self):
+        client = self._login_with_permission("permuser", "patients_add_patient")
+        url = reverse("patient_create")
+        response = client.get(url)
+        assert response.status_code == 200
+
+    def test_history_with_permission(self):
+        patient = self._create_patient()
+        client = self._login_with_permission("permuser", "patients_view_patient")
+        url = reverse("patient_history", kwargs={"pk": patient.pk})
+        response = client.get(url)
+        assert response.status_code == 200

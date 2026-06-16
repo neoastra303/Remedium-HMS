@@ -5,6 +5,9 @@ from decimal import Decimal
 from datetime import date, timedelta
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.urls import reverse
+from django.contrib.auth.models import User, Permission
+from django.test import Client
 from billing.models import Invoice, Payment
 from patients.models import Patient
 
@@ -110,3 +113,78 @@ class TestPaymentModel:
         )
         invoice.refresh_from_db()
         assert invoice.paid is False
+
+
+@pytest.mark.django_db
+class TestInvoiceViews:
+    """Template rendering tests for Invoice views."""
+
+    def _create_patient(self):
+        return Patient.objects.create(
+            unique_id="PAT_INVV",
+            first_name="Test",
+            last_name="Patient",
+            date_of_birth=timezone.now().date() - timedelta(days=365 * 30),
+            gender="M",
+        )
+
+    def _create_invoice(self):
+        return Invoice.objects.create(
+            patient=self._create_patient(),
+            total_amount=Decimal("100.00"),
+        )
+
+    def _login_with_permission(self, username, codename):
+        client = Client()
+        user = User.objects.create_user(username=username, password="pass")
+        perm = Permission.objects.get(codename=codename)
+        user.user_permissions.add(perm)
+        client.login(username=username, password="pass")
+        return client
+
+    def test_list_requires_permission(self):
+        user = User.objects.create_user(username="testuser", password="pass")
+        client = Client()
+        client.login(username="testuser", password="pass")
+        url = reverse("billing:invoice_list")
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_list_with_permission(self):
+        client = self._login_with_permission("permuser", "billing_view_invoice")
+        url = reverse("billing:invoice_list")
+        response = client.get(url)
+        assert response.status_code == 200
+        assert "invoices" in response.context
+
+    def test_detail_requires_permission(self):
+        invoice = self._create_invoice()
+        user = User.objects.create_user(username="testuser", password="pass")
+        client = Client()
+        client.login(username="testuser", password="pass")
+        url = reverse("billing:invoice_detail", kwargs={"pk": invoice.pk})
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_detail_with_permission(self):
+        invoice = self._create_invoice()
+        client = self._login_with_permission("permuser", "billing_view_invoice")
+        url = reverse("billing:invoice_detail", kwargs={"pk": invoice.pk})
+        response = client.get(url)
+        assert response.status_code == 200
+        assert response.context["invoice"].pk == invoice.pk
+
+    def test_create_requires_permission(self):
+        user = User.objects.create_user(username="testuser", password="pass")
+        client = Client()
+        client.login(username="testuser", password="pass")
+        url = reverse("billing:invoice_create")
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_create_with_permission(self):
+        self._create_patient()
+        client = self._login_with_permission("permuser", "billing_add_invoice")
+        url = reverse("billing:invoice_create")
+        response = client.get(url)
+        assert response.status_code == 200

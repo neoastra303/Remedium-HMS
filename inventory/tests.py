@@ -2,6 +2,9 @@
 
 import pytest
 from django.contrib.auth.models import User
+from django.urls import reverse
+from django.contrib.auth.models import Permission
+from django.test import Client
 from rest_framework.test import APIClient
 from rest_framework import status
 from inventory.models import InventoryItem
@@ -73,3 +76,52 @@ class TestInventoryAPI:
     def test_unauthenticated_denied(self):
         r = APIClient().get("/api/v1/inventory/")
         assert r.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.django_db
+class TestInventoryViews:
+    """Template rendering tests for InventoryItem views."""
+
+    def _login_with_permission(self, username, codename):
+        client = Client()
+        user = User.objects.create_user(username=username, password="pass")
+        perm = Permission.objects.get(codename=codename)
+        user.user_permissions.add(perm)
+        client.login(username=username, password="pass")
+        return client
+
+    def test_list_requires_permission(self):
+        user = User.objects.create_user(username="testuser", password="pass")
+        client = Client()
+        client.login(username="testuser", password="pass")
+        url = reverse("inventoryitem_list")
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_list_with_permission(self):
+        client = self._login_with_permission("permuser", "inventory_view_inventoryitem")
+        url = reverse("inventoryitem_list")
+        response = client.get(url)
+        assert response.status_code == 200
+        assert "inventory_items" in response.context
+
+    def test_detail_requires_permission(self):
+        item = InventoryItem.objects.create(
+            name="Gloves", category="PPE", quantity=100, unit="BOX"
+        )
+        user = User.objects.create_user(username="testuser", password="pass")
+        client = Client()
+        client.login(username="testuser", password="pass")
+        url = reverse("inventoryitem_detail", kwargs={"pk": item.pk})
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_detail_with_permission(self):
+        item = InventoryItem.objects.create(
+            name="Gloves", category="PPE", quantity=100, unit="BOX"
+        )
+        client = self._login_with_permission("permuser", "inventory_view_inventoryitem")
+        url = reverse("inventoryitem_detail", kwargs={"pk": item.pk})
+        response = client.get(url)
+        assert response.status_code == 200
+        assert response.context["item"].pk == item.pk

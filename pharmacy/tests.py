@@ -4,6 +4,9 @@ import pytest
 from unittest.mock import patch, MagicMock
 from django.utils import timezone
 from datetime import timedelta
+from django.urls import reverse
+from django.contrib.auth.models import Permission
+from django.test import Client
 from rest_framework.test import APIClient
 from rest_framework import status
 from pharmacy.models import Prescription
@@ -227,3 +230,64 @@ class TestPrescriptionAPIWithOpenFDA:
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data["total_reports"] == 50
+
+
+@pytest.mark.django_db
+class TestPrescriptionViews:
+    """Template rendering tests for Prescription views."""
+
+    def _create_patient(self):
+        return Patient.objects.create(
+            unique_id="PAT_RXV",
+            first_name="Test",
+            last_name="Patient",
+            date_of_birth=timezone.now().date() - timedelta(days=365 * 30),
+            gender="M",
+        )
+
+    def _create_doctor(self):
+        return Staff.objects.create(
+            staff_id="DOC_RXV",
+            first_name="Dr. Test",
+            last_name="Doctor",
+            role="DOCTOR",
+        )
+
+    def _login_with_permission(self, username, codename):
+        client = Client()
+        user = User.objects.create_user(username=username, password="pass")
+        perm = Permission.objects.get(codename=codename)
+        user.user_permissions.add(perm)
+        client.login(username=username, password="pass")
+        return client
+
+    def test_list_requires_permission(self):
+        user = User.objects.create_user(username="testuser", password="pass")
+        client = Client()
+        client.login(username="testuser", password="pass")
+        url = reverse("prescription_list")
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_list_with_permission(self):
+        client = self._login_with_permission("permuser", "pharmacy_view_prescription")
+        url = reverse("prescription_list")
+        response = client.get(url)
+        assert response.status_code == 200
+        assert "prescriptions" in response.context
+
+    def test_create_requires_permission(self):
+        user = User.objects.create_user(username="testuser", password="pass")
+        client = Client()
+        client.login(username="testuser", password="pass")
+        url = reverse("prescription_create")
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_create_with_permission(self):
+        self._create_patient()
+        self._create_doctor()
+        client = self._login_with_permission("permuser", "pharmacy_add_prescription")
+        url = reverse("prescription_create")
+        response = client.get(url)
+        assert response.status_code == 200

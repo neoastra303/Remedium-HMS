@@ -3,6 +3,9 @@
 import pytest
 from django.utils import timezone
 from datetime import timedelta
+from django.urls import reverse
+from django.contrib.auth.models import User, Permission
+from django.test import Client
 from laboratory.models import LabTest
 from patients.models import Patient
 from hospital.models import HospitalService
@@ -59,3 +62,55 @@ class TestLabTestModel:
                 status=status,
             )
             test.full_clean()  # Should not raise
+
+
+@pytest.mark.django_db
+class TestLabTestViews:
+    """Template rendering tests for LabTest views."""
+
+    def _create_patient(self):
+        return Patient.objects.create(
+            unique_id="PAT_LABV",
+            first_name="Test",
+            last_name="Patient",
+            date_of_birth=timezone.now().date() - timedelta(days=365 * 30),
+            gender="M",
+        )
+
+    def _login_with_permission(self, username, codename):
+        client = Client()
+        user = User.objects.create_user(username=username, password="pass")
+        perm = Permission.objects.get(codename=codename)
+        user.user_permissions.add(perm)
+        client.login(username=username, password="pass")
+        return client
+
+    def test_list_requires_permission(self):
+        user = User.objects.create_user(username="testuser", password="pass")
+        client = Client()
+        client.login(username="testuser", password="pass")
+        url = reverse("labtest_list")
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_list_with_permission(self):
+        client = self._login_with_permission("permuser", "laboratory_view_labtest")
+        url = reverse("labtest_list")
+        response = client.get(url)
+        assert response.status_code == 200
+        assert "lab_tests" in response.context
+
+    def test_create_requires_permission(self):
+        user = User.objects.create_user(username="testuser", password="pass")
+        client = Client()
+        client.login(username="testuser", password="pass")
+        url = reverse("labtest_create")
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_create_with_permission(self):
+        self._create_patient()
+        client = self._login_with_permission("permuser", "laboratory_add_labtest")
+        url = reverse("labtest_create")
+        response = client.get(url)
+        assert response.status_code == 200

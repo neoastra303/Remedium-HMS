@@ -45,13 +45,13 @@
                     </td>
                     <td class="pe-4 text-end">
                         <div class="btn-group">
-                            <a href="{% url 'invoice_detail' invoice.pk %}" class="btn btn-sm btn-outline-primary" title="View">
+                            <a href="{% url 'invoice_detail' invoice.pk %}" class="btn btn-sm btn-outline-primary" title="View" aria-label="View">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="{% url 'invoice_update' invoice.pk %}" class="btn btn-sm btn-outline-warning" title="Edit">
+                            <a href="{% url 'invoice_update' invoice.pk %}" class="btn btn-sm btn-outline-warning" title="Edit" aria-label="Edit">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <button type="button" class="btn btn-sm btn-outline-danger" title="Delete"
+                            <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete"
                                 data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
                                 data-action-url="{% url 'invoice_delete' invoice.pk %}"
                                 data-item-name="invoice #{{ invoice.id }}">

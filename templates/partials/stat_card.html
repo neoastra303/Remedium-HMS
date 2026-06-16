@@ -1,0 +1,17 @@
+<div class="col-6 col-md-3">
+    <div class="stat-card stat-card--{{ color }}">
+        <div class="stat-card__icon"><i class="bi {{ icon }}"></i></div>
+        <div class="stat-card__label">{{ label }}</div>
+        <div class="stat-card__value">{{ value }}</div>
+        {% if sub_badges %}
+        <div class="stat-card__sub">
+            {% for badge in sub_badges %}
+            <span class="text-{{ badge.color|default:'muted' }}">{{ badge.text }}</span>
+            {% if not forloop.last %}<span class="mx-1">·</span>{% endif %}
+            {% endfor %}
+        </div>
+        {% elif sub_text %}
+        <div class="stat-card__sub">{{ sub_text }}</div>
+        {% endif %}
+    </div>
+</div>

@@ -31,9 +31,9 @@
                     <td class="d-mobile-none">{% if patientcare.heart_rate %}{{ patientcare.heart_rate }} bpm{% else %}—{% endif %}</td>
                     <td class="d-mobile-none">{% if patientcare.temperature %}{{ patientcare.temperature }}°C{% else %}—{% endif %}</td>
                     <td class="pe-4 text-end">
-                        <a href="{% url 'care_monitoring:patientcare_detail' patientcare.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'care_monitoring:patientcare_update' patientcare.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'care_monitoring:patientcare_delete' patientcare.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        <a href="{% url 'care_monitoring:patientcare_detail' patientcare.pk %}" class="btn btn-sm btn-outline-primary" title="View" aria-label="View"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'care_monitoring:patientcare_update' patientcare.pk %}" class="btn btn-sm btn-outline-warning" title="Edit" aria-label="Edit"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'care_monitoring:patientcare_delete' patientcare.pk %}" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete"><i class="bi bi-trash"></i></a>
                     </td>
                 </tr>
                 {% empty %}

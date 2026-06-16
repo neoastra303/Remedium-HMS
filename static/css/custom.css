@@ -1,20 +1,32 @@
 /* ── Remedium HMS — Design System ───────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
   /* Modern Clinical-Glass Palette */
   --primary-blue: #2563eb;
+  --secondary-purple: #7b2ff7;
   --bg-clinical: #f1f5f9;
+  --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #e8edf5 100%);
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(255, 255, 255, 0.5);
   --shadow-elevated: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.08);
   --font-inter: 'Inter', system-ui, sans-serif;
   --radius-card: 16px;
   --radius-btn: 12px;
   --radius-input: 10px;
   --transition-base: 0.2s ease;
+  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --text-main: #1e293b;
   --text-muted: #64748b;
+  --text-heading: #0f172a;
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.06);
+  --table-header-bg: #f8fafc;
+  --table-row-hover: rgba(0, 98, 255, 0.03);
+  --medical-green: #20bc77;
+  --primary-glow: rgba(37, 99, 235, 0.25);
+  --badge-font-size: 0.72rem;
 }
 
 body { font-family: var(--font-inter); background: var(--bg-clinical); }
@@ -52,56 +64,63 @@ body {
 }
 
 /* ── Animations ────────────────────────────────────────────────────── */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.6; }
-}
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.6; }
+  }
 
-@keyframes shimmer {
-  0%   { background-position: -200px 0; }
-  100% { background-position: calc(200px + 100%) 0; }
-}
+  @keyframes shimmer {
+    0%   { background-position: -200px 0; }
+    100% { background-position: calc(200px + 100%) 0; }
+  }
 
-.animate-fade-in {
-  animation: fadeIn 0.4s ease forwards;
-}
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease forwards;
+  }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.4s ease forwards;
-}
+  .animate-fade-in-up {
+    animation: fadeInUp 0.4s ease forwards;
+  }
 
-/* Stagger children */
-.stagger-children > * {
-  opacity: 0;
-  animation: fadeInUp 0.35s ease forwards;
+  .stagger-children > * {
+    opacity: 0;
+    animation: fadeInUp 0.35s ease forwards;
+  }
+  .stagger-children > *:nth-child(1) { animation-delay: 0.02s; }
+  .stagger-children > *:nth-child(2) { animation-delay: 0.04s; }
+  .stagger-children > *:nth-child(3) { animation-delay: 0.06s; }
+  .stagger-children > *:nth-child(4) { animation-delay: 0.08s; }
+  .stagger-children > *:nth-child(5) { animation-delay: 0.10s; }
+  .stagger-children > *:nth-child(6) { animation-delay: 0.12s; }
+  .stagger-children > *:nth-child(7) { animation-delay: 0.14s; }
+  .stagger-children > *:nth-child(8) { animation-delay: 0.16s; }
 }
-.stagger-children > *:nth-child(1) { animation-delay: 0.02s; }
-.stagger-children > *:nth-child(2) { animation-delay: 0.04s; }
-.stagger-children > *:nth-child(3) { animation-delay: 0.06s; }
-.stagger-children > *:nth-child(4) { animation-delay: 0.08s; }
-.stagger-children > *:nth-child(5) { animation-delay: 0.10s; }
-.stagger-children > *:nth-child(6) { animation-delay: 0.12s; }
-.stagger-children > *:nth-child(7) { animation-delay: 0.14s; }
-.stagger-children > *:nth-child(8) { animation-delay: 0.16s; }
 
 /* ── Skeleton Loading ──────────────────────────────────────────────── */
 .skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200px 100%;
-  animation: shimmer 1.5s infinite;
+  background: #f0f0f0;
   border-radius: 6px;
   display: inline-block;
   line-height: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+  }
 }
 
 .skeleton-text {
@@ -686,9 +705,10 @@ body {
   font-weight: 600;
 }
 
-/* Tab content transitions */
-.tab-pane {
-  animation: fadeIn 0.25s ease;
+@media (prefers-reduced-motion: no-preference) {
+  .tab-pane {
+    animation: fadeIn 0.25s ease;
+  }
 }
 
 /* ── Pagination ────────────────────────────────────────────────────── */
@@ -812,7 +832,6 @@ body {
   left: -100px;
   opacity: 0.08;
   pointer-events: none;
-  animation: floatBlob 10s ease-in-out infinite alternate;
 }
 
 .login-page::after {
@@ -827,7 +846,16 @@ body {
   right: -80px;
   opacity: 0.08;
   pointer-events: none;
-  animation: floatBlob 12s ease-in-out infinite alternate-reverse;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .login-page::before {
+    animation: floatBlob 10s ease-in-out infinite alternate;
+  }
+
+  .login-page::after {
+    animation: floatBlob 12s ease-in-out infinite alternate-reverse;
+  }
 }
 
 @keyframes floatBlob {
@@ -893,7 +921,12 @@ body {
   border: 4px solid rgba(0, 98, 255, 0.1);
   border-top-color: var(--primary-blue);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .loading-spinner {
+    animation: spin 0.8s linear infinite;
+  }
 }
 
 @keyframes spin {
@@ -1045,16 +1078,19 @@ body {
 
 /* ── June 2026 UX Enhancements ─────────────────────────────────────── */
 
-/* 1. Page Transitions (Blurred Zoom) */
-body.page-transitioning {
-  filter: blur(10px) brightness(0.9);
-  transform: scale(0.98);
-  opacity: 0.8;
-  transition: filter 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+@media (prefers-reduced-motion: no-preference) {
+  body.page-transitioning {
+    filter: blur(10px) brightness(0.9);
+    transform: scale(0.98);
+    opacity: 0.8;
+    transition: filter 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+  }
 }
 
-.animate-blurred-zoom-in {
-  animation: blurredZoomIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+@media (prefers-reduced-motion: no-preference) {
+  .animate-blurred-zoom-in {
+    animation: blurredZoomIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
 }
 
 @keyframes blurredZoomIn {
@@ -1070,8 +1106,10 @@ body.page-transitioning {
   75% { transform: translateX(-6px); }
 }
 
-.haptic-shake {
-  animation: hapticShake 0.3s ease-in-out;
+@media (prefers-reduced-motion: no-preference) {
+  .haptic-shake {
+    animation: hapticShake 0.3s ease-in-out;
+  }
 }
 
 /* 3. Global Search (Spotlight Style) */

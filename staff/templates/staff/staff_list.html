@@ -39,13 +39,13 @@
                     <td class="d-none d-lg-table-cell text-muted small">{{ member.email|default:"—" }}</td>
                     <td class="pe-4 text-end">
                         <div class="btn-group">
-                            <a href="{% url 'staff_detail' member.pk %}" class="btn btn-sm btn-outline-primary" title="View">
+                            <a href="{% url 'staff_detail' member.pk %}" class="btn btn-sm btn-outline-primary" title="View" aria-label="View">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="{% url 'staff_update' member.pk %}" class="btn btn-sm btn-outline-warning" title="Edit">
+                            <a href="{% url 'staff_update' member.pk %}" class="btn btn-sm btn-outline-warning" title="Edit" aria-label="Edit">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <button type="button" class="btn btn-sm btn-outline-danger" title="Delete"
+                            <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete"
                                 data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
                                 data-action-url="{% url 'staff_delete' member.pk %}"
                                 data-item-name="{{ member.first_name }} {{ member.last_name }}">

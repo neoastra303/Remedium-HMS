@@ -90,6 +90,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Initial commit of project files ([`fbeb48c`])
 
 ### Fixed
+- apply all review suggestions ([`2c80896`])
 - resolve XML parsing errors by explicitly writing SVGs with UTF-8 encoding and XML headers ([`0902923`])
 - CI/CD â€” align Python versions, split dev deps, fix gitignore, drop python-ci.yml ([`9f9b993`])
 - media serving, 404/500 pages, README stats, audit log, vital trends redirect, +9 tests (113 total, 75% coverage) ([`112a6a3`])

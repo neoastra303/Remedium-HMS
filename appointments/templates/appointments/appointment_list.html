@@ -55,17 +55,17 @@
                     <td class="pe-4 text-end">
                         <div class="btn-group">
                             {% if appointment.status == 'Scheduled' %}
-                                <a href="{% url 'check_in_appointment' appointment.pk %}" class="btn btn-sm btn-success text-white" title="Check-in Patient">
+                                <a href="{% url 'check_in_appointment' appointment.pk %}" class="btn btn-sm btn-success text-white" title="Check-in Patient" aria-label="Check-in Patient">
                                     <i class="bi bi-person-check"></i>
                                 </a>
                             {% endif %}
-                            <a href="{% url 'appointment_detail' appointment.pk %}" class="btn btn-sm btn-outline-primary" title="View">
+                            <a href="{% url 'appointment_detail' appointment.pk %}" class="btn btn-sm btn-outline-primary" title="View" aria-label="View">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="{% url 'appointment_update' appointment.pk %}" class="btn btn-sm btn-outline-warning" title="Edit">
+                            <a href="{% url 'appointment_update' appointment.pk %}" class="btn btn-sm btn-outline-warning" title="Edit" aria-label="Edit">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <button type="button" class="btn btn-sm btn-outline-danger" title="Delete"
+                            <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete"
                                 data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
                                 data-action-url="{% url 'appointment_delete' appointment.pk %}"
                                 data-item-name="{{ appointment.patient }} appointment">

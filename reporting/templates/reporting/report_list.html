@@ -23,9 +23,9 @@
                     <td>{{ report.report_type }}</td>
                     <td class="d-mobile-none text-muted small">{{ report.created_at|date:"M d, Y" }}</td>
                     <td class="pe-4 text-end">
-                        <a href="{% url 'report_detail' report.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'report_download' report.pk %}" class="btn btn-sm btn-outline-success"><i class="bi bi-download"></i></a>
-                        <a href="{% url 'report_delete' report.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        <a href="{% url 'report_detail' report.pk %}" class="btn btn-sm btn-outline-primary" title="View" aria-label="View"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'report_download' report.pk %}" class="btn btn-sm btn-outline-success" title="Download" aria-label="Download"><i class="bi bi-download"></i></a>
+                        <a href="{% url 'report_delete' report.pk %}" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete"><i class="bi bi-trash"></i></a>
                     </td>
                 </tr>
                 {% empty %}

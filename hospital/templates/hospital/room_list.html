@@ -15,9 +15,9 @@
                     <td>{{ room.ward.name }}</td>
                     <td>{{ room.capacity }}</td>
                     <td class="pe-4 text-end">
-                        <a href="{% url 'room_detail' room.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'room_update' room.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'room_delete' room.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        <a href="{% url 'room_detail' room.pk %}" class="btn btn-sm btn-outline-primary" title="View" aria-label="View"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'room_update' room.pk %}" class="btn btn-sm btn-outline-warning" title="Edit" aria-label="Edit"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'room_delete' room.pk %}" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete"><i class="bi bi-trash"></i></a>
                     </td>
                 </tr>
                 {% empty %}<tr><td colspan="4" class="text-center py-4 text-muted">No rooms found.</td></tr>

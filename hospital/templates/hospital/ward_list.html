@@ -14,9 +14,9 @@
                     <td class="ps-4 fw-medium">{{ ward.name }}</td>
                     <td>{{ ward.capacity }} beds</td>
                     <td class="pe-4 text-end">
-                        <a href="{% url 'ward_detail' ward.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'ward_update' ward.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'ward_delete' ward.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        <a href="{% url 'ward_detail' ward.pk %}" class="btn btn-sm btn-outline-primary" title="View" aria-label="View"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'ward_update' ward.pk %}" class="btn btn-sm btn-outline-warning" title="Edit" aria-label="Edit"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'ward_delete' ward.pk %}" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete"><i class="bi bi-trash"></i></a>
                     </td>
                 </tr>
                 {% empty %}<tr><td colspan="3" class="text-center py-4 text-muted">No wards found.</td></tr>

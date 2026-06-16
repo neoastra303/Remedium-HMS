@@ -29,9 +29,9 @@
                         {% else %}<span class="badge bg-success rounded-pill">OK</span>{% endif %}
                     </td>
                     <td class="pe-4 text-end">
-                        <a href="{% url 'inventoryitem_detail' item.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'inventoryitem_update' item.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'inventoryitem_delete' item.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        <a href="{% url 'inventoryitem_detail' item.pk %}" class="btn btn-sm btn-outline-primary" title="View" aria-label="View"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'inventoryitem_update' item.pk %}" class="btn btn-sm btn-outline-warning" title="Edit" aria-label="Edit"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'inventoryitem_delete' item.pk %}" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete"><i class="bi bi-trash"></i></a>
                     </td>
                 </tr>
                 {% empty %}

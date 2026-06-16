@@ -35,9 +35,9 @@
                     </td>
                     <td class="d-mobile-none text-muted small">{{ prescription.prescribed_date|date:"M d, Y" }}</td>
                     <td class="pe-4 text-end">
-                        <a href="{% url 'prescription_detail' prescription.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'prescription_update' prescription.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'prescription_delete' prescription.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        <a href="{% url 'prescription_detail' prescription.pk %}" class="btn btn-sm btn-outline-primary" title="View" aria-label="View"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'prescription_update' prescription.pk %}" class="btn btn-sm btn-outline-warning" title="Edit" aria-label="Edit"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'prescription_delete' prescription.pk %}" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete"><i class="bi bi-trash"></i></a>
                     </td>
                 </tr>
                 {% empty %}

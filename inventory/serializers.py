@@ -21,10 +21,10 @@ class InventoryItemSerializer(serializers.ModelSerializer):
             "cost_per_unit",
             "supplier",
             "expiry_date",
-            "last_updated",
-            "created_date",
+            "created_at",
+            "updated_at",
             "needs_reorder",
             "is_expired",
             "total_value",
         ]
-        read_only_fields = ["id", "last_updated", "created_date"]
+        read_only_fields = ["id", "created_at", "updated_at"]

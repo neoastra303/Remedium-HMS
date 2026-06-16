@@ -84,7 +84,7 @@ class AppointmentDetailView(
 
 
 @login_required
-@perm_decorator("appointments.change_appointment")
+@perm_decorator("appointments.appointments_change_appointment")
 def check_in_appointment(request, pk):
     appointment = get_object_or_404(Appointment, pk=pk)
     appointment.status = "Waiting"
@@ -97,6 +97,7 @@ class QueueTrackerView(LoginRequiredMixin, PermissionRequiredMixin, generic.List
     model = Appointment
     template_name = "appointments/queue_tracker.html"
     context_object_name = "queue"
+    paginate_by = 10
     permission_required = "appointments.appointments_view_appointment"
     raise_exception = True
 

@@ -95,6 +95,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Initial commit of project files ([`fbeb48c`])
 
 ### Fixed
+- update InventoryItemSerializer fields after model rename ([`b7a89f0`])
 - remove duplicate STATUS_CHOICES inline definition in Surgery model ([`4f3c49c`])
 - add raise_exception=True to 11 hospital views ([`2b34fe1`])
 - use get_object_or_404 and reverse_lazy in reporting views ([`1ab71a8`])

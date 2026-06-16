@@ -18,7 +18,7 @@
   --transition-base: 0.2s ease;
   --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --text-main: #1e293b;
-  --text-muted: #64748b;
+  --text-muted: #4b5563;
   --text-heading: #0f172a;
   --card-bg: #ffffff;
   --card-border: rgba(0, 0, 0, 0.06);
@@ -320,7 +320,7 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #94a3b8;
+  color: #6b7280;
   margin-bottom: 0.25rem;
 }
 
@@ -334,7 +334,7 @@ body {
 
 .stat-card__sub {
   font-size: 0.72rem;
-  color: #94a3b8;
+  color: #6b7280;
 }
 
 /* ── Dashboard Widgets ─────────────────────────────────────────────── */
@@ -364,7 +364,7 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #94a3b8;
+  color: #6b7280;
   margin-bottom: 0.75rem;
 }
 
@@ -405,7 +405,7 @@ body {
 
 .quick-action__sub {
   font-size: 0.7rem;
-  color: #94a3b8;
+  color: #6b7280;
 }
 
 /* ── Tables ────────────────────────────────────────────────────────── */
@@ -572,7 +572,7 @@ body {
 
 .appt-row__meta {
   font-size: 0.7rem;
-  color: #94a3b8;
+  color: #6b7280;
 }
 
 .appt-row__badge {
@@ -617,7 +617,7 @@ body {
   height: 32px;
   border-radius: 50%;
   background: #f1f5f9;
-  color: #64748b;
+  color: #4b5563;
   font-size: 0.68rem;
   font-weight: 700;
   display: flex;
@@ -634,14 +634,14 @@ body {
 
 .patient-row__meta {
   font-size: 0.68rem;
-  color: #94a3b8;
+  color: #6b7280;
 }
 
 /* ── Empty State ───────────────────────────────────────────────────── */
 .empty-state {
   text-align: center;
   padding: 2.5rem 1rem;
-  color: #cbd5e1;
+  color: #9ca3af;
 }
 
 .empty-state i {
@@ -738,7 +738,7 @@ body {
 }
 
 .page-item.disabled .page-link {
-  color: #cbd5e1;
+  color: #9ca3af;
   background: transparent;
 }
 
@@ -801,7 +801,7 @@ body {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #94a3b8;
+  color: #6b7280;
 }
 
 /* ── List Group ────────────────────────────────────────────────────── */
@@ -954,7 +954,7 @@ body {
 }
 
 .breadcrumb-custom .separator {
-  color: #cbd5e1;
+  color: #9ca3af;
 }
 
 .breadcrumb-custom .current {
@@ -1007,12 +1007,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #9ca3af;
   border-radius: 20px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #6b7280;
 }
 
 /* ── Responsive ────────────────────────────────────────────────────── */

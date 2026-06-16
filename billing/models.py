@@ -3,8 +3,6 @@ from django.db.models import Sum
 from patients.models import Patient
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from core.models import RemediumBaseModel
 from simple_history.models import HistoricalRecords
 
@@ -14,6 +12,9 @@ class InvoiceCounter(models.Model):
 
     year = models.PositiveIntegerField(primary_key=True)
     last_seq = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"Invoice counter for {self.year} (seq: {self.last_seq})"
 
     @classmethod
     def next_seq(cls, year):
@@ -109,6 +110,8 @@ class InvoiceItem(models.Model):
         # Update parent invoice total
         self.invoice.update_total()
 
+    history = HistoricalRecords()
+
     def __str__(self):
         return f"{self.description} (x{self.quantity}) on {self.invoice.invoice_number}"
 
@@ -146,14 +149,3 @@ class Payment(RemediumBaseModel):
     def __str__(self):
         return f"{self.amount} for Invoice #{self.invoice.invoice_number}"
 
-
-@receiver(post_save, sender=Payment)
-def update_invoice_paid(sender, instance, created, **kwargs):
-    """Signal to update invoice paid status when a payment is created."""
-    if created:
-        total_paid = (
-            instance.invoice.payments.aggregate(total=Sum("amount"))["total"] or 0
-        )
-        if total_paid >= instance.invoice.total_amount:
-            instance.invoice.paid = True
-            instance.invoice.save(update_fields=["paid"])

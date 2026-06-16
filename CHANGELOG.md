@@ -43,6 +43,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- remove dead code from integration views ([`ed1463d`])
 - regenerate OpenAPI schema after model and serializer changes ([`1d0fdde`])
 - update core project configuration ([`d24498b`])
 - move billing signal from models.py to dedicated signals.py ([`ad0d49b`])

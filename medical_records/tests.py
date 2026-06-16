@@ -4,9 +4,12 @@ import pytest
 import io
 from datetime import timedelta
 from django.utils import timezone
+from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ValidationError
-from medical_records.models import PatientDocument
+from django.contrib.auth.models import User, Permission
+from django.test import Client
+from medical_records.models import PatientDocument, Encounter
 from patients.models import Patient
 
 
@@ -79,6 +82,63 @@ class TestPatientDocumentModel:
         )
         with pytest.raises(ValidationError):
             doc.full_clean()
+
+    def test_create_encounter(self):
+        """Test Encounter creation."""
+        patient = self._create_patient()
+        enc = Encounter.objects.create(
+            patient=patient,
+            encounter_type="AMBULATORY",
+            reason_for_visit="Checkup",
+        )
+        assert enc.pk is not None
+        assert enc.reason_for_visit == "Checkup"
+
+    def test_encounter_detail_view_requires_permission(self):
+        """Test encounter detail requires permission."""
+        patient = self._create_patient()
+        enc = Encounter.objects.create(
+            patient=patient,
+            encounter_type="AMBULATORY",
+            reason_for_visit="Checkup",
+        )
+        user = User.objects.create_user(username="testuser", password="pass")
+        client = Client()
+        client.login(username="testuser", password="pass")
+        url = reverse("encounter_detail", kwargs={"pk": enc.pk})
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_encounter_detail_view_with_permission(self):
+        """Test encounter detail loads with proper permission."""
+        patient = self._create_patient()
+        enc = Encounter.objects.create(
+            patient=patient,
+            encounter_type="AMBULATORY",
+            reason_for_visit="Checkup",
+        )
+        user = User.objects.create_user(username="permuser", password="pass")
+        perm = Permission.objects.get(codename="view_encounter")
+        user.user_permissions.add(perm)
+        client = Client()
+        client.login(username="permuser", password="pass")
+        url = reverse("encounter_detail", kwargs={"pk": enc.pk})
+        response = client.get(url)
+        assert response.status_code == 200
+        assert response.context["encounter"].pk == enc.pk
+
+    def test_patient_document_list_pagination(self):
+        """Test document list view has pagination."""
+        patient = self._create_patient()
+        user = User.objects.create_user(username="permuser", password="pass")
+        perm = Permission.objects.get(codename="medical_records_view_document")
+        user.user_permissions.add(perm)
+        client = Client()
+        client.login(username="permuser", password="pass")
+        url = reverse("patient_document_list", kwargs={"patient_pk": patient.pk})
+        response = client.get(url)
+        assert response.status_code == 200
+        assert response.context["paginator"] is not None
 
     def test_patient_documents_relation(self):
         """Test patient can have multiple documents."""

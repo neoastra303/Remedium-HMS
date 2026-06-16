@@ -6,12 +6,13 @@ from django.core.exceptions import ValidationError
 from simple_history.models import HistoricalRecords
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from core.models import RemediumBaseModel
 
 # 10 MB file size limit
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 
-class Encounter(models.Model):
+class Encounter(RemediumBaseModel):
     """
     Represents a single clinical interaction or 'visit' for a patient.
     Serves as a hub for all activities during that visit.
@@ -55,7 +56,7 @@ class Encounter(models.Model):
         return f"{self.get_encounter_type_display()} on {self.start_time.date()} for {self.patient}"
 
 
-class PatientDocument(models.Model):
+class PatientDocument(RemediumBaseModel):
     DOCUMENT_TYPES = [
         ("LAB_REPORT", "Lab Report"),
         ("XRAY", "X-Ray"),
@@ -67,6 +68,7 @@ class PatientDocument(models.Model):
 
     class Meta:
         app_label = "medical_records"
+        ordering = ["-uploaded_at"]
         permissions = [
             ("medical_records_view_document", "Can view document"),
             ("medical_records_add_document", "Can add document"),

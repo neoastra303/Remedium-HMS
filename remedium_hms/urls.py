@@ -61,8 +61,7 @@ urlpatterns = [
         "api/v1/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"
     ),
     # All app URLs included WITHOUT namespace so {% url 'name' %} works in templates.
-    # Apps that need {% url 'app:name' %} (care_monitoring, billing) are also included
-    # WITH namespace below.
+    # care_monitoring and billing are namespaced for {% url 'app:name' %} access.
     path("", include("core.urls")),
     path("", include("patients.urls")),
     path("", include("staff.urls")),
@@ -77,8 +76,6 @@ urlpatterns = [
     path("", include("surgery.urls")),
     path("", include("medical_records.urls")),
     path("", include("notifications.urls")),
-    path("", include("care_monitoring.urls")),
-    # Namespaced includes for apps that use {% url 'app:name' %} in templates
     path("", include(("care_monitoring.urls", "care_monitoring"))),
     path("", include(("billing.urls", "billing"))),
 ]

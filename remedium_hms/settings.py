@@ -11,9 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config(
-    "SECRET_KEY", default="development-secret-key-for-local-testing-only"
-)
+SECRET_KEY = config("SECRET_KEY")
 if not SECRET_KEY:
     raise ValueError("SECRET_KEY environment variable must be set")
 
@@ -52,7 +50,6 @@ INSTALLED_APPS = [
     "simple_history",
     "crispy_forms",
     "crispy_bootstrap5",
-    "rest_framework.authtoken",
     "rest_framework_simplejwt.token_blacklist",
     "drf_spectacular",
 ]
@@ -287,16 +284,11 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="noreply@remediumhms.c
 
 # Dedicated encryption key for application secrets stored in the database.
 # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-_field_encryption_key = config(
-    "FIELD_ENCRYPTION_KEY",
-    default="KETwFe-Gtw80MYNku8lysC7POgv98lgTUUadt010MIA=",
-)
-FIELD_ENCRYPTION_KEY = _field_encryption_key
-if _field_encryption_key == "KETwFe-Gtw80MYNku8lysC7POgv98lgTUUadt010MIA=" and not DEBUG:
+FIELD_ENCRYPTION_KEY = config("FIELD_ENCRYPTION_KEY")
+if not FIELD_ENCRYPTION_KEY:
     raise ValueError(
-        "FIELD_ENCRYPTION_KEY is set to the development default. "
-        "Generate a production key with: python -c \"from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())\""
-        " and set the FIELD_ENCRYPTION_KEY environment variable."
+        "FIELD_ENCRYPTION_KEY environment variable must be set. "
+        "Generate one with: python -c \"from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())\""
     )
 
 # Logging Configuration
@@ -391,7 +383,8 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
-# These are disabled by default for development, enable in production via settings_production.py or env vars
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# These are disabled by default for development, enable in production via env vars
 SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", default=0, cast=int)
 SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=False, cast=bool)
 SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", default=False, cast=bool)

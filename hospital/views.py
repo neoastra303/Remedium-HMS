@@ -16,6 +16,7 @@ class HospitalServiceListView(
     context_object_name = "services"
     paginate_by = 15
     permission_required = "hospital.view_hospitalservice"
+    raise_exception = True
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -47,6 +48,7 @@ class WardListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView
     context_object_name = "wards"
     paginate_by = 10
     permission_required = "hospital.view_ward"
+    raise_exception = True
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -59,6 +61,7 @@ class WardDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
     template_name = "hospital/ward_detail.html"
     context_object_name = "ward"
     permission_required = "hospital.view_ward"
+    raise_exception = True
 
 
 class WardCreateView(
@@ -71,6 +74,7 @@ class WardCreateView(
     template_name = "hospital/ward_form.html"
     success_url = reverse_lazy("ward_list")
     permission_required = "hospital.add_ward"
+    raise_exception = True
     success_message = "Ward created successfully."
 
 
@@ -84,6 +88,7 @@ class WardUpdateView(
     template_name = "hospital/ward_form.html"
     success_url = reverse_lazy("ward_list")
     permission_required = "hospital.change_ward"
+    raise_exception = True
     success_query_param = "updated"
     success_message = "Ward updated successfully."
 
@@ -96,6 +101,7 @@ class WardDeleteView(
     template_name = "hospital/ward_confirm_delete.html"
     success_url = reverse_lazy("ward_list")
     permission_required = "hospital.delete_ward"
+    raise_exception = True
     success_message = "Ward deleted successfully."
 
 
@@ -105,6 +111,7 @@ class RoomListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView
     context_object_name = "rooms"
     paginate_by = 10
     permission_required = "hospital.view_room"
+    raise_exception = True
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -117,6 +124,7 @@ class RoomDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
     template_name = "hospital/room_detail.html"
     context_object_name = "room"
     permission_required = "hospital.view_room"
+    raise_exception = True
 
 
 class RoomCreateView(
@@ -129,6 +137,7 @@ class RoomCreateView(
     template_name = "hospital/room_form.html"
     success_url = reverse_lazy("room_list")
     permission_required = "hospital.add_room"
+    raise_exception = True
     success_message = "Room created successfully."
 
 
@@ -142,6 +151,7 @@ class RoomUpdateView(
     template_name = "hospital/room_form.html"
     success_url = reverse_lazy("room_list")
     permission_required = "hospital.change_room"
+    raise_exception = True
     success_query_param = "updated"
     success_message = "Room updated successfully."
 
@@ -154,4 +164,5 @@ class RoomDeleteView(
     template_name = "hospital/room_confirm_delete.html"
     success_url = reverse_lazy("room_list")
     permission_required = "hospital.delete_room"
+    raise_exception = True
     success_message = "Room deleted successfully."

@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased] - 2026-06-16
 
 ### Added
+- comprehensive UX feedback system and codebase cleanup ([`8124379`])
 - standardize dashboard prototypes with global UI components, enhanced branding, and improved CSS design system ([`7ffe242`])
 - enhance dashboard prototypes with CRUD UI elements, navigation, and modern styling ([`a0451c7`])
 - implement HTML dashboard prototypes with glassmorphic design and branding ([`87f9f5d`])

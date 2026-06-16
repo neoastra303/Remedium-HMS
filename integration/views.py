@@ -6,8 +6,6 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views import generic
-from rest_framework import generics, serializers
-from patients.models import Patient
 from .models import ExternalIntegration
 
 
@@ -98,14 +96,3 @@ def trigger_sync(request, pk):
     messages.success(request, f"Sync triggered for {integration.system_name}.")
     return redirect("integration_detail", pk=pk)
 
-
-# DRF views (kept for API compatibility)
-class PatientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Patient
-        fields = "__all__"
-
-
-class PatientListAPIView(generics.ListAPIView):
-    queryset = Patient.objects.all()
-    serializer_class = PatientSerializer

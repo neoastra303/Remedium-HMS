@@ -43,6 +43,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- harden CSRF, add login throttling, enforce password validation ([`036d507`])
 - add template rendering tests for all apps and fix conftest ([`a36fa65`])
 - remove stale templates and unused JS modules ([`bd6e0f0`])
 - remove dead code from integration views ([`17e0430`])

@@ -21,9 +21,10 @@
         </div>
         {% if user.is_authenticated %}
         <div class="d-flex align-items-center gap-2">
-            <span class="d-flex align-items-center gap-1 text-success small fw-medium bg-success bg-opacity-10 px-3 py-1 rounded-pill">
-                <span class="status-dot bg-success"></span>Online
-            </span>
+            <span class="text-muted small" id="lastUpdated"></span>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="location.reload()" title="Refresh">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
         </div>
         {% else %}
         <a class="btn btn-primary rounded-pill px-4" href="{% url 'login' %}">
@@ -233,41 +234,20 @@
     </div>
 
     {% else %}
-    {# ── Public Landing ── #}
-    <div class="row align-items-center justify-content-center" style="min-height:65vh;">
-        <div class="col-md-6 text-center">
-            <div class="mb-4 text-gradient" style="font-size:4rem;"><i class="bi bi-shield-plus"></i></div>
-            <h3 class="fw-bold mb-2">Enterprise Healthcare Management</h3>
-            <p class="text-muted mb-5">Streamline operations, enhance patient care, and secure medical data.</p>
-            <div class="row g-3 mb-5 stagger-children">
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm p-4 h-100 text-center card-action">
-                        <i class="bi bi-shield-check fs-3 text-success mb-2 d-block"></i>
-                        <div class="fw-semibold small">Secure Records</div>
-                        <div class="text-muted" style="font-size:0.78rem;">HIPAA-compliant</div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm p-4 h-100 text-center card-action">
-                        <i class="bi bi-graph-up fs-3 text-primary mb-2 d-block"></i>
-                        <div class="fw-semibold small">Real-time Analytics</div>
-                        <div class="text-muted" style="font-size:0.78rem;">Live dashboards</div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm p-4 h-100 text-center card-action">
-                        <i class="bi bi-people fs-3 text-info mb-2 d-block"></i>
-                        <div class="fw-semibold small">Staff Management</div>
-                        <div class="text-muted" style="font-size:0.78rem;">Roster scheduling</div>
-                    </div>
-                </div>
-            </div>
-            <a href="{% url 'login' %}" class="btn btn-primary btn-lg rounded-pill px-5">
-                <i class="bi bi-box-arrow-in-right me-2"></i>Access Portal
-            </a>
-        </div>
-    </div>
+    <script>window.location.href = "{% url 'login' %}";</script>
     {% endif %}
 
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var lastUpdated = document.getElementById('lastUpdated');
+    if (lastUpdated) {
+        var now = new Date();
+        lastUpdated.textContent = 'Updated: ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    }
+});
+</script>
 {% endblock %}

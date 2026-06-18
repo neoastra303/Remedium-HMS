@@ -65,7 +65,7 @@ def get_role_display(role):
 def homepage(request):
     context = {}
     if not request.user.is_authenticated:
-        return render(request, "index.html", context)
+        return render(request, "landing.html", context)
 
     staff_profile = getattr(request.user, "staff_profile", None)
     role = get_role(request)
@@ -115,6 +115,28 @@ def homepage(request):
             for d in dept_stats:
                 d["pct"] = int(d["count"] / max_count * 100) if max_count else 0
         context["dept_stats"] = dept_stats
+
+        # Chart data: revenue for last 7 days
+        revenue_by_day = []
+        day_labels = []
+        day_name_map = {0: 'Mon', 1: 'Tue', 2: 'Wed', 3: 'Thu', 4: 'Fri', 5: 'Sat', 6: 'Sun'}
+        for i in range(6, -1, -1):
+            day = today - timedelta(days=i)
+            day_revenue = Invoice.objects.filter(
+                paid=True, issue_date__date=day
+            ).aggregate(total=Sum("total_amount"))["total"] or 0
+            revenue_by_day.append(float(day_revenue))
+            day_labels.append(day_name_map[day.weekday()])
+        context["chart_revenue_data"] = revenue_by_day
+        context["chart_day_labels"] = day_labels
+
+        # Chart data: appointments for last 7 days
+        appt_by_day = []
+        for i in range(6, -1, -1):
+            day = today - timedelta(days=i)
+            day_appts = Appointment.objects.filter(appointment_date__date=day).count()
+            appt_by_day.append(day_appts)
+        context["chart_appointments_data"] = appt_by_day
 
     # ── Doctor context ──
     if role == "DOCTOR" and staff_profile:

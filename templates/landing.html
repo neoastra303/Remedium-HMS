@@ -1,0 +1,640 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Remedium HMS - Enterprise Hospital Management System. Streamline operations, enhance patient care, and secure medical data.">
+    <title>Remedium HMS — Enterprise Hospital Management</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏥</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <style>
+        :root {
+            --landing-primary: #2563eb;
+            --landing-purple: #7b2ff7;
+            --landing-dark: #0f172a;
+            --landing-gray: #64748b;
+        }
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        /* ── Landing Navbar ── */
+        .landing-nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1030;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            padding: 0.75rem 0;
+            transition: box-shadow 0.3s ease;
+        }
+        .landing-nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
+        .landing-nav .navbar-brand {
+            font-weight: 800; font-size: 1.3rem;
+            background: linear-gradient(135deg, var(--landing-primary), var(--landing-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .landing-nav .nav-link {
+            font-weight: 500; color: var(--landing-gray) !important;
+            padding: 0.5rem 1rem !important; transition: color 0.2s;
+        }
+        .landing-nav .nav-link:hover { color: var(--landing-primary) !important; }
+
+        /* ── Hero Section ── */
+        .hero-section {
+            min-height: 100vh; display: flex; align-items: center;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f1f5f9 100%);
+            position: relative; overflow: hidden; padding-top: 80px;
+        }
+        .hero-section::before {
+            content: ''; position: absolute; width: 600px; height: 600px;
+            background: var(--landing-primary); filter: blur(200px);
+            border-radius: 50%; top: -200px; right: -100px; opacity: 0.08;
+        }
+        .hero-section::after {
+            content: ''; position: absolute; width: 500px; height: 500px;
+            background: var(--landing-purple); filter: blur(200px);
+            border-radius: 50%; bottom: -150px; left: -100px; opacity: 0.06;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.15);
+            border-radius: 100px; padding: 0.4rem 1rem; font-size: 0.8rem;
+            font-weight: 600; color: var(--landing-primary); margin-bottom: 1.5rem;
+        }
+        .hero-title {
+            font-size: 3.5rem; font-weight: 800; line-height: 1.1;
+            color: var(--landing-dark); letter-spacing: -0.03em; margin-bottom: 1.5rem;
+        }
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--landing-primary), var(--landing-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero-subtitle {
+            font-size: 1.15rem; color: var(--landing-gray);
+            line-height: 1.7; max-width: 520px; margin-bottom: 2.5rem;
+        }
+        .hero-cta .btn { padding: 0.8rem 2rem; font-weight: 600; border-radius: 12px; }
+        .hero-mockup {
+            position: relative; z-index: 1;
+        }
+        .mockup-card {
+            background: #fff; border-radius: 16px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.12);
+            overflow: hidden; border: 1px solid rgba(0,0,0,0.06);
+        }
+        .mockup-header {
+            background: linear-gradient(135deg, var(--landing-primary), var(--landing-purple));
+            padding: 1rem 1.5rem; color: #fff; display: flex; align-items: center; gap: 0.75rem;
+        }
+        .mockup-dots { display: flex; gap: 6px; }
+        .mockup-dots span { width: 10px; height: 10px; border-radius: 50%; }
+        .mockup-dots span:nth-child(1) { background: #ff5f57; }
+        .mockup-dots span:nth-child(2) { background: #febc2e; }
+        .mockup-dots span:nth-child(3) { background: #28c840; }
+        .mockup-body { padding: 1.5rem; }
+        .mockup-stat-row { display: flex; gap: 1rem; margin-bottom: 1rem; }
+        .mockup-stat {
+            flex: 1; background: #f8fafc; border-radius: 10px; padding: 1rem;
+            text-align: center;
+        }
+        .mockup-stat .value { font-size: 1.5rem; font-weight: 700; color: var(--landing-dark); }
+        .mockup-stat .label { font-size: 0.7rem; color: var(--landing-gray); text-transform: uppercase; letter-spacing: 0.05em; }
+        .mockup-chart {
+            height: 120px; background: linear-gradient(180deg, rgba(37,99,235,0.08) 0%, transparent 100%);
+            border-radius: 10px; position: relative; overflow: hidden;
+        }
+        .mockup-chart::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+            height: 60%; background: linear-gradient(135deg, var(--landing-primary), var(--landing-purple));
+            opacity: 0.15; clip-path: polygon(0 40%, 15% 30%, 30% 50%, 45% 20%, 60% 35%, 75% 15%, 90% 25%, 100% 10%, 100% 100%, 0 100%);
+        }
+
+        /* ── Trust Bar ── */
+        .trust-bar {
+            background: #fff; border-top: 1px solid rgba(0,0,0,0.04);
+            border-bottom: 1px solid rgba(0,0,0,0.04); padding: 2rem 0;
+        }
+        .trust-item {
+            display: flex; align-items: center; gap: 0.75rem;
+            color: var(--landing-gray); font-size: 0.85rem; font-weight: 500;
+        }
+        .trust-item i { font-size: 1.5rem; color: var(--landing-primary); }
+
+        /* ── Features Section ── */
+        .features-section { padding: 6rem 0; background: #fff; }
+        .section-label {
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.1em; color: var(--landing-primary); margin-bottom: 0.75rem;
+        }
+        .section-title {
+            font-size: 2.2rem; font-weight: 800; color: var(--landing-dark);
+            letter-spacing: -0.02em; margin-bottom: 1rem;
+        }
+        .section-subtitle {
+            font-size: 1.05rem; color: var(--landing-gray); max-width: 600px;
+        }
+        .feature-card {
+            background: #fff; border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 16px; padding: 2rem; transition: all 0.3s ease;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            border-color: rgba(37,99,235,0.15);
+        }
+        .feature-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; margin-bottom: 1.25rem;
+        }
+        .feature-icon--blue { background: rgba(37,99,235,0.1); color: #2563eb; }
+        .feature-icon--green { background: rgba(34,197,94,0.1); color: #16a34a; }
+        .feature-icon--purple { background: rgba(123,47,247,0.1); color: #7b2ff7; }
+        .feature-icon--orange { background: rgba(249,115,22,0.1); color: #ea580c; }
+        .feature-icon--teal { background: rgba(20,184,166,0.1); color: #0d9488; }
+        .feature-icon--rose { background: rgba(244,63,94,0.1); color: #e11d48; }
+        .feature-title { font-size: 1.05rem; font-weight: 700; color: var(--landing-dark); margin-bottom: 0.5rem; }
+        .feature-desc { font-size: 0.88rem; color: var(--landing-gray); line-height: 1.6; }
+
+        /* ── Roles Section ── */
+        .roles-section { padding: 6rem 0; background: #f8fafc; }
+        .role-card {
+            background: #fff; border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 16px; padding: 2rem; text-align: center;
+            transition: all 0.3s ease; height: 100%;
+        }
+        .role-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        }
+        .role-avatar {
+            width: 64px; height: 64px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin: 0 auto 1rem;
+        }
+        .role-name { font-size: 1rem; font-weight: 700; color: var(--landing-dark); margin-bottom: 0.5rem; }
+        .role-features { list-style: none; padding: 0; margin: 0; }
+        .role-features li {
+            font-size: 0.82rem; color: var(--landing-gray); padding: 0.3rem 0;
+            display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+        }
+        .role-features li i { color: #22c55e; font-size: 0.7rem; }
+
+        /* ── Security Section ── */
+        .security-section { padding: 6rem 0; background: #fff; }
+        .security-item {
+            display: flex; gap: 1.25rem; padding: 1.5rem;
+            background: #f8fafc; border-radius: 14px; margin-bottom: 1rem;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+        .security-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; flex-shrink: 0;
+        }
+        .security-title { font-size: 0.95rem; font-weight: 700; color: var(--landing-dark); margin-bottom: 0.25rem; }
+        .security-desc { font-size: 0.82rem; color: var(--landing-gray); line-height: 1.5; }
+
+        /* ── CTA Section ── */
+        .cta-section {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, var(--landing-dark) 0%, #1e293b 100%);
+            color: #fff; text-align: center;
+        }
+        .cta-section .section-title { color: #fff; }
+        .cta-section .section-subtitle { color: #94a3b8; margin: 0 auto 2rem; }
+
+        /* ── Footer ── */
+        .landing-footer {
+            background: var(--landing-dark); border-top: 1px solid rgba(255,255,255,0.06);
+            padding: 3rem 0 1.5rem; color: #94a3b8;
+        }
+        .footer-brand {
+            font-weight: 800; font-size: 1.2rem; color: #fff; margin-bottom: 0.75rem;
+        }
+        .footer-link { color: #94a3b8; text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+        .footer-link:hover { color: #fff; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.5rem; margin-top: 2rem; font-size: 0.8rem; }
+
+        /* ── Responsive ── */
+        @media (max-width: 991.98px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-mockup { margin-top: 3rem; }
+            .section-title { font-size: 1.8rem; }
+        }
+        @media (max-width: 767.98px) {
+            .hero-title { font-size: 2rem; }
+            .mockup-stat-row { flex-direction: column; }
+            .trust-item { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Landing Navbar ── -->
+<nav class="landing-nav" id="landingNav">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <a class="navbar-brand text-decoration-none" href="#">Remedium HMS</a>
+            <div class="d-flex align-items-center gap-3">
+                <a href="#features" class="nav-link d-none d-md-inline">Features</a>
+                <a href="#roles" class="nav-link d-none d-md-inline">For Your Team</a>
+                <a href="#security" class="nav-link d-none d-md-inline">Security</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-primary rounded-pill px-4 btn-sm">
+                    <i class="bi bi-box-arrow-in-right me-1"></i>Sign In
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ── Hero Section ── -->
+<section class="hero-section">
+    <div class="container position-relative" style="z-index:1;">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-badge">
+                    <i class="bi bi-shield-check"></i> HIPAA-Ready &middot; Enterprise-Grade
+                </div>
+                <h1 class="hero-title">
+                    The Operating System for<br>
+                    <span class="gradient-text">Modern Hospitals</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Streamline patient care, automate billing, manage staff schedules, and secure medical records — all in one powerful platform built for healthcare teams.
+                </p>
+                <div class="hero-cta d-flex gap-3 flex-wrap">
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Access Portal
+                    </a>
+                    <a href="#features" class="btn btn-outline-secondary btn-lg">
+                        <i class="bi bi-play-circle me-2"></i>See How It Works
+                    </a>
+                </div>
+                <div class="d-flex gap-4 mt-4 flex-wrap">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        <span class="small text-muted">113+ passing tests</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        <span class="small text-muted">83% code coverage</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        <span class="small text-muted">Open source</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-mockup">
+                    <div class="mockup-card">
+                        <div class="mockup-header">
+                            <div class="mockup-dots"><span></span><span></span><span></span></div>
+                            <span class="small fw-semibold">Remedium Dashboard</span>
+                        </div>
+                        <div class="mockup-body">
+                            <div class="mockup-stat-row">
+                                <div class="mockup-stat">
+                                    <div class="value">1,247</div>
+                                    <div class="label">Patients</div>
+                                </div>
+                                <div class="mockup-stat">
+                                    <div class="value">38</div>
+                                    <div class="label">Today</div>
+                                </div>
+                                <div class="mockup-stat">
+                                    <div class="value">$42K</div>
+                                    <div class="label">Revenue</div>
+                                </div>
+                            </div>
+                            <div class="mockup-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Trust Bar ── -->
+<section class="trust-bar">
+    <div class="container">
+        <div class="row g-4 justify-content-center text-center">
+            <div class="col-6 col-md-3">
+                <div class="trust-item justify-content-center">
+                    <i class="bi bi-shield-lock"></i>
+                    <span>HIPAA Compliant</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="trust-item justify-content-center">
+                    <i class="bi bi-lock-fill"></i>
+                    <span>PHI Encrypted</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="trust-item justify-content-center">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Audit Trails</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="trust-item justify-content-center">
+                    <i class="bi bi-cloud-fill"></i>
+                    <span>Cloud Ready</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Features Section ── -->
+<section class="features-section" id="features">
+    <div class="container">
+        <div class="text-center mb-5">
+            <div class="section-label">Platform Features</div>
+            <h2 class="section-title">Everything your hospital needs</h2>
+            <p class="section-subtitle mx-auto">From patient registration to discharge, Remedium covers every touchpoint in the healthcare journey.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon feature-icon--blue"><i class="bi bi-people-fill"></i></div>
+                    <div class="feature-title">Patient Management</div>
+                    <div class="feature-desc">Complete patient lifecycle from admission to discharge. Encrypted PHI, medical history, and insurance tracking.</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon feature-icon--green"><i class="bi bi-calendar-check-fill"></i></div>
+                    <div class="feature-title">Smart Scheduling</div>
+                    <div class="feature-desc">Conflict-aware appointment engine that prevents double-booking and respects doctor shifts and availability.</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon feature-icon--purple"><i class="bi bi-capsule-fill"></i></div>
+                    <div class="feature-title">Pharmacy & Inventory</div>
+                    <div class="feature-desc">Real-time stock tracking, OpenFDA drug lookup, automated reorder alerts, and prescription management.</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon feature-icon--orange"><i class="bi bi-graph-up-arrow"></i></div>
+                    <div class="feature-title">Revenue Analytics</div>
+                    <div class="feature-desc">Immutable ledger-based billing, revenue dashboards, unpaid invoice tracking, and financial reporting.</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon feature-icon--teal"><i class="bi bi-heart-pulse-fill"></i></div>
+                    <div class="feature-title">Care Monitoring</div>
+                    <div class="feature-desc">Vital signs visualization, BMI calculation, critical condition flagging, and real-time patient status.</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon feature-icon--rose"><i class="bi bi-microscope"></i></div>
+                    <div class="feature-title">Laboratory</div>
+                    <div class="feature-desc">Test queue management, result entry with critical range flagging, and automated lab order processing.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Roles Section ── -->
+<section class="roles-section" id="roles">
+    <div class="container">
+        <div class="text-center mb-5">
+            <div class="section-label">Built For Every Role</div>
+            <h2 class="section-title">Tailored dashboards for your team</h2>
+            <p class="section-subtitle mx-auto">Each role gets a purpose-built interface with the data and tools they need — nothing more, nothing less.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="role-card">
+                    <div class="role-avatar" style="background:rgba(37,99,235,0.1);color:#2563eb;">
+                        <i class="bi bi-heart-pulse"></i>
+                    </div>
+                    <div class="role-name">Physicians</div>
+                    <ul class="role-features">
+                        <li><i class="bi bi-check2"></i> Daily schedule</li>
+                        <li><i class="bi bi-check2"></i> Patient vitals</li>
+                        <li><i class="bi bi-check2"></i> Quick prescriptions</li>
+                        <li><i class="bi bi-check2"></i> Surgery tracking</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="role-card">
+                    <div class="role-avatar" style="background:rgba(34,197,94,0.1);color:#16a34a;">
+                        <i class="bi bi-person-workspace"></i>
+                    </div>
+                    <div class="role-name">Nurses</div>
+                    <ul class="role-features">
+                        <li><i class="bi bi-check2"></i> Ward tracking</li>
+                        <li><i class="bi bi-check2"></i> Vitals logging</li>
+                        <li><i class="bi bi-check2"></i> Bed management</li>
+                        <li><i class="bi bi-check2"></i> Admission flow</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="role-card">
+                    <div class="role-avatar" style="background:rgba(123,47,247,0.1);color:#7b2ff7;">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <div class="role-name">Administrators</div>
+                    <ul class="role-features">
+                        <li><i class="bi bi-check2"></i> Revenue analytics</li>
+                        <li><i class="bi bi-check2"></i> Staff management</li>
+                        <li><i class="bi bi-check2"></i> Audit logs</li>
+                        <li><i class="bi bi-check2"></i> Department load</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="role-card">
+                    <div class="role-avatar" style="background:rgba(249,115,22,0.1);color:#ea580c;">
+                        <i class="bi bi-capsule"></i>
+                    </div>
+                    <div class="role-name">Pharmacists</div>
+                    <ul class="role-features">
+                        <li><i class="bi bi-check2"></i> Rx queue</li>
+                        <li><i class="bi bi-check2"></i> Stock alerts</li>
+                        <li><i class="bi bi-check2"></i> OpenFDA lookup</li>
+                        <li><i class="bi bi-check2"></i> Dispense tracking</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Security Section ── -->
+<section class="security-section" id="security">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="section-label">Security & Compliance</div>
+                <h2 class="section-title">Built for healthcare-grade security</h2>
+                <p class="section-subtitle mb-4">Every record in Remedium follows a strictly protected lifecycle to ensure data privacy and legal auditability.</p>
+                <div class="security-item">
+                    <div class="security-icon" style="background:rgba(37,99,235,0.1);color:#2563eb;">
+                        <i class="bi bi-key-fill"></i>
+                    </div>
+                    <div>
+                        <div class="security-title">PHI Encryption at Rest</div>
+                        <div class="security-desc">Sensitive patient data (phone, email, medical history) is encrypted at the database layer using Fernet symmetric encryption.</div>
+                    </div>
+                </div>
+                <div class="security-item">
+                    <div class="security-icon" style="background:rgba(34,197,94,0.1);color:#16a34a;">
+                        <i class="bi bi-journal-check"></i>
+                    </div>
+                    <div>
+                        <div class="security-title">Immutable Audit Trails</div>
+                        <div class="security-desc">Every clinical change is tracked with timestamps and user attribution. Soft-delete ensures records are never lost.</div>
+                    </div>
+                </div>
+                <div class="security-item">
+                    <div class="security-icon" style="background:rgba(123,47,247,0.1);color:#7b2ff7;">
+                        <i class="bi bi-person-check-fill"></i>
+                    </div>
+                    <div>
+                        <div class="security-title">Granular RBAC</div>
+                        <div class="security-desc">13 distinct user roles with 8 tailored dashboards. Staff see only what they need — nothing more.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-center">
+                    <div class="mockup-card" style="max-width:400px;margin:0 auto;">
+                        <div class="mockup-header">
+                            <div class="mockup-dots"><span></span><span></span><span></span></div>
+                            <span class="small fw-semibold">Security Lifecycle</span>
+                        </div>
+                        <div class="mockup-body p-4">
+                            <div class="d-flex flex-column gap-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div style="width:36px;height:36px;border-radius:8px;background:rgba(37,99,235,0.1);display:flex;align-items:center;justify-content:center;color:#2563eb;font-size:0.8rem;font-weight:700;">1</div>
+                                    <div><div class="small fw-semibold">Input Data</div><div class="text-muted" style="font-size:0.75rem;">Plain text form submission</div></div>
+                                </div>
+                                <div class="ms-4" style="border-left:2px solid #e2e8f0;height:16px;"></div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div style="width:36px;height:36px;border-radius:8px;background:rgba(34,197,94,0.1);display:flex;align-items:center;justify-content:center;color:#16a34a;font-size:0.8rem;font-weight:700;">2</div>
+                                    <div><div class="small fw-semibold">Fernet Encryption</div><div class="text-muted" style="font-size:0.75rem;">Field-level PHI protection</div></div>
+                                </div>
+                                <div class="ms-4" style="border-left:2px solid #e2e8f0;height:16px;"></div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div style="width:36px;height:36px;border-radius:8px;background:rgba(123,47,247,0.1);display:flex;align-items:center;justify-content:center;color:#7b2ff7;font-size:0.8rem;font-weight:700;">3</div>
+                                    <div><div class="small fw-semibold">Audit Trail Created</div><div class="text-muted" style="font-size:0.75rem;">Immutable change log</div></div>
+                                </div>
+                                <div class="ms-4" style="border-left:2px solid #e2e8f0;height:16px;"></div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div style="width:36px;height:36px;border-radius:8px;background:rgba(249,115,22,0.1);display:flex;align-items:center;justify-content:center;color:#ea580c;font-size:0.8rem;font-weight:700;">4</div>
+                                    <div><div class="small fw-semibold">Soft Delete</div><div class="text-muted" style="font-size:0.75rem;">Archived, never destroyed</div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── CTA Section ── -->
+<section class="cta-section">
+    <div class="container">
+        <h2 class="section-title">Ready to transform your hospital?</h2>
+        <p class="section-subtitle">Join healthcare teams already using Remedium to streamline operations and improve patient outcomes.</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg rounded-pill px-5">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Access Portal
+            </a>
+            <a href="https://github.com/neoastra303/Remedium-HMS" target="_blank" class="btn btn-outline-light btn-lg rounded-pill px-5">
+                <i class="bi bi-github me-2"></i>View on GitHub
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer class="landing-footer">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="footer-brand">Remedium HMS</div>
+                <p class="small" style="max-width:300px;">Enterprise-grade hospital management system built with Django. Open source, secure, and designed for healthcare teams.</p>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <div class="fw-semibold text-white small mb-3">Product</div>
+                <div class="d-flex flex-column gap-2">
+                    <a href="#features" class="footer-link">Features</a>
+                    <a href="#roles" class="footer-link">For Your Team</a>
+                    <a href="#security" class="footer-link">Security</a>
+                    <a href="http://localhost:8000/api/v1/docs/" class="footer-link">API Docs</a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <div class="fw-semibold text-white small mb-3">Resources</div>
+                <div class="d-flex flex-column gap-2">
+                    <a href="https://github.com/neoastra303/Remedium-HMS" target="_blank" class="footer-link">GitHub</a>
+                    <a href="https://github.com/neoastra303/Remedium-HMS/blob/main/docs/setup.md" target="_blank" class="footer-link">Documentation</a>
+                    <a href="https://github.com/neoastra303/Remedium-HMS/blob/main/CONTRIBUTING.md" target="_blank" class="footer-link">Contributing</a>
+                    <a href="https://github.com/neoastra303/Remedium-HMS/blob/main/CHANGELOG.md" target="_blank" class="footer-link">Changelog</a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <div class="fw-semibold text-white small mb-3">Legal</div>
+                <div class="d-flex flex-column gap-2">
+                    <a href="https://github.com/neoastra303/Remedium-HMS/blob/main/LICENSE" target="_blank" class="footer-link">MIT License</a>
+                    <a href="https://github.com/neoastra303/Remedium-HMS/blob/main/SECURITY.md" target="_blank" class="footer-link">Security Policy</a>
+                    <a href="https://github.com/neoastra303/Remedium-HMS/blob/main/CODE_OF_CONDUCT.md" target="_blank" class="footer-link">Code of Conduct</a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <div class="fw-semibold text-white small mb-3">Connect</div>
+                <div class="d-flex flex-column gap-2">
+                    <a href="https://github.com/neoastra303" target="_blank" class="footer-link"><i class="bi bi-github me-2"></i>GitHub</a>
+                    <a href="{% url 'login' %}" class="footer-link"><i class="bi bi-box-arrow-in-right me-2"></i>Sign In</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom d-flex flex-wrap justify-content-between align-items-center">
+            <span>&copy; {% now "Y" %} Remedium HMS. Built with Django &amp; Python.</span>
+            <span>Open Source under MIT License</span>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Navbar scroll shadow
+var nav = document.getElementById('landingNav');
+if (nav) {
+    window.addEventListener('scroll', function() {
+        nav.classList.toggle('scrolled', window.scrollY > 10);
+    });
+}
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+        var target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+});
+</script>
+</body>
+</html>

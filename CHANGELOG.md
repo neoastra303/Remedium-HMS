@@ -105,6 +105,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Initial commit of project files ([`fbeb48c`])
 
 ### Fixed
+- remove page transition delay and improve search scope ([`2f3db4c`])
 - resolve DTL syntax errors and URL namespace in patient templates ([`594e904`])
 - add hospital: namespace prefix to template URL tags ([`9b47562`])
 - add null=True to created_at/updated_at on remaining model files ([`64ddfc5`])

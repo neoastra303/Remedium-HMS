@@ -1,267 +1,310 @@
-# Remedium Hospital Management System (HMS)
-
 <div align="center">
 
-![Remedium Logo](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/static/img/hero-logo.png)
+<img src="design/logo.svg" alt="Remedium HMS" width="120" />
 
-**An Enterprise-Grade, HIPAA-Ready Modular Monolith for Modern Healthcare.**
+# Remedium HMS
 
-[![Django](https://img.shields.io/badge/Django-5.2.14-092E20?style=for-the-badge&logo=django)](https://www.djangoproject.com/)
-[![Python](https://img.shields.io/badge/Python-3.13-3776AB?style=for-the-badge&logo=python)](https://www.python.org/)
-[![DRF](https://img.shields.io/badge/DRF-3.16-A30000?style=for-the-badge&logo=django)](https://www.django-rest-framework.org/)
-[![Security](https://img.shields.io/badge/Security-PHI_Encrypted-blue?style=for-the-badge&logo=googlesheets)](https://github.com/neoastra303/Remedium-HMS)
-[![Tests](https://img.shields.io/badge/Tests-113_Passing-brightgreen?style=for-the-badge)](https://github.com/neoastra303/Remedium-HMS)
-[![Coverage](https://img.shields.io/badge/Coverage-83%25-success?style=for-the-badge)](https://github.com/neoastra303/Remedium-HMS)
+### Enterprise Hospital Management System
 
-[**Explore API Docs**](http://localhost:8000/api/v1/docs/) • [**Quick Start**](docs/quick-start.md) • [**Role Dashboards**](#-intelligent-role-dashboards) • [**Architecture**](docs/architecture.md)
+**An open-source, HIPAA-ready modular monolith built for modern healthcare teams.**
+
+---
+
+[![Django](https://img.shields.io/badge/Django-5.2-092E20?style=flat-square&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![Python](https://img.shields.io/badge/Python-3.13-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![DRF](https://img.shields.io/badge/DRF-3.16-A30000?style=flat-square&logo=django&logoColor=white)](https://www.django-rest-framework.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
+[![Tests](https://img.shields.io/badge/Tests-113+-brightgreen?style=flat-square)](#testing)
+[![Coverage](https://img.shields.io/badge/Coverage-83%25-success?style=flat-square)](#testing)
+
+<br />
+
+[Quick Start](#-quick-start) &nbsp;&bull;&nbsp; [Features](#-features) &nbsp;&bull;&nbsp; [Architecture](#-architecture) &nbsp;&bull;&nbsp; [API Docs](#-api) &nbsp;&bull;&nbsp; [Contributing](#-contributing)
 
 </div>
 
 ---
 
-## 💎 The Remedium Difference
+## Overview
 
-Remedium-HMS is not just another CRUD app. It is a high-security, auditable, and modular enterprise platform designed to handle the complexities of modern hospital operations.
+Remedium HMS is a full-featured hospital management platform designed to handle the real complexities of healthcare operations — from patient admission to discharge, pharmacy dispensing, lab testing, surgery scheduling, and revenue tracking.
 
-### **🛡️ Security-First Core**
-*   **PHI Encryption at Rest:** Sensitive Patient Health Information (Phone, Email, Medical History) is encrypted at the database layer using industry-standard Fernet symmetric encryption.
-*   **Immutable Audit Trails:** Powered by `simple-history`, every clinical change is tracked. Soft-delete logic ensures records are never lost, only archived for legal compliance.
-*   **Granular RBAC:** 13 distinct user roles with 8 tailored dashboards ensure clinical staff see what they need, while administrative staff manage what they must.
+**What makes it different:**
 
-### **🏥 Clinical Excellence**
-*   **OpenFDA Integration:** Real-time drug information and adverse event tracking via the official FDA API.
-*   **Intelligent Care Monitoring:** Vital signs visualization with BMI calculation and critical condition flagging.
-*   **Conflict-Aware Scheduling:** Smart appointment engine that prevents doctor double-booking and respects work shifts.
-
-### **✨ Glassmorphic UI/UX**
-*   A premium, modern interface utilizing **Backdrop Blurs**, **Staggered Animations**, and **Shimmer Skeletons** to provide a fluid, "living" application feel that moves beyond standard Bootstrap.
+- **Security-first** — PHI encrypted at rest with Fernet, immutable audit trails, granular RBAC across 13 roles
+- **Clinical-grade** — Conflict-aware scheduling, vital signs monitoring, OpenFDA drug lookup
+- **Production-ready** — Dockerized, PostgreSQL-compatible, JWT auth, OpenAPI docs
+- **Beautiful UI** — Glassmorphic design system with dark mode, animations, and mobile-first responsive layout
 
 ---
 
-## 🏗️ Architectural Vision
+## Features
 
-Remedium follows a **Modular Monolith** pattern, ensuring strict boundaries between 14 specialized domains while maintaining a unified, high-performance core.
+<table>
+<tr>
+<td width="50%" valign="top">
+
+#### Patient Management
+- Full lifecycle from admission to discharge
+- Encrypted PHI (phone, email, medical history)
+- Insurance tracking and emergency contacts
+
+#### Smart Scheduling
+- Conflict-aware appointment engine
+- Prevents double-booking automatically
+- Respects doctor shifts and availability
+
+#### Pharmacy & Inventory
+- Real-time stock tracking with reorder alerts
+- OpenFDA drug information integration
+- Prescription queue with dispense tracking
+
+</td>
+<td width="50%" valign="top">
+
+#### Revenue Analytics
+- Immutable ledger-based billing system
+- Revenue dashboards with trend charts
+- Unpaid invoice tracking and reporting
+
+#### Care Monitoring
+- Vital signs visualization with charts
+- BMI calculation and critical flagging
+- Real-time patient status dashboard
+
+#### Laboratory
+- Test queue management with priority
+- Critical range flagging on results
+- Automated lab order processing
+
+</td>
+</tr>
+</table>
+
+---
+
+## Architecture
+
+Remedium follows a **Modular Monolith** pattern with strict domain boundaries across 14 specialized apps.
 
 ```mermaid
-graph TD
-    subgraph Core_Layer [Platform Foundation]
-        A[Core & RBAC]:::core
-        S[Staff & Auth]:::core
+graph LR
+    subgraph Core ["Foundation"]
+        A[Core & RBAC]
+        B[Staff & Auth]
     end
 
-    subgraph Clinical_Domain [Clinical Excellence]
-        B1[Patients]:::clinical
-        B2[Medical Records]:::clinical
-        B3[Laboratory]:::clinical
-        B4[Care Monitoring]:::clinical
-    end
-    
-    subgraph Operations_Domain [Operations & Finance]
-        C1[Appointments]:::ops
-        C2[Billing & Ledger]:::ops
-        C3[Pharmacy]:::ops
-        C4[Surgery]:::ops
-    end
-    
-    subgraph Support_Domain [Infrastructure]
-        D1[Inventory]:::infra
-        D2[Reporting]:::infra
-        D3[Integration]:::infra
-        D4[Hospital Units]:::infra
+    subgraph Clinical ["Clinical"]
+        C1[Patients]
+        C2[Medical Records]
+        C3[Laboratory]
+        C4[Care Monitoring]
     end
 
-    A --> Clinical_Domain
-    A --> Operations_Domain
-    A --> Support_Domain
+    subgraph Operations ["Operations"]
+        D1[Appointments]
+        D2[Billing]
+        D3[Pharmacy]
+        D4[Surgery]
+    end
 
-    classDef core fill:#f9f,stroke:#333,stroke-width:2px,color:#000
-    classDef clinical fill:#bbf,stroke:#333,stroke-width:2px,color:#000
-    classDef ops fill:#dfd,stroke:#333,stroke-width:2px,color:#000
-    classDef infra fill:#ffd,stroke:#333,stroke-width:2px,color:#000
+    subgraph Infrastructure ["Infrastructure"]
+        E1[Inventory]
+        E2[Reporting]
+        E3[Integration]
+        E4[Hospital Units]
+    end
+
+    A --> Clinical
+    A --> Operations
+    A --> Infrastructure
+
+    style Core fill:#f0f0ff,stroke:#6366f1,stroke-width:2px
+    style Clinical fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
+    style Operations fill:#f0fdf4,stroke:#22c55e,stroke-width:2px
+    style Infrastructure fill:#fefce8,stroke:#eab308,stroke-width:2px
 ```
 
-### **🔄 The Patient Journey (Full-Cycle Flow)**
+### The Patient Journey
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant P as 👤 Patient
-    participant R as 🏢 Reception
-    participant D as 🩺 Doctor
-    participant L as 🔬 Lab/Pharmacy
-    participant B as 💰 Billing (Ledger)
+    participant P as Patient
+    participant R as Reception
+    participant D as Doctor
+    participant L as Lab / Pharmacy
+    participant B as Billing
 
-    P->>R: Initial Registration & Triage
-    Note right of R: RBAC: Receptionist Role
-    R->>D: Digital Queue Assignment
-    D->>P: Physical Consultation
-    rect rgb(240, 240, 255)
-        Note over D,P: Vitals Capture & PHI Encryption
-    end
-    D->>L: Electronic Order (Lab/Rx)
-    L-->>D: Results Entry / Medication Dispense
+    P->>R: Registration & Triage
+    R->>D: Queue Assignment
+    D->>P: Consultation & Vitals
+    D->>L: Lab Order / Prescription
+    L-->>D: Results / Dispense
     D->>B: Finalize Encounter
-    B->>P: Immutable Ledger Invoice Generated
+    B->>P: Invoice Generated
 ```
 
----
-
-## 🛡️ Security & Integrity Lifecycle
-
-Every record in Remedium follows a strictly protected lifecycle to ensure data privacy (HIPAA compliance ready) and legal auditability.
+### Security Lifecycle
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PlainText: Input Data
-    PlainText --> DB: Field-Level Encryption (Fernet)
-    state DB {
-        [*] --> Active: "is_deleted = False"
-        Active --> SoftDeleted: User Clicks Delete
-        SoftDeleted --> Active: Admin Restore
-        SoftDeleted --> Archival: "is_deleted = True"
-    }
-    DB --> Output: Transparent Decryption (Python Layer)
+    [*] --> Input: Form Submission
+    Input --> Encrypted: Fernet Encryption
+    Encrypted --> Stored: Database Write
+    Stored --> Audit: History Tracked
+    Stored --> SoftDeleted: User Deletes
+    SoftDeleted --> Stored: Admin Restores
+    Stored --> Output: Transparent Decryption
     Output --> [*]
 ```
 
 ---
 
-## 🎨 Professional Interface Showcase
+## Role Dashboards
 
-The frontend utilizes a custom **Glassmorphic Design System** that prioritizes clinical focus and visual comfort.
+Each role gets a purpose-built interface with the data and tools they need.
 
-<div align="center">
-
-| **The Clinical Cockpit (Doctor)** | **Administrative Analytics** |
-|:---:|:---:|
-| ![Doctor View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/doctor-view.png) | ![Admin View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/admin-view.png) |
-| *High-density data visualization for rapid clinical decision-making.* | *Real-time hospital occupancy and revenue stream tracking.* |
-
-| **Ward Management (Nurse)** | **Pharmacy Control** |
-|:---:|:---:|
-| ![Nurse View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/nurse-view.png) | ![Pharmacy View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/pharmacy-view.png) |
-| *Visual bed map and urgent medication countdown trackers.* | *OpenFDA integrated drug search and dispense queue management.* |
-
-| **Laboratory Information** | **Reception & Gateway** |
-|:---:|:---:|
-| ![Lab View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/lab-view.png) | ![Reception View](https://raw.githubusercontent.com/neoastra303/Remedium-HMS/main/design/wireframes/receptionist-view.png) |
-| *Automated test queue with critical range flagging and rapid entry.* | *Streamlined patient registration and ledger-based rapid billing.* |
-
-</div>
+| Role | Dashboard | What You See |
+|:-----|:----------|:-------------|
+| **Admin** | Revenue charts, department load, staff management, audit logs |
+| **Doctor** | Daily schedule, patient vitals, prescriptions, surgery tracking |
+| **Nurse** | Ward overview, critical patients, vitals logging, bed map |
+| **Surgeon** | Surgery schedule, pre-op count, upcoming procedures |
+| **Pharmacist** | Rx queue, stock alerts, OpenFDA lookup, dispense tracking |
+| **Lab Tech** | Test queue, result entry, critical flagging, completed tests |
+| **Receptionist** | Check-in queue, billing, doctor availability, registration |
 
 ---
 
-## 📊 Tech Stack
+## Tech Stack
 
 | Layer | Technology |
-|---|---|
-| **Backend** | Django 5.2.14, Python 3.13, DRF 3.16 |
-| **Database** | SQLite (Dev) • PostgreSQL (Prod) • PHI Encryption |
-| **Frontend** | Bootstrap 5.3, Custom Glassmorphism, Chart.js, Vanilla JS/jQuery |
-| **DevOps** | Docker (Non-Root), Gunicorn, WhiteNoise, GitHub Actions |
-| **API Docs** | OpenAPI 3.0 (Swagger UI + ReDoc) |
-| **Integrations** | OpenFDA API, SMTP Console/Gmail |
+|:------|:-----------|
+| **Backend** | Django 5.2, Python 3.13, Django REST Framework 3.16 |
+| **Database** | PostgreSQL (prod) / SQLite (dev) |
+| **Auth** | JWT tokens, token blacklist, role-based access control |
+| **Frontend** | Bootstrap 5.3, custom glassmorphism CSS, Chart.js, vanilla JS |
+| **Security** | Fernet PHI encryption, CSRF protection, login throttling |
+| **DevOps** | Docker (non-root), Gunicorn, WhiteNoise, GitHub Actions |
+| **API** | OpenAPI 3.0 with Swagger UI and ReDoc |
 
 ---
 
-## 👥 Intelligent Role Dashboards
+## Quick Start
 
-Each role is granted unique permissions and a specialized landing page.
+### 1. Clone & Install
 
-| Role | Interface | Key Features |
-|:---:|:---|---|
-| **Doctor** | `doctor_dashboard.html` | Schedule, active patients, vitals visualization, rapid Rx. |
-| **Nurse** | `nurse_dashboard.html` | Ward tracking, vitals log, admission management. |
-| **Admin** | `admin_dashboard.html` | Revenue analytics, department load, staff management. |
-| **Pharmacist** | `pharmacist_dashboard.html` | Stock alerts, Rx queue, OpenFDA lookups. |
-| **Reception** | `reception_dashboard.html` | Check-in queue, billing flow, doctor availability. |
-
-### **🔐 Test Accounts (Demo Seeding)**
-
-Run `python manage.py create_role_users` to explore the system with any of these pre-configured roles:
-
-| Username | Role | Dashboard Access | Password |
-|:---|:---|:---|:---|
-| `admin` | Administrator | Full Analytics & Operations | `password123` |
-| `doctor` | Doctor | Clinical Consultation & vitals | `password123` |
-| `nurse` | Nurse | In-patient monitoring | `password123` |
-| `pharmacist` | Pharmacist | Inventory & OpenFDA Portal | `password123` |
-| `labtech` | Lab Technician | Result Entry & Queue | `password123` |
-| `receptionist` | Receptionist | Check-in & Ledger Billing | `password123` |
-
----
-
-## 🚀 Quick Start
-
-### 1. Setup Environment
 ```bash
 git clone https://github.com/neoastra303/Remedium-HMS.git
 cd Remedium-HMS
 python -m venv venv
-source venv/bin/activate  # venv\Scripts\activate on Windows
+source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Initialize Database
+### 2. Initialize
+
 ```bash
 python manage.py migrate
-python manage.py create_groups  # Essential for RBAC
-python manage.py create_role_users  # Optional: Seed test accounts
+python manage.py create_groups       # RBAC roles
+python manage.py create_role_users   # Demo accounts (optional)
 ```
 
-### 3. Launch
+### 3. Run
+
 ```bash
 python manage.py runserver
 ```
-Access at `http://localhost:8000`. Login with `admin` / `password123` if you seeded test accounts.
+
+Open **http://localhost:8000** and sign in with `admin` / `password123`.
 
 ---
 
-## 📡 API Ecosystem
+## API
 
 All endpoints are versioned under `/api/v1/`.
 
-*   **Swagger UI:** `/api/v1/docs/`
-*   **ReDoc:** `/api/v1/redoc/`
-*   **Auth:** JWT-based or Token-based headers.
+| Endpoint | Description |
+|:---------|:------------|
+| `/api/v1/patients/` | Patient demographics and management |
+| `/api/v1/appointments/` | Scheduling and conflict detection |
+| `/api/v1/prescriptions/` | Rx management with OpenFDA lookup |
+| `/api/v1/invoices/` | Ledger-based billing |
+| `/api/v1/staff/` | Staff profiles and role management |
+| `/api/v1/lab-tests/` | Laboratory test orders and results |
+| `/api/v1/surgeries/` | Surgery scheduling and tracking |
+| `/api/v1/inventory/` | Pharmacy and supply inventory |
 
-**Key Endpoint Groups:**
-*   `/patients/` — Demographics & Discharge logic.
-*   `/prescriptions/` — Rx management + OpenFDA search.
-*   `/invoices/` — Ledger-based billing.
+**Interactive docs:**
+- Swagger UI: `/api/v1/docs/`
+- ReDoc: `/api/v1/redoc/`
 
 ---
 
-## 🧪 Quality Assurance
+## Testing
 
-We maintain a high bar for reliability:
 ```bash
-python -m pytest --cov=. --cov-report=term-missing
+# Run all tests
+python manage.py test
+
+# With coverage
+pip install pytest-cov
+pytest --cov=. --cov-report=term-missing
 ```
-**Current Status:** 113+ Tests • 83% Coverage • Zero Critical Vulnerabilities.
+
+**Current status:** 113+ tests, 83% coverage, zero critical vulnerabilities.
 
 ---
 
-## 📚 Documentation
+## Project Structure
 
-Detailed documentation is available in the [`docs/`](docs/) folder:
-
-| Document | Description |
-|----------|-------------|
-| [Quick Start](docs/quick-start.md) | Get running in 5 minutes |
-| [Setup Guide](docs/setup.md) | Complete setup instructions |
-| [Architecture](docs/architecture.md) | System design & patterns |
-| [API Reference](docs/api.md) | REST API endpoints & usage |
-| [Deployment](docs/deployment.md) | Production deployment guide |
-| [Frontend Integration](docs/frontend-integration.md) | Frontend-backend integration |
-| [Frontend-Backend Summary](docs/frontend-backend-integration.md) | API-to-JS module mapping |
+```
+Remedium-HMS/
+├── core/                   # Platform foundation, RBAC, API utilities
+├── patients/               # Patient lifecycle and demographics
+├── appointments/           # Scheduling engine with conflict detection
+├── billing/                # Ledger-based invoicing and payments
+├── pharmacy/               # Prescriptions and OpenFDA integration
+├── laboratory/             # Test orders, results, critical flagging
+├── care_monitoring/        # Vital signs and patient monitoring
+├── surgery/                # Surgery scheduling and tracking
+├── inventory/              # Supply chain and stock management
+├── staff/                  # Staff profiles, shifts, and roles
+├── medical_records/        # Encounters and clinical documents
+├── reporting/              # Analytics and custom reports
+├── integration/            # Third-party API integrations
+├── hospital/               # Wards, rooms, beds, and services
+├── notifications/          # SMS, Email, WhatsApp notifications
+├── templates/              # Shared templates and partials
+├── static/                 # CSS, JS, and assets
+├── remedium_hms/           # Project settings and configuration
+├── docs/                   # Documentation
+└── design/                 # Logo and prototypes
+```
 
 ---
 
-## 🤝 Contributing & Support
+## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
+Contributions are welcome! Please read:
 
-**Remedium HMS** — *Empowering Healthcare, One System at a Time.*
+- [Contributing Guide](CONTRIBUTING.md)
+- [Security Policy](SECURITY.md)
+- [Changelog](CHANGELOG.md)
 
-Built with ❤️ by [neoastra303](https://github.com/neoastra303)
+---
+
+## License
+
+This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+
+**Built with Django & Python**
+
+[neoastra303](https://github.com/neoastra303)
+
+</div>

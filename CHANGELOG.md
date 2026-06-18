@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased] - 2026-06-18
 
 ### Added
+- add public landing page with hero, features, and security showcase ([`60c5084`])
 - add pagination to document list, create encounter detail template ([`d9c6544`])
 - comprehensive UX feedback system and codebase cleanup ([`5265948`])
 - standardize dashboard prototypes with global UI components, enhanced branding, and improved CSS design system ([`742c9fe`])

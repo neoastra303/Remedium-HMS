@@ -15,9 +15,10 @@
             </p>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <span class="d-flex align-items-center gap-1 text-success small fw-medium bg-success bg-opacity-10 px-3 py-1 rounded-pill">
-                <span class="status-dot bg-success"></span>Online
-            </span>
+            <span class="text-muted small" id="lastUpdated" title="Last refreshed"></span>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="location.reload()" title="Refresh dashboard">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
         </div>
     </div>
 
@@ -60,6 +61,32 @@
             </div>
         </div>
         {% stat_card icon="bi-person-badge" label="Active Staff" value=active_staff sub_text=dept_stats|length|stringformat:"s"|add:" departments · "|add:on_duty_today|stringformat:"s"|add:" on duty" color="amber" %}
+    </div>
+
+    {# ── Charts Row ── #}
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header-clean d-flex align-items-center gap-2">
+                    <i class="bi bi-graph-up text-primary"></i>
+                    <span class="fw-semibold">Revenue Trend (7 Days)</span>
+                </div>
+                <div class="card-body p-3">
+                    <canvas id="revenueChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header-clean d-flex align-items-center gap-2">
+                    <i class="bi bi-bar-chart text-info"></i>
+                    <span class="fw-semibold">Appointments This Week</span>
+                </div>
+                <div class="card-body p-3">
+                    <canvas id="appointmentsChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row g-4">
@@ -215,4 +242,75 @@
     </div>
 
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Last updated timestamp
+    var lastUpdated = document.getElementById('lastUpdated');
+    if (lastUpdated) {
+        var now = new Date();
+        lastUpdated.textContent = 'Updated: ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    }
+
+    // Revenue Trend Chart
+    var revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx) {
+        new Chart(revenueCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: [{% for label in chart_day_labels %}"{{ label }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [{% for val in chart_revenue_data %}{{ val }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37,99,235,0.08)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    pointHoverRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                    y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, callback: function(v) { return '$' + v; } } }
+                }
+            }
+        });
+    }
+
+    // Appointments Bar Chart
+    var apptCtx = document.getElementById('appointmentsChart');
+    if (apptCtx) {
+        new Chart(apptCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Appointments',
+                    data: [{% for val in chart_appointments_data %}{{ val }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    backgroundColor: 'rgba(123,47,247,0.7)',
+                    borderRadius: 6,
+                    barThickness: 24
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                    y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, stepSize: 1 }, beginAtZero: true }
+                }
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

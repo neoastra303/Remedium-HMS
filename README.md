@@ -13,7 +13,7 @@
 [![Tests](https://img.shields.io/badge/Tests-113_Passing-brightgreen?style=for-the-badge)](https://github.com/neoastra303/Remedium-HMS)
 [![Coverage](https://img.shields.io/badge/Coverage-83%25-success?style=for-the-badge)](https://github.com/neoastra303/Remedium-HMS)
 
-[**Explore API Docs**](http://localhost:8000/api/v1/docs/) • [**Quick Start**](#-quick-start) • [**Role Dashboards**](#-intelligent-role-dashboards) • [**Architecture**](#-architectural-vision)
+[**Explore API Docs**](http://localhost:8000/api/v1/docs/) • [**Quick Start**](docs/quick-start.md) • [**Role Dashboards**](#-intelligent-role-dashboards) • [**Architecture**](docs/architecture.md)
 
 </div>
 
@@ -239,6 +239,22 @@ We maintain a high bar for reliability:
 python -m pytest --cov=. --cov-report=term-missing
 ```
 **Current Status:** 113+ Tests • 83% Coverage • Zero Critical Vulnerabilities.
+
+---
+
+## 📚 Documentation
+
+Detailed documentation is available in the [`docs/`](docs/) folder:
+
+| Document | Description |
+|----------|-------------|
+| [Quick Start](docs/quick-start.md) | Get running in 5 minutes |
+| [Setup Guide](docs/setup.md) | Complete setup instructions |
+| [Architecture](docs/architecture.md) | System design & patterns |
+| [API Reference](docs/api.md) | REST API endpoints & usage |
+| [Deployment](docs/deployment.md) | Production deployment guide |
+| [Frontend Integration](docs/frontend-integration.md) | Frontend-backend integration |
+| [Frontend-Backend Summary](docs/frontend-backend-integration.md) | API-to-JS module mapping |
 
 ---
 

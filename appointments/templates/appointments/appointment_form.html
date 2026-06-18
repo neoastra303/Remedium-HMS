@@ -2,16 +2,119 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<h1 class="mb-4">Schedule Appointment</h1>
-
-<div class="card mb-4">
-    <div class="card-body">
-        <form method="post" novalidate>
-            {% csrf_token %}
-            {{ form|crispy }}
-            <button type="submit" class="btn btn-primary">Save Appointment</button>
-            <a href="{% url 'appointment_list' %}" class="btn btn-secondary">Cancel</a>
-        </form>
+<div class="d-flex align-items-center mb-4">
+    <a href="{% url 'appointment_list' %}" class="btn btn-sm btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i></a>
+    <div>
+        <h4 class="fw-bold mb-0">{% if object %}Edit Appointment{% else %}Schedule Appointment{% endif %}</h4>
+        <p class="text-muted small mb-0">{% if object %}Update appointment details{% else %}Book a new patient appointment{% endif %}</p>
     </div>
 </div>
+
+<form method="post" novalidate id="appointmentForm" data-validate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <div>{{ form.non_field_errors }}</div>
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
+
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3 px-4">
+                    <span class="fw-bold small text-uppercase text-muted">
+                        <i class="bi bi-person me-2 text-primary"></i>Patient &amp; Provider
+                    </span>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.patient.id_for_label }}" class="form-label">Patient</label>
+                            {{ form.patient }}
+                            {% if form.patient.errors %}
+                            <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ form.patient.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.doctor.id_for_label }}" class="form-label">Doctor</label>
+                            {{ form.doctor }}
+                            {% if form.doctor.errors %}
+                            <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ form.doctor.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3 px-4">
+                    <span class="fw-bold small text-uppercase text-muted">
+                        <i class="bi bi-calendar-event me-2 text-info"></i>Schedule
+                    </span>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="{{ form.appointment_date.id_for_label }}" class="form-label">Date &amp; Time</label>
+                            {{ form.appointment_date }}
+                            {% if form.appointment_date.errors %}
+                            <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ form.appointment_date.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}
+                            <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ form.status.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.arrived_at.id_for_label }}" class="form-label">Arrived At</label>
+                            {{ form.arrived_at }}
+                            {% if form.arrived_at.errors %}
+                            <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ form.arrived_at.errors.0 }}</div>
+                            {% endif %}
+                            {% if form.arrived_at.help_text %}
+                            <div class="text-muted small mt-1">{{ form.arrived_at.help_text }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3 px-4">
+                    <span class="fw-bold small text-uppercase text-muted">
+                        <i class="bi bi-journal-text me-2 text-warning"></i>Details
+                    </span>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="{{ form.reason.id_for_label }}" class="form-label">Reason for Visit</label>
+                            {{ form.reason }}
+                            {% if form.reason.errors %}
+                            <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ form.reason.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+            <i class="bi bi-check-circle me-1"></i>{% if object %}Update Appointment{% else %}Save Appointment{% endif %}
+        </button>
+        <a href="{% url 'appointment_list' %}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
 {% endblock %}

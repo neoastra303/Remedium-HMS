@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased] - 2026-06-18
 
 ### Added
+- improve dashboard UX with timestamps, notification bell, and mobile nav ([`0e4aaca`])
 - add revenue trend and appointment charts to admin dashboard ([`f471c1a`])
 - add public landing page with hero, features, and security showcase ([`60c5084`])
 - add pagination to document list, create encounter detail template ([`d9c6544`])

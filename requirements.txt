@@ -1,4 +1,5 @@
-# Local development — includes all production and dev/test dependencies
-# For production deployments use requirements-prod.txt
+# WARNING: This file is for LOCAL DEVELOPMENT ONLY.
+# It pulls in dev/test dependencies (pytest, coverage, etc.).
+# For production deployments, use: pip install -r requirements-prod.txt
 -r requirements-prod.txt
 -r requirements-dev.txt

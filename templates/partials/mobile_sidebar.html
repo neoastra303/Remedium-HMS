@@ -1,0 +1,102 @@
+{% load static %}
+<!-- Mobile Sidebar Navigation -->
+<div class="mobile-sidebar-overlay" id="mobileSidebarOverlay"></div>
+<nav class="mobile-sidebar" id="mobileSidebar" aria-label="Mobile navigation">
+    <div class="mobile-sidebar-header">
+        <a class="mobile-sidebar-brand" href="{% url 'home' %}">Remedium HMS</a>
+        <button class="btn-close" id="closeMobileSidebar" aria-label="Close navigation"></button>
+    </div>
+    <div class="mobile-sidebar-body">
+        <ul class="mobile-sidebar-nav">
+            <li>
+                <a class="mobile-nav-item {% if request.resolver_match.app_name == 'core' and request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+
+            {% if is_hms_admin or is_hms_doctor or is_hms_nurse or is_hms_receptionist or is_hms_surgeon or is_hms_anesthesiologist or is_hms_radiologist %}
+            <li class="mobile-nav-section">Clinical</li>
+            <li>
+                <a class="mobile-nav-item {% if request.resolver_match.app_name == 'patients' %}active{% endif %}" href="{% url 'patient_list' %}">
+                    <i class="bi bi-people"></i> Patients
+                </a>
+            </li>
+            <li>
+                <a class="mobile-nav-item {% if request.resolver_match.app_name == 'appointments' %}active{% endif %}" href="{% url 'appointment_list' %}">
+                    <i class="bi bi-calendar-event"></i> Appointments
+                </a>
+            </li>
+            <li>
+                <a class="mobile-nav-item {% if request.resolver_match.app_name == 'surgery' %}active{% endif %}" href="{% url 'surgery_list' %}">
+                    <i class="bi bi-scissors"></i> Surgery
+                </a>
+            </li>
+            {% if is_hms_admin or is_hms_doctor or is_hms_nurse %}
+            <li>
+                <a class="mobile-nav-item {% if request.resolver_match.app_name == 'care_monitoring' %}active{% endif %}" href="{% url 'care_monitoring:patientcare_list' %}">
+                    <i class="bi bi-heart-pulse"></i> Vitals / Care
+                </a>
+            </li>
+            {% endif %}
+            {% endif %}
+
+            {% if is_hms_admin or is_hms_pharmacist or is_hms_lab_tech %}
+            <li class="mobile-nav-section">Operations</li>
+            {% if is_hms_admin %}
+            <li>
+                <a class="mobile-nav-item {% if request.resolver_match.app_name == 'inventory' %}active{% endif %}" href="{% url 'inventoryitem_list' %}">
+                    <i class="bi bi-box-seam"></i> Inventory
+                </a>
+            </li>
+            {% endif %}
+            {% if is_hms_admin or is_hms_pharmacist %}
+            <li>
+                <a class="mobile-nav-item {% if request.resolver_match.app_name == 'pharmacy' %}active{% endif %}" href="{% url 'prescription_list' %}">
+                    <i class="bi bi-capsule"></i> Pharmacy
+                </a>
+            </li>
+            {% endif %}
+            {% if is_hms_admin or is_hms_lab_tech %}
+            <li>
+                <a class="mobile-nav-item {% if request.resolver_match.app_name == 'laboratory' %}active{% endif %}" href="{% url 'labtest_list' %}">
+                    <i class="bi bi-microscope"></i> Laboratory
+                </a>
+            </li>
+            {% endif %}
+            {% endif %}
+
+            {% if is_hms_admin %}
+            <li class="mobile-nav-section">Administration</li>
+            <li>
+                <a class="mobile-nav-item {% if request.resolver_match.app_name == 'staff' %}active{% endif %}" href="{% url 'staff_list' %}">
+                    <i class="bi bi-person-badge"></i> Staff
+                </a>
+            </li>
+            <li>
+                <a class="mobile-nav-item {% if request.resolver_match.app_name == 'reporting' %}active{% endif %}" href="{% url 'report_list' %}">
+                    <i class="bi bi-bar-chart"></i> Reports
+                </a>
+            </li>
+            <li>
+                <a class="mobile-nav-item" href="{% url 'notification_list' %}">
+                    <i class="bi bi-journal-text"></i> Audit Logs
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="mobile-sidebar-footer">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="avatar-circle" style="width:36px;height:36px;font-size:0.7rem;">
+                {{ user.first_name|first|default:user.username|first }}{{ user.last_name|first }}
+            </div>
+            <div>
+                <div class="fw-bold small">{{ user.get_full_name|default:user.username }}</div>
+                <div class="text-muted" style="font-size:0.7rem;">{{ user.staff_profile.get_role_display|default:"System User" }}</div>
+            </div>
+        </div>
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm w-100 rounded-pill">
+            <i class="bi bi-box-arrow-right me-1"></i> Sign Out
+        </a>
+    </div>
+</nav>

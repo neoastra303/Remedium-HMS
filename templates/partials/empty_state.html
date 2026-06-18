@@ -2,5 +2,10 @@
     <td colspan="{{ colspan|default:5 }}" class="text-center py-5">
         <i class="bi {{ icon|default:'bi-inbox' }}" style="font-size:2.5rem;color:#cbd5e1;display:block;margin-bottom:0.75rem;"></i>
         <p class="text-muted small mb-0">{{ message|default:"No items found." }}</p>
+        {% if cta_url and cta_text %}
+        <a href="{{ cta_url }}" class="btn btn-sm btn-primary mt-3">
+            <i class="bi {{ cta_icon|default:'bi-plus-circle' }} me-1"></i>{{ cta_text }}
+        </a>
+        {% endif %}
     </td>
 </tr>

@@ -15,9 +15,10 @@
             </p>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <span class="d-flex align-items-center gap-1 text-success small fw-medium bg-success bg-opacity-10 px-3 py-1 rounded-pill">
-                <span class="status-dot bg-success"></span>On Shift
-            </span>
+            <span class="text-muted small" id="lastUpdated" title="Last refreshed"></span>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="location.reload()" title="Refresh dashboard">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
         </div>
     </div>
 
@@ -186,4 +187,16 @@
     </div>
 
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var lastUpdated = document.getElementById('lastUpdated');
+    if (lastUpdated) {
+        var now = new Date();
+        lastUpdated.textContent = 'Updated: ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    }
+});
+</script>
 {% endblock %}

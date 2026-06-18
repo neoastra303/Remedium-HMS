@@ -1,13 +1,23 @@
 <div class="col-6 col-md-3">
     <div class="stat-card stat-card--{{ color }}">
-        <div class="stat-card__icon"><i class="bi {{ icon }}"></i></div>
+        <div class="d-flex justify-content-between align-items-start">
+            <div class="stat-card__icon"><i class="bi {{ icon }}"></i></div>
+            {% if trend_value %}
+            <span class="stat-card__trend stat-card__trend--{{ trend_direction|default:'neutral' }}">
+                {% if trend_direction == 'up' %}<i class="bi bi-arrow-up"></i>
+                {% elif trend_direction == 'down' %}<i class="bi bi-arrow-down"></i>
+                {% else %}<i class="bi bi-dash"></i>{% endif %}
+                {{ trend_value }}
+            </span>
+            {% endif %}
+        </div>
         <div class="stat-card__label">{{ label }}</div>
         <div class="stat-card__value">{{ value }}</div>
         {% if sub_badges %}
         <div class="stat-card__sub">
             {% for badge in sub_badges %}
             <span class="text-{{ badge.color|default:'muted' }}">{{ badge.text }}</span>
-            {% if not forloop.last %}<span class="mx-1">·</span>{% endif %}
+            {% if not forloop.last %}<span class="mx-1">&middot;</span>{% endif %}
             {% endfor %}
         </div>
         {% elif sub_text %}

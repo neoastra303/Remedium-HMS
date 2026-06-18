@@ -90,6 +90,12 @@
                     <span class="spinner-border spinner-border-sm me-2"></span>Signing in…
                 </span>
             </button>
+            <div id="loginTimeout" class="d-none mt-2">
+                <small class="text-muted d-flex align-items-center justify-content-center">
+                    <i class="bi bi-hourglass-split me-1"></i>
+                    Server may be responding slowly. Please wait…
+                </small>
+            </div>
         </form>
 
         <div class="text-center mt-4">
@@ -116,9 +122,23 @@
             }
         }
         document.getElementById('loginForm').addEventListener('submit', function() {
-            document.getElementById('loginText').classList.add('d-none');
-            document.getElementById('loginSpinner').classList.remove('d-none');
-            document.getElementById('loginBtn').disabled = true;
+            var loginText = document.getElementById('loginText');
+            var loginSpinner = document.getElementById('loginSpinner');
+            var loginBtn = document.getElementById('loginBtn');
+            var loginTimeout = document.getElementById('loginTimeout');
+            loginText.classList.add('d-none');
+            loginSpinner.classList.remove('d-none');
+            loginBtn.disabled = true;
+
+            // Show timeout message after 10 seconds
+            var timeoutId = setTimeout(function() {
+                if (loginTimeout) loginTimeout.classList.remove('d-none');
+            }, 10000);
+
+            // Cancel timeout if page unloads (successful login)
+            window.addEventListener('beforeunload', function() {
+                clearTimeout(timeoutId);
+            });
         });
     </script>
 </body>

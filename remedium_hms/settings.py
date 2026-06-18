@@ -100,12 +100,18 @@ POSTGRES_ENGINES = {
 }
 
 if DB_ENGINE in POSTGRES_ENGINES:
+    _db_password = config("DB_PASSWORD", default="")
+    if not _db_password:
+        raise ValueError(
+            "DB_PASSWORD environment variable must be set when using PostgreSQL. "
+            "Using default passwords like 'postgres' is insecure and not allowed."
+        )
     DATABASES = {
         "default": {
             "ENGINE": DB_ENGINE,
             "NAME": config("DB_NAME", default="remedium_hms"),
             "USER": config("DB_USER", default="postgres"),
-            "PASSWORD": config("DB_PASSWORD", default="postgres"),
+            "PASSWORD": _db_password,
             "HOST": config("DB_HOST", default="localhost"),
             "PORT": config("DB_PORT", default="5432"),
         }
@@ -333,8 +339,7 @@ LOGGING = {
 
 # Create logs directory if it doesn't exist
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
-if not os.path.exists(LOGS_DIR):
-    os.makedirs(LOGS_DIR)
+os.makedirs(LOGS_DIR, exist_ok=True)
 
 # Cache Configuration (Redis)
 # Cache Configuration with Redis fallback to LocMemCache
@@ -380,7 +385,7 @@ X_FRAME_OPTIONS = "DENY"
 SECURE_CONTENT_TYPE_NOSNIFF = True
 REFERRER_POLICY = "same-origin"
 SESSION_COOKIE_HTTPONLY = True
-CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

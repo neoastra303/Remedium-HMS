@@ -14,12 +14,18 @@ if not ALLOWED_HOSTS or ALLOWED_HOSTS == [""]:
     raise ValueError("ALLOWED_HOSTS must be set in production")
 
 # Configure a production database (e.g., PostgreSQL)
+_db_password = config("DB_PASSWORD", default="")
+if not _db_password:
+    raise ValueError(
+        "DB_PASSWORD environment variable must be set in production. "
+        "Using default passwords is insecure and not allowed."
+    )
 DATABASES = {
     "default": {
         "ENGINE": config("DB_ENGINE", default="django.db.backends.postgresql"),
         "NAME": config("DB_NAME", default="remedium_hms"),
         "USER": config("DB_USER", default="remedium_user"),
-        "PASSWORD": config("DB_PASSWORD", default="secure_password"),
+        "PASSWORD": _db_password,
         "HOST": config("DB_HOST", default="localhost"),
         "PORT": config("DB_PORT", default="5432"),
     }
@@ -40,7 +46,7 @@ CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", default=True, cast=bool)
 SECURE_CONTENT_TYPE_NOSNIFF = True
 REFERRER_POLICY = "same-origin"
 SESSION_COOKIE_HTTPONLY = True
-CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
 # Note: SECURE_BROWSER_XSS_FILTER and SECURE_CONTENT_TYPE_NOSNIFF are deprecated in Django 4.0+

@@ -2,6 +2,7 @@ from rest_framework.views import exception_handler
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer
+from rest_framework.throttling import AnonRateThrottle
 import logging
 
 logger = logging.getLogger(__name__)
@@ -78,3 +79,21 @@ def custom_exception_handler(exc, context):
         )
 
     return response
+
+
+class LoginThrottle(AnonRateThrottle):
+    """Throttle for login attempts - uses the 'login_attempts' rate."""
+    scope = "login_attempts"
+
+
+def throttled_token_obtain_pair_view():
+    """
+    Returns a TokenObtainPairView with login_attempts throttling applied.
+    Import this in urls.py to replace the default TokenObtainPairView.
+    """
+    from rest_framework_simplejwt.views import TokenObtainPairView
+
+    class ThrottledTokenObtainPairView(TokenObtainPairView):
+        throttle_classes = [LoginThrottle]
+
+    return ThrottledTokenObtainPairView.as_view()

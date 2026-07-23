@@ -5,8 +5,8 @@ from rest_framework.exceptions import ValidationError
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from .models import Patient
-from .serializers import PatientSerializer
-from core.permissions import IsClinicalStaff
+from .serializers import PatientSerializer, PatientBriefSerializer
+from core.permissions import IsClinicalStaff, IsAdminUser
 from core.serializers import StandardErrorSerializer
 
 
@@ -16,7 +16,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 @extend_schema_view(
     list=extend_schema(
         summary="List all patients",
-        description="Retrieve a paginated list of all patients in the system.",
+        description="Retrieve a paginated list of all patients. Clinical staff receive the full record; admins and receptionists receive a brief summary.",
     ),
     retrieve=extend_schema(
         summary="Get patient details",
@@ -53,6 +53,24 @@ class PatientViewSet(viewsets.ModelViewSet):
     ordering_fields = ["admission_date", "first_name", "last_name"]
     ordering = ["-admission_date"]
 
+    # Roles that receive the brief (non-PHI) serializer on list/retrieve
+    _BRIEF_ROLES = {"RECEPTIONIST", "ADMIN"}
+
+    def get_serializer_class(self):
+        """
+        Return PatientBriefSerializer for non-clinical staff (e.g. receptionist,
+        admin) on list/retrieve actions, and PatientFullSerializer for clinical staff.
+        """
+        if self.action in ("list", "retrieve"):
+            user = self.request.user
+            try:
+                role = user.staff_profile.role
+            except AttributeError:
+                role = None
+            if role in self._BRIEF_ROLES and not user.is_superuser:
+                return PatientBriefSerializer
+        return PatientSerializer
+
     @extend_schema(
         summary="List admitted patients",
         description="Retrieve a list of all patients currently admitted to the hospital (those with an admission date but no discharge date).",
@@ -83,3 +101,4 @@ class PatientViewSet(viewsets.ModelViewSet):
         patient.save()
         serializer = self.get_serializer(patient)
         return Response(serializer.data)
+

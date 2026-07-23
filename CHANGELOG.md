@@ -5,7 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] - 2026-06-18
+## [Unreleased] - 2026-07-23
 
 ### Added
 - improve dashboard UX with timestamps, notification bell, and mobile nav ([`0e4aaca`])
@@ -46,6 +46,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- redesign README with modern layout and professional structure ([`85a8fb5`])
 - standardize appointment form layout and improve DevOps config ([`550bfed`])
 - harden CSRF, add login throttling, enforce password validation ([`036d507`])
 - add template rendering tests for all apps and fix conftest ([`a36fa65`])

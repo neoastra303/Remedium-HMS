@@ -62,11 +62,17 @@ class Invoice(RemediumBaseModel):
     history = HistoricalRecords()
 
     def save(self, *args, **kwargs):
-        """Auto-generate invoice number if not set."""
+        """Auto-generate invoice number and validate before saving."""
         if not self.invoice_number:
             year = timezone.now().year
             seq = InvoiceCounter.next_seq(year)
             self.invoice_number = f"INV-{year}-{seq:05d}"
+        # Enforce model-level validation so API calls (which bypass forms) are
+        # also protected against invalid dates and negative amounts.
+        # Skip when update_fields is set — those are targeted internal saves
+        # (e.g. the payment signal updating only `paid`) that don't need re-validation.
+        if not kwargs.get("update_fields"):
+            self.full_clean()
         return super().save(*args, **kwargs)
 
     def update_total(self):

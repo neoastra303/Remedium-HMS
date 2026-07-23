@@ -46,6 +46,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **staff**: Add tests and improve code quality for staff app ([`07a8222`])
 
 ### Changed
+- extract homepage role context helpers and wire PatientBriefSerializer ([`0327738`])
 - add pytest step to test job and fix SECRET_KEY length ([`94aa29b`])
 - redesign README with modern layout and professional structure ([`85a8fb5`])
 - standardize appointment form layout and improve DevOps config ([`550bfed`])

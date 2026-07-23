@@ -121,9 +121,6 @@ class Command(BaseCommand):
                 try:
                     app_label_perm, codename_perm = perm_codename.split("_", 1)
                     action, model_name = codename_perm.split("_", 1)
-                    self.stdout.write(
-                        f"DEBUG: Looking for ContentType with app_label={app_label_perm}, model={model_name}"
-                    )
                     content_type = ContentType.objects.get(
                         app_label=app_label_perm, model=model_name
                     )

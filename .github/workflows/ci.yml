@@ -20,7 +20,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      SECRET_KEY: ci-test-secret-key
+      SECRET_KEY: ci-test-secret-key-that-is-long-enough-for-jwt-hmac-sha256-minimum-32-bytes
       FIELD_ENCRYPTION_KEY: a0E5WUtzUi1XS2l5c0x5c0hPUWc5dkw4Z1RVVTNkYlM=
       DEBUG: False
     steps:
@@ -31,6 +31,7 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python manage.py collectstatic --noinput
       - run: python manage.py check --deploy --fail-level WARNING
+      - run: pytest --tb=short -q
 
   security:
     runs-on: ubuntu-latest

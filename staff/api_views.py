@@ -17,8 +17,9 @@ class StaffViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def medical_staff(self, request):
-        """Get all medical staff."""
-        medical = self.queryset.filter(is_medical_staff=True)
+        """Get all medical staff (DB-level filter, not Python property)."""
+        medical_roles = ["DOCTOR", "NURSE", "SURGEON", "ANESTHESIOLOGIST", "RADIOLOGIST"]
+        medical = self.queryset.filter(role__in=medical_roles)
         serializer = self.get_serializer(medical, many=True)
         return Response(serializer.data)
 
